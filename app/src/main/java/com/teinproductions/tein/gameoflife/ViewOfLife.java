@@ -16,6 +16,8 @@ public class ViewOfLife extends View {
     private int horCells = 10;
     private boolean[][] field = new boolean[horCells][verCells];
 
+    private boolean running = false;
+
     /**
      * The rules of Game of Life:
      * - A dead cell with exactly three living neighbours, awakens.
@@ -32,7 +34,6 @@ public class ViewOfLife extends View {
         for (int y = 0; y < fieldCache.length; y++) {
             for (int x = 0; x < fieldCache[0].length; x++) {
                 int neighbours = livingNeighbours(fieldCache, x, y);
-                Log.d("neighbours", "(" + x + "," + y + ") " + neighbours);
                 if (neighbours > 3 || neighbours < 2) field[y][x] = false;
                 if (neighbours == 3) field[y][x] = true;
             }
@@ -85,6 +86,41 @@ public class ViewOfLife extends View {
         }
 
         return livingNeighbours;
+    }
+
+    public void start() {
+        Log.d("START", "start() begin");
+        if (running) return;
+        running = true;
+        Log.d("START", "start()");
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (1 == 1) {
+                    Log.d("START", "in thread");
+                    Log.d("START", "running");
+                    if (!running) return;
+
+                    post(new Runnable() {
+                        @Override
+                        public void run() {
+                            nextGeneration();
+                        }
+                    });
+
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
+    }
+
+    public void stop() {
+        running = false;
     }
 
     @Override
@@ -140,11 +176,6 @@ public class ViewOfLife extends View {
         if (getWidth() % pixelsPerCell == 0) horCells--;
 
         field = new boolean[horCells][verCells];
-
-        Log.d("lollipop", "getWidth(): " + getWidth());
-        Log.d("lollipop", "getHeight(): " + getHeight());
-        Log.d("lollipop", "verCells: " + verCells);
-        Log.d("lollipop", "horCells: " + horCells);
     }
 
     @Override
@@ -153,11 +184,6 @@ public class ViewOfLife extends View {
             try {
                 int x = (int) Math.floor(event.getX() / pixelsPerCell);
                 int y = (int) Math.floor(event.getY() / pixelsPerCell);
-
-                Log.d("lollipop", "event.getX(): " + event.getX());
-                Log.d("lollipop", "event.getY(): " + event.getY());
-                Log.d("lollipop", "x: " + x);
-                Log.d("lollipop", "y: " + y);
 
                 field[x][y] = !field[x][y];
                 invalidate();
@@ -169,11 +195,6 @@ public class ViewOfLife extends View {
             try {
                 int x = (int) Math.floor(event.getX() / pixelsPerCell);
                 int y = (int) Math.floor(event.getY() / pixelsPerCell);
-
-                Log.d("lollipop", "event.getX(): " + event.getX());
-                Log.d("lollipop", "event.getY(): " + event.getY());
-                Log.d("lollipop", "x: " + x);
-                Log.d("lollipop", "y: " + y);
 
                 field[x][y] = true;
                 invalidate();
@@ -193,6 +214,9 @@ public class ViewOfLife extends View {
         invalidate();
     }
 
+    public boolean isRunning() {
+        return running;
+    }
 
     public ViewOfLife(Context context) {
         super(context);
