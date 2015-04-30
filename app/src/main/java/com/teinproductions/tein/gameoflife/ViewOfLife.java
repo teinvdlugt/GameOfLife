@@ -5,15 +5,18 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 
 public class ViewOfLife extends View {
 
-    private int pixelsPerCell = 50;
+    private int pixelsPerCell = 70;
 
     private int verCells = 10;
     private int horCells = 10;
     private boolean[][] field = new boolean[horCells][verCells];
+
+    private boolean stillTracking = false;
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -69,8 +72,6 @@ public class ViewOfLife extends View {
 
         field = new boolean[horCells][verCells];
 
-        generateRandomField();
-
         Log.d("lollipop", "getWidth(): " + getWidth());
         Log.d("lollipop", "getHeight(): " + getHeight());
         Log.d("lollipop", "verCells: " + verCells);
@@ -86,6 +87,43 @@ public class ViewOfLife extends View {
                 field[y][x] = (int) Math.floor(Math.random() * 2) == 0;
             }
         }
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            try {
+                int x = (int) Math.floor(event.getX() / pixelsPerCell);
+                int y = (int) Math.floor(event.getY() / pixelsPerCell);
+
+                Log.d("lollipop", "event.getX(): " + event.getX());
+                Log.d("lollipop", "event.getY(): " + event.getY());
+                Log.d("lollipop", "x: " + x);
+                Log.d("lollipop", "y: " + y);
+
+                field[x][y] = !field[x][y];
+                invalidate();
+                return true;
+            } catch (ArrayIndexOutOfBoundsException e) {
+                return super.onTouchEvent(event);
+            }
+        } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+            try {
+                int x = (int) Math.floor(event.getX() / pixelsPerCell);
+                int y = (int) Math.floor(event.getY() / pixelsPerCell);
+
+                Log.d("lollipop", "event.getX(): " + event.getX());
+                Log.d("lollipop", "event.getY(): " + event.getY());
+                Log.d("lollipop", "x: " + x);
+                Log.d("lollipop", "y: " + y);
+
+                field[x][y] = true;
+                invalidate();
+                return true;
+            } catch (ArrayIndexOutOfBoundsException e) {
+                return super.onTouchEvent(event);
+            }
+        } else return super.onTouchEvent(event);
     }
 
     public int getPixelsPerCell() {
