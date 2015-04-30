@@ -16,7 +16,76 @@ public class ViewOfLife extends View {
     private int horCells = 10;
     private boolean[][] field = new boolean[horCells][verCells];
 
-    private boolean stillTracking = false;
+    /**
+     * The rules of Game of Life:
+     * - A dead cell with exactly three living neighbours, awakens.
+     * - A living cell with two or three living neighbours, stay alive.
+     * - A living cell with less than two living neighbours, dies.
+     * - A living cell with more than three living neighbours, dies.
+     */
+    public void nextGeneration() {
+        boolean[][] fieldCache = new boolean[field.length][field[0].length];
+        for (int y = 0; y < field.length; y++) {
+            System.arraycopy(field[y], 0, fieldCache[y], 0, field[0].length);
+        }
+
+        for (int y = 0; y < fieldCache.length; y++) {
+            for (int x = 0; x < fieldCache[0].length; x++) {
+                int neighbours = livingNeighbours(fieldCache, x, y);
+                Log.d("neighbours", "(" + x + "," + y + ") " + neighbours);
+                if (neighbours > 3 || neighbours < 2) field[y][x] = false;
+                if (neighbours == 3) field[y][x] = true;
+            }
+        }
+
+        invalidate();
+    }
+
+    public int livingNeighbours(boolean[][] field, int x, int y) {
+        int livingNeighbours = 0;
+
+        try {
+            if (field[y - 1][x - 1]) livingNeighbours++;
+        } catch (ArrayIndexOutOfBoundsException ignored) {
+        }
+
+        try {
+            if (field[y - 1][x]) livingNeighbours++;
+        } catch (ArrayIndexOutOfBoundsException ignored) {
+        }
+
+        try {
+            if (field[y - 1][x + 1]) livingNeighbours++;
+        } catch (ArrayIndexOutOfBoundsException ignored) {
+        }
+
+        try {
+            if (field[y][x - 1]) livingNeighbours++;
+        } catch (ArrayIndexOutOfBoundsException ignored) {
+        }
+
+        try {
+            if (field[y][x + 1]) livingNeighbours++;
+        } catch (ArrayIndexOutOfBoundsException ignored) {
+        }
+
+        try {
+            if (field[y + 1][x - 1]) livingNeighbours++;
+        } catch (ArrayIndexOutOfBoundsException ignored) {
+        }
+
+        try {
+            if (field[y + 1][x]) livingNeighbours++;
+        } catch (ArrayIndexOutOfBoundsException ignored) {
+        }
+
+        try {
+            if (field[y + 1][x + 1]) livingNeighbours++;
+        } catch (ArrayIndexOutOfBoundsException ignored) {
+        }
+
+        return livingNeighbours;
+    }
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -76,17 +145,6 @@ public class ViewOfLife extends View {
         Log.d("lollipop", "getHeight(): " + getHeight());
         Log.d("lollipop", "verCells: " + verCells);
         Log.d("lollipop", "horCells: " + horCells);
-    }
-
-    /**
-     * For debugging
-     */
-    private void generateRandomField() {
-        for (int y = 0; y < field.length; y++) {
-            for (int x = 0; x < field[0].length; x++) {
-                field[y][x] = (int) Math.floor(Math.random() * 2) == 0;
-            }
-        }
     }
 
     @Override
