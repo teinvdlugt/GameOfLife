@@ -3,6 +3,7 @@ package com.teinproductions.tein.gameoflife;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -10,7 +11,7 @@ import android.view.View;
 
 public class ViewOfLife extends View {
 
-    private int pixelsPerCell = 70;
+    private int pixelsPerCell = 30;
 
     private int verCells = 10;
     private int horCells = 10;
@@ -178,6 +179,9 @@ public class ViewOfLife extends View {
         field = new boolean[horCells][verCells];
     }
 
+    private float previousMovePositionX = -1;
+    private float previousMovePositionY = -1;
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -185,7 +189,10 @@ public class ViewOfLife extends View {
                 int x = (int) Math.floor(event.getX() / pixelsPerCell);
                 int y = (int) Math.floor(event.getY() / pixelsPerCell);
 
-                field[x][y] = !field[x][y];
+                previousMovePositionX = event.getX();
+                previousMovePositionY = event.getY();
+
+                field[x][y] = true;
                 invalidate();
                 return true;
             } catch (ArrayIndexOutOfBoundsException e) {
@@ -196,6 +203,11 @@ public class ViewOfLife extends View {
                 int x = (int) Math.floor(event.getX() / pixelsPerCell);
                 int y = (int) Math.floor(event.getY() / pixelsPerCell);
 
+                allCellsOnLine(event);
+
+                previousMovePositionX = event.getX();
+                previousMovePositionY = event.getY();
+
                 field[x][y] = true;
                 invalidate();
                 return true;
@@ -203,6 +215,39 @@ public class ViewOfLife extends View {
                 return super.onTouchEvent(event);
             }
         } else return super.onTouchEvent(event);
+    }
+
+    // TODO needs enhancement!
+    private void allCellsOnLine(MotionEvent event) {
+        float xDiff = event.getX() - previousMovePositionX;
+        float yDiff = event.getY() - previousMovePositionY;
+
+        double lengthOfLine = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+        int amountOfCells = (int) Math.ceil(lengthOfLine / pixelsPerCell);
+
+        if (amountOfCells < 1) return;
+
+        float xSpacing = xDiff / amountOfCells;
+        float ySpacing = yDiff / amountOfCells;
+
+        float currX = previousMovePositionX, currY = previousMovePositionY;
+        while (currX <= event.getX() && currY <= event.getY()) {
+            long downTime = SystemClock.uptimeMillis();
+            long eventTime = SystemClock.uptimeMillis() + 100;
+            int metaState = 0;
+
+            MotionEvent motionEvent = MotionEvent.obtain(
+                    downTime, eventTime,
+                    MotionEvent.ACTION_DOWN,
+                    currX, currY, metaState);
+
+            dispatchTouchEvent(motionEvent);
+
+            Log.d("conway", "in while loop");
+
+            currX += xSpacing;
+            currY += ySpacing;
+        }
     }
 
     public int getPixelsPerCell() {
