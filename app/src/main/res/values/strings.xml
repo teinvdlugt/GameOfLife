@@ -3,4 +3,8 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="xs_pencil">Pencil</string>
+    <string name="xs_eraser">Eraser</string>
+    <string name="xs_clear">Clear</string>
+    <string name="xs_start_or_stop">Start or stop</string>
 </resources>

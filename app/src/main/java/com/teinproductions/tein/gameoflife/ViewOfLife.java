@@ -19,6 +19,10 @@ public class ViewOfLife extends View {
 
     private boolean running = false;
 
+    public enum EditMode {ADD, REMOVE}
+
+    private EditMode editMode = EditMode.ADD;
+
     /**
      * The rules of Game of Life:
      * - A dead cell with exactly three living neighbours, awakens.
@@ -192,7 +196,14 @@ public class ViewOfLife extends View {
                 previousMovePositionX = event.getX();
                 previousMovePositionY = event.getY();
 
-                field[x][y] = true;
+                switch (editMode) {
+                    case ADD:
+                        field[x][y] = true;
+                        break;
+                    case REMOVE:
+                        field[x][y] = false;
+                }
+
                 invalidate();
                 return true;
             } catch (ArrayIndexOutOfBoundsException e) {
@@ -208,7 +219,14 @@ public class ViewOfLife extends View {
                 previousMovePositionX = event.getX();
                 previousMovePositionY = event.getY();
 
-                field[x][y] = true;
+                switch (editMode) {
+                    case ADD:
+                        field[x][y] = true;
+                        break;
+                    case REMOVE:
+                        field[x][y] = false;
+                }
+
                 invalidate();
                 return true;
             } catch (ArrayIndexOutOfBoundsException e) {
@@ -235,7 +253,6 @@ public class ViewOfLife extends View {
             long downTime = SystemClock.uptimeMillis();
             long eventTime = SystemClock.uptimeMillis() + 100;
             int metaState = 0;
-
             MotionEvent motionEvent = MotionEvent.obtain(
                     downTime, eventTime,
                     MotionEvent.ACTION_DOWN,
@@ -243,12 +260,21 @@ public class ViewOfLife extends View {
 
             dispatchTouchEvent(motionEvent);
 
-            Log.d("conway", "in while loop");
-
             currX += xSpacing;
             currY += ySpacing;
         }
     }
+
+    public void clear() {
+        for (int i = 0; i < field.length; i++) {
+            for (int j = 0; j < field[0].length; j++) {
+                field[i][j] = false;
+            }
+        }
+
+        invalidate();
+    }
+
 
     public int getPixelsPerCell() {
         return pixelsPerCell;
@@ -257,6 +283,14 @@ public class ViewOfLife extends View {
     public void setPixelsPerCell(int pixelsPerCell) {
         this.pixelsPerCell = pixelsPerCell;
         invalidate();
+    }
+
+    public void setEditMode(EditMode editMode) {
+        this.editMode = editMode;
+    }
+
+    public EditMode getEditMode() {
+        return editMode;
     }
 
     public boolean isRunning() {
