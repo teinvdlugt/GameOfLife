@@ -7,4 +7,7 @@
     <string name="xs_eraser">Eraser</string>
     <string name="xs_clear">Clear</string>
     <string name="xs_start_or_stop">Start or stop</string>
+    <string name="xs_zoom_fit">Zoom fit</string>
+    <string name="xs_zoom_in">Zoom in</string>
+    <string name="xs_zoom_out">Zoom out</string>
 </resources>

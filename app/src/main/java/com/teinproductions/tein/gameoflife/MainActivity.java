@@ -47,6 +47,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void onClickZoomFit(View view) {
+    }
+
+    public void onClickZoomIn(View view) {
+    }
+
+    public void onClickZoomOut(View view) {
+        viewOfLife.zoomOutY(1, 1);
+    }
+
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
@@ -59,6 +69,4 @@ public class MainActivity extends AppCompatActivity {
                     | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
         }
     }
-
-
 }

@@ -11,17 +11,18 @@ import android.view.View;
 
 public class ViewOfLife extends View {
 
-    private int pixelsPerCell = 30;
+    private float pixelsPerCell;
 
-    private int verCells = 10;
-    private int horCells = 10;
-    private boolean[][] field = new boolean[horCells][verCells];
+    private boolean[][] field;
 
     private boolean running = false;
 
     public enum EditMode {ADD, REMOVE}
 
     private EditMode editMode = EditMode.ADD;
+
+    private float previousMovePositionX = -1;
+    private float previousMovePositionY = -1;
 
     /**
      * The rules of Game of Life:
@@ -93,45 +94,25 @@ public class ViewOfLife extends View {
         return livingNeighbours;
     }
 
-    public void start() {
-        Log.d("START", "start() begin");
-        if (running) return;
-        running = true;
-        Log.d("START", "start()");
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (1 == 1) {
-                    Log.d("START", "in thread");
-                    Log.d("START", "running");
-                    if (!running) return;
-
-                    post(new Runnable() {
-                        @Override
-                        public void run() {
-                            nextGeneration();
-                        }
-                    });
-
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }).start();
-    }
-
-    public void stop() {
-        running = false;
-    }
 
     @Override
     protected void onDraw(Canvas canvas) {
+        if (field == null) initField();
+
         drawBlocks(canvas);
         drawGrid(canvas);
+    }
+
+    private void initField() {
+        pixelsPerCell = 30;
+        int verCells = (int) Math.floor(getHeight() / pixelsPerCell);
+        int horCells = (int) Math.floor(getWidth() / pixelsPerCell);
+
+        // Otherwise, the last lines from the grid won't be drawn:
+        if (getHeight() % pixelsPerCell == 0) verCells--;
+        if (getWidth() % pixelsPerCell == 0) horCells--;
+
+        field = new boolean[verCells][horCells];
     }
 
     private void drawBlocks(Canvas canvas) {
@@ -141,10 +122,10 @@ public class ViewOfLife extends View {
         for (int y = 0; y < field.length; y++) {
             for (int x = 0; x < field[0].length; x++) {
                 if (field[y][x]) {
-                    int left = y * pixelsPerCell;
-                    int right = (y + 1) * pixelsPerCell;
-                    int top = x * pixelsPerCell;
-                    int bottom = (x + 1) * pixelsPerCell;
+                    float left = x * pixelsPerCell;
+                    float right = (x + 1) * pixelsPerCell;
+                    float top = y * pixelsPerCell;
+                    float bottom = (y + 1) * pixelsPerCell;
 
                     canvas.drawRect(left, top, right, bottom, paint);
                 }
@@ -157,34 +138,28 @@ public class ViewOfLife extends View {
         paint.setColor(getResources().getColor(android.R.color.black));
 
         // Vertical lines
-        for (int x = 0; x < getWidth(); x += pixelsPerCell) {
-            int stopY = verCells * pixelsPerCell;
-            canvas.drawLine(x, 0, x, stopY, paint);
+        for (int x = 0; x < field[0].length; x++) {
+            canvas.drawLine(x * pixelsPerCell, 0, x * pixelsPerCell, field.length * pixelsPerCell, paint);
         }
+        // Last vertical line:
+        // TODO last line not drawn
+        canvas.drawLine(field[0].length * pixelsPerCell, 0,
+                field[0].length * pixelsPerCell, field.length * pixelsPerCell, paint);
 
         // Horizontal lines
-        for (int y = 0; y < getHeight(); y += pixelsPerCell) {
-            int stopX = horCells * pixelsPerCell;
-            canvas.drawLine(0, y, stopX, y, paint);
+        for (int y = 0; y < field.length; y++) {
+            canvas.drawLine(0, y * pixelsPerCell, field[0].length * pixelsPerCell, y * pixelsPerCell, paint);
         }
+        // Last horizontal line:
+        canvas.drawLine(0, field.length * pixelsPerCell,
+                field[0].length * pixelsPerCell, field.length * pixelsPerCell, paint);
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldW, int oldH) {
         super.onSizeChanged(w, h, oldW, oldH);
-
-        verCells = (int) Math.floor(getHeight() / pixelsPerCell);
-        horCells = (int) Math.floor(getWidth() / pixelsPerCell);
-
-        // Otherwise, the last lines from the grid won't be drawn:
-        if (getHeight() % pixelsPerCell == 0) verCells--;
-        if (getWidth() % pixelsPerCell == 0) horCells--;
-
-        field = new boolean[horCells][verCells];
+        initField();
     }
-
-    private float previousMovePositionX = -1;
-    private float previousMovePositionY = -1;
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -198,10 +173,10 @@ public class ViewOfLife extends View {
 
                 switch (editMode) {
                     case ADD:
-                        field[x][y] = true;
+                        field[y][x] = true;
                         break;
                     case REMOVE:
-                        field[x][y] = false;
+                        field[y][x] = false;
                 }
 
                 invalidate();
@@ -221,10 +196,10 @@ public class ViewOfLife extends View {
 
                 switch (editMode) {
                     case ADD:
-                        field[x][y] = true;
+                        field[y][x] = true;
                         break;
                     case REMOVE:
-                        field[x][y] = false;
+                        field[y][x] = false;
                 }
 
                 invalidate();
@@ -265,22 +240,106 @@ public class ViewOfLife extends View {
         }
     }
 
-    public void clear() {
-        for (int i = 0; i < field.length; i++) {
-            for (int j = 0; j < field[0].length; j++) {
-                field[i][j] = false;
-            }
-        }
 
+    public void start() {
+        Log.d("START", "start() begin");
+        if (running) return;
+        running = true;
+        Log.d("START", "start()");
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (1 == 1) {
+                    if (!running) return;
+
+                    post(new Runnable() {
+                        @Override
+                        public void run() {
+                            nextGeneration();
+                        }
+                    });
+
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
+    }
+
+    public void stop() {
+        running = false;
+    }
+
+    public void clear() {
+        field = new boolean[field.length][field[0].length];
         invalidate();
     }
 
+    /**
+     * This method is called zoomOutY because you only specify the rows to add at the top and bottom.
+     * The columns to add to the left and right are then calculated automatically from the new
+     * pixelsPerCell and the width of the view.
+     *
+     * @param addTop    The rows to add to the top of the existing field
+     * @param addBottom The rows to add to the bottom of the existing field
+     */
+    public void zoomOutY(int addTop, int addBottom) {
+        expandFieldY(addTop, addBottom);
+        invalidate();
+    }
 
-    public int getPixelsPerCell() {
+    private void expandFieldY(int addTop, int addBottom) {
+        boolean[][] newField = new boolean[field.length + addTop + addBottom][field[0].length];
+
+        pixelsPerCell = getHeight() / (newField.length);
+
+        for (int i = 0; i < field.length; i++) {
+            if (!(addTop - i > 0)) {
+                // This is not a new, empty row
+                newField[i + addTop] = field[i];
+            }
+        }
+
+        // Zoomed out over y, now adapt amount of x cells to the width and the new pixelsPerCell
+        int newHorCells = (int) Math.floor(getWidth() / pixelsPerCell);
+        int diffX = newHorCells - field[0].length;
+        boolean[][] newNewField = new boolean[newField.length][newHorCells];
+
+        for (int i = 0; i < newField.length; i++) {
+            newNewField[i] = expandRow(newField[i], diffX / 2, diffX / 2 + diffX % 2);
+        }
+
+
+        field = newNewField;
+
+        Log.d("draw problems", "new width: " + field[0].length);
+        Log.d("draw problems", "new height: " + field.length);
+    }
+
+    private boolean[] expandRow(boolean[] row, int addLeft, int addRight) {
+        boolean[] newRow = new boolean[row.length + addLeft + addRight];
+
+        for (int i = 0; i < row.length; i++) {
+            if (addLeft - i > 0) {
+                // This is a new cell, leave it empty
+            } else {
+                newRow[i + addLeft] = row[i];
+            }
+        }
+
+        return newRow;
+    }
+
+
+    public float getPixelsPerCell() {
         return pixelsPerCell;
     }
 
-    public void setPixelsPerCell(int pixelsPerCell) {
+    public void setPixelsPerCell(float pixelsPerCell) {
         this.pixelsPerCell = pixelsPerCell;
         invalidate();
     }
