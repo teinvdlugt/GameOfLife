@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.os.SystemClock;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -99,7 +100,7 @@ public class ViewOfLife extends View {
         if (field == null) initField();
 
         drawBlocks(canvas);
-        drawGrid(canvas);
+        if (pixelsPerCell >= 12) drawGrid(canvas);
     }
 
     private void initField() {
@@ -279,6 +280,8 @@ public class ViewOfLife extends View {
 
 
     public void zoomOutPixels(int amount) {
+        if (pixelsPerCell < 2) return;
+
         pixelsPerCell -= amount;
         int newYCells = (int) (getHeight() / pixelsPerCell);
         int diffYCells = newYCells - field.length;
@@ -286,35 +289,47 @@ public class ViewOfLife extends View {
         int addTop = diffYCells / 2;
         int addBottom = diffYCells / 2 + diffYCells % 2;
 
-        zoomOutY(addTop, addBottom);
+        zoomOutY(addTop, addBottom, false);
     }
 
     /**
+     * Accounts for this method and for expandFieldY():
      * This method is called zoomOutY because you only specify the rows to add at the top and bottom.
      * The columns to add to the left and right are then calculated automatically from the new
      * pixelsPerCell and the width of the view.
      *
      * @param addTop    The rows to add to the top of the existing field
      * @param addBottom The rows to add to the bottom of the existing field
+     * @param changePPC Whether of not pixelsPerCell must be recalculated.
+     *                  The third line in expandFieldY() caused trouble when
+     *                  having a height of 720 px.
      */
-    public void zoomOutY(int addTop, int addBottom) {
-        expandFieldY(addTop, addBottom);
+    public void zoomOutY(int addTop, int addBottom, boolean changePPC) {
+        if (pixelsPerCell < 2) return;
+
+        expandFieldY(addTop, addBottom, changePPC);
         invalidate();
     }
 
-    private void expandFieldY(int addTop, int addBottom) {
+    private void expandFieldY(int addTop, int addBottom, boolean changePPC) {
         boolean[][] newField = new boolean[field.length + addTop + addBottom][field[0].length];
 
-        pixelsPerCell = getHeight() / (newField.length);
+        if (changePPC) pixelsPerCell = getHeight() / (newField.length);
+
+        Log.d("coffee", "addTop: " + addTop);
+        Log.d("coffee", "addBottom: " + addBottom);
+        Log.d("coffee", "new pixelsPerCell: " + pixelsPerCell);
+        Log.d("coffee", "new cells y: " + newField.length);
+        Log.d("coffee", "new cells x: " + newField[0].length);
 
         for (int i = 0; i < field.length; i++) {
-            if (!(addTop - i > 0)) {
+            if (addTop - i <= 1) {
                 // This is not a new, empty row
                 newField[i + addTop] = field[i];
             }
         }
 
-        // Zoomed out over y, now adapt amount of x cells to the width and the new pixelsPerCell
+        // Zoomed out over y, now adapt amount of x cells to the width and new pixelsPerCell
         int newHorCells = (int) Math.floor(getWidth() / pixelsPerCell);
         int diffX = newHorCells - field[0].length;
         boolean[][] newNewField = new boolean[newField.length][newHorCells];
@@ -331,9 +346,7 @@ public class ViewOfLife extends View {
         boolean[] newRow = new boolean[row.length + addLeft + addRight];
 
         for (int i = 0; i < row.length; i++) {
-            if (addLeft - i > 0) {
-                // This is a new cell, leave it empty
-            } else {
+            if (addLeft - i <= 1) {
                 newRow[i + addLeft] = row[i];
             }
         }
