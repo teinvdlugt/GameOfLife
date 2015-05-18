@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickZoomOut(View view) {
-        viewOfLife.zoomOutY(1, 1);
+        viewOfLife.zoomOutPixels();
     }
 
     @Override

@@ -5,7 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.os.SystemClock;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -142,17 +141,18 @@ public class ViewOfLife extends View {
             canvas.drawLine(x * pixelsPerCell, 0, x * pixelsPerCell, field.length * pixelsPerCell, paint);
         }
         // Last vertical line:
-        // TODO last line not drawn
-        canvas.drawLine(field[0].length * pixelsPerCell, 0,
-                field[0].length * pixelsPerCell, field.length * pixelsPerCell, paint);
+        float x = field[0].length * pixelsPerCell;
+        if (x == getWidth()) x--;
+        canvas.drawLine(x, 0, x, field.length * pixelsPerCell, paint);
 
         // Horizontal lines
         for (int y = 0; y < field.length; y++) {
             canvas.drawLine(0, y * pixelsPerCell, field[0].length * pixelsPerCell, y * pixelsPerCell, paint);
         }
         // Last horizontal line:
-        canvas.drawLine(0, field.length * pixelsPerCell,
-                field[0].length * pixelsPerCell, field.length * pixelsPerCell, paint);
+        float y = field.length * pixelsPerCell;
+        if (y == getHeight()) y--;
+        canvas.drawLine(0, y, field[0].length * pixelsPerCell, y, paint);
     }
 
     @Override
@@ -242,10 +242,8 @@ public class ViewOfLife extends View {
 
 
     public void start() {
-        Log.d("START", "start() begin");
         if (running) return;
         running = true;
-        Log.d("START", "start()");
 
         new Thread(new Runnable() {
             @Override
@@ -277,6 +275,18 @@ public class ViewOfLife extends View {
     public void clear() {
         field = new boolean[field.length][field[0].length];
         invalidate();
+    }
+
+
+    public void zoomOutPixels(int amount) {
+        pixelsPerCell -= amount;
+        int newYCells = (int) (getHeight() / pixelsPerCell);
+        int diffYCells = newYCells - field.length;
+
+        int addTop = diffYCells / 2;
+        int addBottom = diffYCells / 2 + diffYCells % 2;
+
+        zoomOutY(addTop, addBottom);
     }
 
     /**
@@ -315,9 +325,6 @@ public class ViewOfLife extends View {
 
 
         field = newNewField;
-
-        Log.d("draw problems", "new width: " + field[0].length);
-        Log.d("draw problems", "new height: " + field.length);
     }
 
     private boolean[] expandRow(boolean[] row, int addLeft, int addRight) {
@@ -334,6 +341,10 @@ public class ViewOfLife extends View {
         return newRow;
     }
 
+
+    public void zoomOutPixels() {
+        zoomOutPixels(1);
+    }
 
     public float getPixelsPerCell() {
         return pixelsPerCell;
