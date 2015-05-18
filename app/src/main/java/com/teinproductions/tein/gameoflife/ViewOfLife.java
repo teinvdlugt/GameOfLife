@@ -289,7 +289,7 @@ public class ViewOfLife extends View {
         int addTop = diffYCells / 2;
         int addBottom = diffYCells / 2 + diffYCells % 2;
 
-        zoomOutY(addTop, addBottom, false);
+        zoomOutY(addTop, addBottom, false, true);
     }
 
     /**
@@ -300,33 +300,46 @@ public class ViewOfLife extends View {
      *
      * @param addTop    The rows to add to the top of the existing field
      * @param addBottom The rows to add to the bottom of the existing field
-     * @param changePPC Whether of not pixelsPerCell must be recalculated.
+     * @param changePPC Whether or not pixelsPerCell must be recalculated.
      *                  The third line in expandFieldY() caused trouble when
      *                  having a height of 720 px.
+     * @param changeX   Whether or not the amount of horizontal cells has to be
+     *                  recalculated.
      */
-    public void zoomOutY(int addTop, int addBottom, boolean changePPC) {
+    public void zoomOutY(int addTop, int addBottom, boolean changePPC, boolean changeX) {
         if (pixelsPerCell < 2) return;
 
-        expandFieldY(addTop, addBottom, changePPC);
+        expandFieldY(addTop, addBottom, changePPC, changeX);
         invalidate();
     }
 
-    private void expandFieldY(int addTop, int addBottom, boolean changePPC) {
+    private void expandFieldY(int addTop, int addBottom, boolean changePPC, boolean changeX) {
         boolean[][] newField = new boolean[field.length + addTop + addBottom][field[0].length];
 
         if (changePPC) pixelsPerCell = getHeight() / (newField.length);
 
-        Log.d("coffee", "addTop: " + addTop);
+        /*Log.d("coffee", "addTop: " + addTop);
         Log.d("coffee", "addBottom: " + addBottom);
         Log.d("coffee", "new pixelsPerCell: " + pixelsPerCell);
         Log.d("coffee", "new cells y: " + newField.length);
-        Log.d("coffee", "new cells x: " + newField[0].length);
+        Log.d("coffee", "new cells x: " + newField[0].length);*/
 
-        for (int i = 0; i < field.length; i++) {
-            if (addTop - i <= 1) {
-                // This is not a new, empty row
-                newField[i + addTop] = field[i];
+        Log.d("coffee", "addTop: " + addTop);
+        Log.d("coffee", "addBottom: " + addBottom);
+
+        for (int i = 0; i < newField.length; i++) {
+            if (i - addTop >= 0 && i - addTop < field.length) {
+                Log.d("coffee", "not a new row");
+                // This is not a new row
+                newField[i] = field[i - addTop];
+            } else {
+                Log.d("coffee", "a new row");
             }
+        }
+
+        if (!changeX) {
+            field = newField;
+            return;
         }
 
         // Zoomed out over y, now adapt amount of x cells to the width and new pixelsPerCell
@@ -355,6 +368,137 @@ public class ViewOfLife extends View {
     }
 
 
+    // TODO needs enhancement
+    public void zoomFit() {
+        int startX = lowestX();
+        int stopX = highestX();
+        int startY = lowestY();
+        int stopY = highestY();
+
+        if (startX == -1 || stopX == -1 || startY == -1 || stopY == -1) {
+            field = null;
+            invalidate();
+            return;
+        }
+
+        if (startX < 2 || stopX > field[0].length - 2 || startY < 2 || stopY > field.length) {
+            return;
+        }
+
+        startX = startX - 2;
+        stopX = stopX + 2;
+        startY = startY - 2;
+        stopY = stopY + 2;
+
+        zoomIn(startX, stopX, startY, stopY);
+
+        invalidate();
+    }
+
+    public int lowestX() {
+        int lowestX = -1;
+
+        for (boolean[] row : field) {
+            for (int x = 0; x < field[0].length; x++) {
+                if (x >= lowestX && lowestX != -1) break;
+                if (row[x]) lowestX = x;
+            }
+        }
+
+        return lowestX;
+    }
+
+    public int highestX() {
+        int highestX = -1;
+
+        for (boolean[] row : field) {
+            for (int x = field[0].length - 1; x >= 0; x--) {
+                if (x <= highestX) break;
+                if (row[x]) highestX = x;
+            }
+        }
+
+        return highestX;
+    }
+
+    public int lowestY() {
+        for (int y = 0; y < field.length; y++) {
+            // If this row contains a true, then immediately return that
+            for (int x = 0; x < field[0].length; x++) {
+                if (field[y][x]) return y;
+            }
+        }
+
+        return -1;
+    }
+
+    public int highestY() {
+        for (int y = field.length - 1; y >= 0; y--) {
+            for (int x = 0; x < field[0].length; x++) {
+                if (field[y][x]) return y;
+            }
+        }
+
+        return -1;
+    }
+
+    public void zoomIn(int startX, int stopX, int startY, int stopY) {
+        boolean[][] newField = new boolean[stopY - startY + 1][stopX - startX + 1];
+
+        for (int y = 0; y < newField.length; y++) {
+            // The y index in field that corresponds with the y index in newField
+            int corrY = y + startY;
+            for (int x = 0; x < newField[0].length; x++) {
+                int corrX = x + startX;
+                newField[y][x] = field[corrY][corrX];
+            }
+        }
+
+        field = newField;
+
+        // Now that the new field is constructed, adapt the pixelsPerCell:
+        float pPCX = getWidth() / field[0].length;
+        float pPCY = getHeight() / field.length;
+        if (pPCX < pPCY) pixelsPerCell = pPCX;
+        pixelsPerCell = pPCX < pPCY ? pPCX : pPCY;
+        if ((int) pPCX == (int) pPCY) return;
+
+        // Extend the field again to fill the remaining space:
+        if (pixelsPerCell == pPCX) {
+            Log.d("coffee", "pPCX is true");
+            // Then the y space has to be filled up
+            int cellsY = (int) (getHeight() / pixelsPerCell);
+            int diffY = cellsY - newField.length;
+
+            Log.d("coffee", "cellsY: " + cellsY);
+            Log.d("coffee", "diffY: " + diffY);
+
+            expandFieldY(diffY / 2, diffY / 2 + diffY % 2, false, false);
+        } else {
+            Log.d("coffee", "pPCY is true");
+            // Then the x space has to be filled up
+            int cellsX = (int) (getWidth() / pixelsPerCell);
+            int diffX = cellsX - newField[0].length;
+
+            expandFieldX(diffX / 2, diffX / 2 + diffX % 2);
+        }
+    }
+
+    private void expandFieldX(int addLeft, int addRight) {
+        boolean[][] newField = new boolean[field.length][field[0].length + addLeft + addRight];
+
+        for (int y = 0; y < field.length; y++) {
+            for (int x = 0; x < field[0].length; x++) {
+                if (addLeft - x <= 1) {
+                    newField[y][x + addLeft] = field[y][x];
+                }
+            }
+        }
+
+        field = newField;
+    }
+
+
     public void zoomOutPixels() {
         zoomOutPixels(1);
     }
@@ -366,6 +510,14 @@ public class ViewOfLife extends View {
     public void setPixelsPerCell(float pixelsPerCell) {
         this.pixelsPerCell = pixelsPerCell;
         invalidate();
+    }
+
+    public int getFieldWidth() {
+        return field[0].length;
+    }
+
+    public int getFieldHeight() {
+        return field.length;
     }
 
     public void setEditMode(EditMode editMode) {

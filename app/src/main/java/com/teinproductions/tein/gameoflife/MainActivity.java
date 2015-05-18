@@ -3,6 +3,7 @@ package com.teinproductions.tein.gameoflife;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 
@@ -48,13 +49,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickZoomFit(View view) {
-    }
-
-    public void onClickZoomIn(View view) {
+        viewOfLife.zoomFit();
     }
 
     public void onClickZoomOut(View view) {
-        viewOfLife.zoomOutPixels();
+        if (viewOfLife.getFieldWidth() < 30 || viewOfLife.getFieldHeight() < 30) {
+            Log.d("more coffee", "true");
+            viewOfLife.zoomOutY(1, 1, true, true);
+        } else {
+            viewOfLife.zoomOutPixels();
+        }
     }
 
     @Override
