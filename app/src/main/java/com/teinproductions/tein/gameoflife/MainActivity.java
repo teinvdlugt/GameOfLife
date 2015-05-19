@@ -1,5 +1,7 @@
 package com.teinproductions.tein.gameoflife;
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -11,7 +13,7 @@ import android.widget.ImageButton;
 public class MainActivity extends AppCompatActivity {
 
     private ViewOfLife viewOfLife;
-    private ImageButton playPauseButton;
+    private ImageButton playPauseButton, autoZoomButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
         viewOfLife = (ViewOfLife) findViewById(R.id.view_of_life);
         playPauseButton = (ImageButton) findViewById(R.id.playPause_button);
+        autoZoomButton = (ImageButton) findViewById(R.id.auto_zoom_button);
     }
 
     public void onClickPencil(View view) {
@@ -61,6 +64,16 @@ public class MainActivity extends AppCompatActivity {
         }
 
         Log.d("sizes", "height: " + viewOfLife.getFieldHeight() + ", width: " + viewOfLife.getFieldWidth());
+    }
+
+    public void onClickAutoZoom(View view) {
+        if (viewOfLife.isAutoZoom()) {
+            viewOfLife.setAutoZoom(false);
+            autoZoomButton.setBackgroundResource(Color.argb(0,0,0,0));
+        } else {
+            viewOfLife.setAutoZoom(true);
+            autoZoomButton.setBackgroundColor(R.color.block_color);
+        }
     }
 
     @Override

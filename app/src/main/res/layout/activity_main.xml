@@ -48,11 +48,15 @@
             android:onClick="onClickZoomFit"
             android:src="@mipmap/ic_fullscreen_black_36dp" />
 
-        <Space
+        <ImageButton
+            android:id="@+id/auto_zoom_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@null" />
+            android:background="@color/block_color"
+            android:contentDescription="@string/xs_autozoom"
+            android:onClick="onClickAutoZoom"
+            android:src="@mipmap/ic_autozoom_black_36dp" />
 
         <Space
             android:layout_width="0dp"

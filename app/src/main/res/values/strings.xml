@@ -10,4 +10,5 @@
     <string name="xs_zoom_fit">Zoom fit</string>
     <string name="xs_zoom_in">Zoom in</string>
     <string name="xs_zoom_out">Zoom out</string>
+    <string name="xs_autozoom">Zoom out automatically</string>
 </resources>

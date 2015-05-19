@@ -5,7 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.os.SystemClock;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -16,6 +15,8 @@ public class ViewOfLife extends View {
     private boolean[][] field;
 
     private boolean running = false;
+
+    private boolean autoZoom = true;
 
     public enum EditMode {ADD, REMOVE}
 
@@ -37,11 +38,41 @@ public class ViewOfLife extends View {
             System.arraycopy(field[y], 0, fieldCache[y], 0, field[0].length);
         }
 
+        boolean autoZoomOut = pixelsPerCell >= 2 && autoZoom;
+        boolean zoomOutTop = false, zoomOutRight = false, zoomOutBottom = false, zoomOutLeft = false;
+
         for (int y = 0; y < fieldCache.length; y++) {
             for (int x = 0; x < fieldCache[0].length; x++) {
                 int neighbours = livingNeighbours(fieldCache, x, y);
                 if (neighbours > 3 || neighbours < 2) field[y][x] = false;
                 if (neighbours == 3) field[y][x] = true;
+
+                // Check if it is needed to zoom out
+                if (autoZoomOut && field[y][x]) {
+                    if (y < 2) zoomOutTop = true;
+                    if (x > field[0].length - 3) zoomOutRight = true;
+                    if (y > field.length - 3) zoomOutBottom = true;
+                    if (x < 2) zoomOutLeft = true;
+                }
+            }
+        }
+
+        if (autoZoomOut) {
+            if ((zoomOutTop || zoomOutBottom) && (zoomOutLeft || zoomOutRight)) {
+                // Zoom out over both x and y
+                if (getHeight() > getWidth()) {
+                    // Zoom out over y
+                    expandFieldY(zoomOutTop ? 2 : 0, zoomOutBottom ? 2 : 0, true, true);
+                } else {
+                    // Zoom out over x
+                    expandFieldX(zoomOutLeft ? 2 : 0, zoomOutRight ? 2 : 0, true, true);
+                }
+            } else if (zoomOutTop || zoomOutBottom) {
+                // Zoom out only over y
+                expandFieldY(zoomOutTop ? 2 : 0, zoomOutBottom ? 2 : 0, true, true);
+            } else if (zoomOutLeft || zoomOutRight) {
+                // Zoom out only over x
+                expandFieldX(zoomOutLeft ? 2 : 0, zoomOutRight ? 2 : 0, true, true);
             }
         }
 
@@ -252,12 +283,18 @@ public class ViewOfLife extends View {
                 while (1 == 1) {
                     if (!running) return;
 
+                    //long millis = System.currentTimeMillis();
+
                     post(new Runnable() {
                         @Override
                         public void run() {
+                            //long millis = System.currentTimeMillis();
                             nextGeneration();
+                            //Log.d("asdfasdf", "elapsed time: " + (System.currentTimeMillis() - millis) + " ms");
                         }
                     });
+
+                    //Log.d("asdfasdf", "elapsed time in thread: " + (System.currentTimeMillis() - millis) + " ms");
 
                     try {
                         Thread.sleep(100);
@@ -461,7 +498,7 @@ public class ViewOfLife extends View {
             int cellsY = (int) (getHeight() / pixelsPerCell);
             int diffY = cellsY - newField.length;
 
-            boolean modulusTop = Math.floor(Math.random() * 2) == 1; // TODO extract method
+            boolean modulusTop = Math.floor(Math.random() * 2) == 1;
             int addTop = diffY / 2 + (modulusTop ? diffY % 2 : 0);
             int addBottom = diffY / 2 + (modulusTop ? 0 : diffY % 2);
 
@@ -475,12 +512,14 @@ public class ViewOfLife extends View {
             int addLeft = diffX / 2 + (modulusLeft ? diffX % 2 : 0);
             int addRight = diffX / 2 + (modulusLeft ? 0 : diffX % 2);
 
-            expandFieldX(addLeft, addRight);
+            expandFieldX(addLeft, addRight, false, false);
         }
     }
 
-    private void expandFieldX(int addLeft, int addRight) {
+    private void expandFieldX(int addLeft, int addRight, boolean changePPC, boolean changeY) {
         boolean[][] newField = new boolean[field.length][field[0].length + addLeft + addRight];
+
+        if (changePPC) pixelsPerCell = getWidth() / newField[0].length;
 
         for (int y = 0; y < field.length; y++) {
             for (int x = 0; x < field[0].length; x++) {
@@ -491,6 +530,16 @@ public class ViewOfLife extends View {
         }
 
         field = newField;
+        if (!changeY) return;
+
+        // Now fill the y space:
+        int cellsY = (int) (getHeight() / pixelsPerCell);
+        int diffY = cellsY - field.length;
+        boolean modulusTop = randomBoolean();
+        int addTop = diffY / 2 + (modulusTop ? diffY % 2 : 0);
+        int addBottom = diffY / 2 + (modulusTop ? 0 : diffY % 2);
+
+        expandFieldY(addTop, addBottom, false, false);
     }
 
 
@@ -527,6 +576,14 @@ public class ViewOfLife extends View {
         return running;
     }
 
+    public boolean isAutoZoom() {
+        return autoZoom;
+    }
+
+    public void setAutoZoom(boolean autoZoom) {
+        this.autoZoom = autoZoom;
+    }
+
     public ViewOfLife(Context context) {
         super(context);
     }
@@ -537,5 +594,10 @@ public class ViewOfLife extends View {
 
     public ViewOfLife(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+    }
+
+
+    public static boolean randomBoolean() {
+        return Math.floor(Math.random() * 2) == 1;
     }
 }
