@@ -105,8 +105,8 @@ public class ViewOfLife extends View {
 
     private void initField() {
         pixelsPerCell = 30;
-        int verCells = (int) Math.floor(getHeight() / pixelsPerCell);
-        int horCells = (int) Math.floor(getWidth() / pixelsPerCell);
+        int verCells = (int) (getHeight() / pixelsPerCell);
+        int horCells = (int) (getWidth() / pixelsPerCell);
 
         // Otherwise, the last lines from the grid won't be drawn:
         if (getHeight() % pixelsPerCell == 0) verCells--;
@@ -166,8 +166,8 @@ public class ViewOfLife extends View {
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             try {
-                int x = (int) Math.floor(event.getX() / pixelsPerCell);
-                int y = (int) Math.floor(event.getY() / pixelsPerCell);
+                int x = (int) (event.getX() / pixelsPerCell);
+                int y = (int) (event.getY() / pixelsPerCell);
 
                 previousMovePositionX = event.getX();
                 previousMovePositionY = event.getY();
@@ -187,8 +187,8 @@ public class ViewOfLife extends View {
             }
         } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
             try {
-                int x = (int) Math.floor(event.getX() / pixelsPerCell);
-                int y = (int) Math.floor(event.getY() / pixelsPerCell);
+                int x = (int) (event.getX() / pixelsPerCell);
+                int y = (int) (event.getY() / pixelsPerCell);
 
                 allCellsOnLine(event);
 
@@ -286,8 +286,9 @@ public class ViewOfLife extends View {
         int newYCells = (int) (getHeight() / pixelsPerCell);
         int diffYCells = newYCells - field.length;
 
-        int addTop = diffYCells / 2;
-        int addBottom = diffYCells / 2 + diffYCells % 2;
+        boolean modulusTop = Math.floor(Math.random() * 2) == 1;
+        int addTop = diffYCells / 2 + (modulusTop ? diffYCells % 2 : 0);
+        int addBottom = diffYCells / 2 + (modulusTop ? 0 : diffYCells % 2);
 
         zoomOutY(addTop, addBottom, false, true);
     }
@@ -318,23 +319,10 @@ public class ViewOfLife extends View {
 
         if (changePPC) pixelsPerCell = getHeight() / (newField.length);
 
-        /*Log.d("coffee", "addTop: " + addTop);
-        Log.d("coffee", "addBottom: " + addBottom);
-        Log.d("coffee", "new pixelsPerCell: " + pixelsPerCell);
-        Log.d("coffee", "new cells y: " + newField.length);
-        Log.d("coffee", "new cells x: " + newField[0].length);*/
-
-        Log.d("coffee", "addTop: " + addTop);
-        Log.d("coffee", "addBottom: " + addBottom);
-
-        for (int i = 0; i < newField.length; i++) {
-            if (i - addTop >= 0 && i - addTop < field.length) {
-                Log.d("coffee", "not a new row");
-                // This is not a new row
-                newField[i] = field[i - addTop];
-            } else {
-                Log.d("coffee", "a new row");
-            }
+        for (int y = 0; y < field.length; y++) {
+            // The y index of newField that corresponds to the y index in field:
+            int corrY = y + addTop;
+            newField[corrY] = field[y];
         }
 
         if (!changeX) {
@@ -343,12 +331,16 @@ public class ViewOfLife extends View {
         }
 
         // Zoomed out over y, now adapt amount of x cells to the width and new pixelsPerCell
-        int newHorCells = (int) Math.floor(getWidth() / pixelsPerCell);
+        int newHorCells = (int) (getWidth() / pixelsPerCell);
         int diffX = newHorCells - field[0].length;
         boolean[][] newNewField = new boolean[newField.length][newHorCells];
 
+        boolean modulusLeft = ((int) Math.floor(Math.random() * 2)) == 1;
         for (int i = 0; i < newField.length; i++) {
-            newNewField[i] = expandRow(newField[i], diffX / 2, diffX / 2 + diffX % 2);
+            int addLeft = diffX / 2 + (modulusLeft ? diffX % 2 : 0);
+            int addRight = diffX / 2 + (modulusLeft ? 0 : diffX % 2);
+
+            newNewField[i] = expandRow(newField[i], addLeft, addRight);
         }
 
 
@@ -381,17 +373,17 @@ public class ViewOfLife extends View {
             return;
         }
 
-        if (startX < 2 || stopX > field[0].length - 2 || startY < 2 || stopY > field.length) {
-            return;
-        }
-
-        startX = startX - 2;
-        stopX = stopX + 2;
-        startY = startY - 2;
-        stopY = stopY + 2;
+        // Add a 'padding' of two if possible:
+        if (startX == 1) startX = 0;
+        if (startX > 1) startX -= 2;
+        if (stopX == field[0].length - 2) stopX = field[0].length - 1;
+        if (stopX < field[0].length - 2) stopX += 2;
+        if (startY == 1) startY = 0;
+        if (startY > 1) startY -= 2;
+        if (stopY == field.length - 2) stopY = field.length - 1;
+        if (stopY < field.length - 2) stopY += 2;
 
         zoomIn(startX, stopX, startY, stopY);
-
         invalidate();
     }
 
@@ -459,28 +451,31 @@ public class ViewOfLife extends View {
         // Now that the new field is constructed, adapt the pixelsPerCell:
         float pPCX = getWidth() / field[0].length;
         float pPCY = getHeight() / field.length;
-        if (pPCX < pPCY) pixelsPerCell = pPCX;
+
         pixelsPerCell = pPCX < pPCY ? pPCX : pPCY;
-        if ((int) pPCX == (int) pPCY) return;
+        if (Math.floor(pPCX) == Math.floor(pPCY)) return;
 
         // Extend the field again to fill the remaining space:
         if (pixelsPerCell == pPCX) {
-            Log.d("coffee", "pPCX is true");
             // Then the y space has to be filled up
             int cellsY = (int) (getHeight() / pixelsPerCell);
             int diffY = cellsY - newField.length;
 
-            Log.d("coffee", "cellsY: " + cellsY);
-            Log.d("coffee", "diffY: " + diffY);
+            boolean modulusTop = Math.floor(Math.random() * 2) == 1; // TODO extract method
+            int addTop = diffY / 2 + (modulusTop ? diffY % 2 : 0);
+            int addBottom = diffY / 2 + (modulusTop ? 0 : diffY % 2);
 
-            expandFieldY(diffY / 2, diffY / 2 + diffY % 2, false, false);
+            expandFieldY(addTop, addBottom, false, false);
         } else {
-            Log.d("coffee", "pPCY is true");
             // Then the x space has to be filled up
             int cellsX = (int) (getWidth() / pixelsPerCell);
             int diffX = cellsX - newField[0].length;
 
-            expandFieldX(diffX / 2, diffX / 2 + diffX % 2);
+            boolean modulusLeft = Math.floor(Math.random() * 2) == 1;
+            int addLeft = diffX / 2 + (modulusLeft ? diffX % 2 : 0);
+            int addRight = diffX / 2 + (modulusLeft ? 0 : diffX % 2);
+
+            expandFieldX(addLeft, addRight);
         }
     }
 
@@ -489,9 +484,9 @@ public class ViewOfLife extends View {
 
         for (int y = 0; y < field.length; y++) {
             for (int x = 0; x < field[0].length; x++) {
-                if (addLeft - x <= 1) {
-                    newField[y][x + addLeft] = field[y][x];
-                }
+                // The x index in newField that corresponds to the x index in field:
+                int corrX = x + addLeft;
+                newField[y][corrX] = field[y][x];
             }
         }
 

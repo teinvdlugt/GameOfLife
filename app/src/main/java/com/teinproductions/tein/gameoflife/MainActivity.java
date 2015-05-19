@@ -59,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
         } else {
             viewOfLife.zoomOutPixels();
         }
+
+        Log.d("sizes", "height: " + viewOfLife.getFieldHeight() + ", width: " + viewOfLife.getFieldWidth());
     }
 
     @Override
