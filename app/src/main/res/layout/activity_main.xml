@@ -58,18 +58,21 @@
             android:onClick="onClickAutoZoom"
             android:src="@mipmap/ic_autozoom_black_36dp" />
 
-        <Space
+        <ImageButton
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@null" />
+            android:background="?android:attr/selectableItemBackground"
+            android:contentDescription="@string/settings"
+            android:onClick="onClickSettings"
+            android:src="@mipmap/ic_settings_black_36dp" />
     </LinearLayout>
 
     <com.teinproductions.tein.gameoflife.ViewOfLife
         android:id="@+id/view_of_life"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1" />
 
     <LinearLayout
         android:layout_width="match_parent"

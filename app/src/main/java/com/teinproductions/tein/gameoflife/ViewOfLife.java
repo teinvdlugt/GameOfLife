@@ -17,6 +17,7 @@ public class ViewOfLife extends View {
     private boolean running = false;
 
     private boolean autoZoom = true;
+    private int speed = 100;
 
     public enum EditMode {ADD, REMOVE}
 
@@ -297,7 +298,7 @@ public class ViewOfLife extends View {
                     //Log.d("asdfasdf", "elapsed time in thread: " + (System.currentTimeMillis() - millis) + " ms");
 
                     try {
-                        Thread.sleep(100);
+                        Thread.sleep(speed);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -582,6 +583,14 @@ public class ViewOfLife extends View {
 
     public void setAutoZoom(boolean autoZoom) {
         this.autoZoom = autoZoom;
+    }
+
+    public int getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
     }
 
     public ViewOfLife(Context context) {

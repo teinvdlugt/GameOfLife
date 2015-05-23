@@ -2,4 +2,6 @@
 <resources>
     <color name="block_color">#ff404aff</color>
     <color name="window_background">#ffc7ff6e</color>
+    <color name="greenToolbarColor">#ff94c65c</color>
+    <color name="greenSystemBarColor">#ff77a251</color>
 </resources>

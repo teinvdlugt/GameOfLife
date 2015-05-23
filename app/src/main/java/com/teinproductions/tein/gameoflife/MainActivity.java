@@ -1,9 +1,10 @@
 package com.teinproductions.tein.gameoflife;
 
+import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -23,6 +24,8 @@ public class MainActivity extends AppCompatActivity {
         viewOfLife = (ViewOfLife) findViewById(R.id.view_of_life);
         playPauseButton = (ImageButton) findViewById(R.id.playPause_button);
         autoZoomButton = (ImageButton) findViewById(R.id.auto_zoom_button);
+
+        resetSpeed();
     }
 
     public void onClickPencil(View view) {
@@ -40,14 +43,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickPlayPause(View view) {
-        ImageButton button = (ImageButton) findViewById(R.id.playPause_button);
-
         if (viewOfLife.isRunning()) {
             viewOfLife.stop();
-            button.setImageResource(R.mipmap.ic_play_arrow_black_36dp);
+            playPauseButton.setImageResource(R.mipmap.ic_play_arrow_black_36dp);
         } else {
+            resetSpeed();
             viewOfLife.start();
-            button.setImageResource(R.mipmap.ic_pause_black_36dp);
+            playPauseButton.setImageResource(R.mipmap.ic_pause_black_36dp);
         }
     }
 
@@ -69,11 +71,15 @@ public class MainActivity extends AppCompatActivity {
     public void onClickAutoZoom(View view) {
         if (viewOfLife.isAutoZoom()) {
             viewOfLife.setAutoZoom(false);
-            autoZoomButton.setBackgroundResource(Color.argb(0,0,0,0));
+            autoZoomButton.setBackgroundResource(Color.argb(0, 0, 0, 0));
         } else {
             viewOfLife.setAutoZoom(true);
-            autoZoomButton.setBackgroundColor(R.color.block_color);
+            autoZoomButton.setBackgroundColor(getResources().getColor(R.color.block_color));
         }
+    }
+
+    public void onClickSettings(View view) {
+        startActivity(new Intent(this, SettingsActivity.class));
     }
 
     @Override
@@ -86,6 +92,23 @@ public class MainActivity extends AppCompatActivity {
                     | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                     | View.SYSTEM_UI_FLAG_FULLSCREEN
                     | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        viewOfLife.stop();
+        playPauseButton.setImageResource(R.mipmap.ic_play_arrow_black_36dp);
+        super.onPause();
+    }
+
+    public void resetSpeed() {
+        String speed = PreferenceManager.getDefaultSharedPreferences(this)
+                .getString(getString(R.string.speed_key), "100");
+        try {
+            viewOfLife.setSpeed(Integer.parseInt(speed));
+        } catch (NumberFormatException e) {
+            viewOfLife.setSpeed(100);
         }
     }
 }

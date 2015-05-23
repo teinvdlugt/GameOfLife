@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+        android:inputType="number"
+        android:defaultValue="100"
+        android:title="@string/speed"
+        android:dialogTitle="Speed in ms"
+        android:key="@string/speed_key" />
+</PreferenceScreen>
