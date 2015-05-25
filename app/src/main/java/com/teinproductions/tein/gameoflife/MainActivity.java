@@ -58,13 +58,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickZoomOut(View view) {
-        if (viewOfLife.getFieldWidth() < 30 || viewOfLife.getFieldHeight() < 30) {
-            Log.d("more coffee", "true");
-            viewOfLife.zoomOutY(1, 1, true, true);
-        } else {
-            viewOfLife.zoomOutPixels();
-        }
-
+        viewOfLife.zoomOut();
         Log.d("sizes", "height: " + viewOfLife.getFieldHeight() + ", width: " + viewOfLife.getFieldWidth());
     }
 
