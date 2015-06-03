@@ -32,6 +32,7 @@ public class ViewOfLife extends View {
     private int zoomInLeft, zoomInRight, zoomInTop, zoomInBottom;
 
     /**
+     * Alert: invalidate() is not called in this method
      * The rules of Game of Life:
      * - A dead cell with exactly three living neighbours, awakens.
      * - A living cell with two or three living neighbours, stay alive.
@@ -75,8 +76,6 @@ public class ViewOfLife extends View {
                 zoomFitField();
             }
         }
-
-        invalidate(); // TODO has to be called in game thread in start()
     }
 
     private int livingNeighbours(boolean[][] field, int x, int y) {
@@ -313,24 +312,21 @@ public class ViewOfLife extends View {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while (1 == 1) {
+                while (1 + 1 == 2) {
                     if (!running) return;
 
-                    //long millis = System.currentTimeMillis();
+                    long millis = System.currentTimeMillis();
 
-                    post(new Runnable() {
-                        @Override
-                        public void run() {
-                            //long millis = System.currentTimeMillis();
-                            nextGeneration();
-                            //Log.d("asdfasdf", "elapsed time: " + (System.currentTimeMillis() - millis) + " ms");
-                        }
-                    });
+                    nextGeneration();
+                    postInvalidate();
 
-                    //Log.d("asdfasdf", "elapsed time in thread: " + (System.currentTimeMillis() - millis) + " ms");
+                    long takenTime = System.currentTimeMillis() - millis;
+                    long sleepTime;
+                    if (takenTime > speed) sleepTime = takenTime;
+                    else sleepTime = speed - takenTime;
 
                     try {
-                        Thread.sleep(speed);
+                        Thread.sleep(sleepTime);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
