@@ -25,11 +25,11 @@ public class ViewOfLife extends View {
 
     private float previousMovePositionX = -1;
     private float previousMovePositionY = -1;
+    private boolean zoomingIn = false;
+    private float startZoomInPositionX = -1;
+    private float startZoomInPositionY = -1;
 
-    private int zoomInLeft = 0;
-    private int zoomInRight = 0;
-    private int zoomInTop = 0;
-    private int zoomInBottom = 0;
+    private int zoomInLeft, zoomInRight, zoomInTop, zoomInBottom;
 
     /**
      * The rules of Game of Life:
@@ -205,26 +205,27 @@ public class ViewOfLife extends View {
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             try {
-                int x = (int) (event.getX() / pixelsPerCell) + zoomInLeft;
-                int y = (int) (event.getY() / pixelsPerCell) + zoomInTop;
+                if (editMode == EditMode.ADD || editMode == EditMode.REMOVE) {
+                    int x = (int) (event.getX() / pixelsPerCell) + zoomInLeft;
+                    int y = (int) (event.getY() / pixelsPerCell) + zoomInTop;
+                    previousMovePositionX = event.getX();
+                    previousMovePositionY = event.getY();
 
-                previousMovePositionX = event.getX();
-                previousMovePositionY = event.getY();
+                    field[y][x] = editMode == EditMode.ADD;
 
-                switch (editMode) {
-                    case ADD:
-                        field[y][x] = true;
-                        break;
-                    case REMOVE:
-                        field[y][x] = false;
+                    invalidate();
+                } else if (editMode == EditMode.ZOOM_IN && !zoomingIn) {
+                    zoomingIn = true;
+                    startZoomInPositionX = event.getX();
+                    startZoomInPositionY = event.getY();
                 }
 
-                invalidate();
                 return true;
             } catch (ArrayIndexOutOfBoundsException e) {
                 return super.onTouchEvent(event);
             }
-        } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+        } else if (event.getAction() == MotionEvent.ACTION_MOVE
+                && (editMode == EditMode.ADD || editMode == EditMode.REMOVE)) {
             try {
                 int x = (int) (event.getX() / pixelsPerCell) + zoomInLeft;
                 int y = (int) (event.getY() / pixelsPerCell) + zoomInTop;
@@ -247,6 +248,30 @@ public class ViewOfLife extends View {
             } catch (ArrayIndexOutOfBoundsException e) {
                 return super.onTouchEvent(event);
             }
+        } else if ((event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL)
+                && editMode == EditMode.ZOOM_IN && zoomingIn) {
+            int startX = (int) (startZoomInPositionX / pixelsPerCell);
+            int startY = (int) (startZoomInPositionY / pixelsPerCell);
+            int stopX = (int) (event.getX() / pixelsPerCell);
+            int stopY = (int) (event.getY() / pixelsPerCell);
+
+            zoomingIn = false;
+
+            if (startX > stopX) {
+                int temp = startX;
+                startX = stopX;
+                stopX = temp;
+            } else if (startX == stopX) return true;
+
+            if (startY > stopY) {
+                int temp = startY;
+                startY = stopY;
+                stopY = temp;
+            } else if (startY == stopY) return true;
+
+            zoomIn(startX, stopX, startY, stopY);
+
+            return true;
         } else return super.onTouchEvent(event);
     }
 
@@ -336,7 +361,7 @@ public class ViewOfLife extends View {
         } while (getWidth() / width >= pixelsPerCell);
 
         pixelsPerCell = getWidth() / width;
-        zoomOutPixels((int)this.pixelsPerCell - pixelsPerCell);
+        zoomOutPixels((int) this.pixelsPerCell - pixelsPerCell);
     }
 
     public void zoomOutPixels(int amount) {
@@ -497,36 +522,6 @@ public class ViewOfLife extends View {
         }
 
         field = newField;
-
-        /*// Now that the new field is constructed, adapt the pixelsPerCell:
-        float pPCX = getWidth() / field[0].length;
-        float pPCY = getHeight() / field.length;
-
-        pixelsPerCell = pPCX < pPCY ? pPCX : pPCY;
-        if (Math.floor(pPCX) == Math.floor(pPCY)) return;
-
-        // Extend the field again to fill the remaining space:
-        if (pixelsPerCell == pPCX) {
-            // Then the y space has to be filled up
-            int cellsY = (int) (getHeight() / pixelsPerCell);
-            int diffY = cellsY - newField.length;
-
-            boolean modulusTop = Math.floor(Math.random() * 2) == 1;
-            int addTop = diffY / 2 + (modulusTop ? diffY % 2 : 0);
-            int addBottom = diffY / 2 + (modulusTop ? 0 : diffY % 2);
-
-            expandFieldY(addTop, addBottom, false, false);
-        } else {
-            // Then the x space has to be filled up
-            int cellsX = (int) (getWidth() / pixelsPerCell);
-            int diffX = cellsX - newField[0].length;
-
-            boolean modulusLeft = Math.floor(Math.random() * 2) == 1;
-            int addLeft = diffX / 2 + (modulusLeft ? diffX % 2 : 0);
-            int addRight = diffX / 2 + (modulusLeft ? 0 : diffX % 2);
-
-            expandFieldX(addLeft, addRight, false, false);
-        }*/
     }
 
     private void zoomFitField() {
@@ -541,6 +536,24 @@ public class ViewOfLife extends View {
 
         fillXSpace();
         fillYSpace();
+    }
+
+    private void zoomIn(int startX, int stopX, int startY, int stopY) {
+        // The following order can't be changed, because when
+        // zoomInLeft changes, visibleWidth() also changes
+        zoomInRight -= visibleWidth() - stopX - 1;
+        zoomInLeft += startX;
+        zoomInBottom -= visibleHeight() - stopY - 1;
+        zoomInTop += startY;
+
+        int pPCX = getWidth() / visibleWidth();
+        int pPCY = getHeight() / visibleHeight();
+        pixelsPerCell = pPCX < pPCY ? pPCX : pPCY;
+
+        fillXSpace();
+        fillYSpace();
+
+        invalidate();
     }
 
 

@@ -62,6 +62,10 @@ public class MainActivity extends AppCompatActivity {
         Log.d("sizes", "height: " + viewOfLife.getFieldHeight() + ", width: " + viewOfLife.getFieldWidth());
     }
 
+    public void onClickZoomIn(View view) {
+        viewOfLife.setEditMode(ViewOfLife.EditMode.ZOOM_IN);
+    }
+
     public void onClickAutoZoom(View view) {
         if (viewOfLife.isAutoZoom()) {
             viewOfLife.setAutoZoom(false);

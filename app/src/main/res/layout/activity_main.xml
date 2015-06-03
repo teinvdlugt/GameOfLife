@@ -15,20 +15,14 @@
         android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:orientation="horizontal">
 
-        <!--<ImageButton
+        <ImageButton
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="?android:attr/selectableItemBackground"
             android:contentDescription="@string/xs_zoom_in"
             android:onClick="onClickZoomIn"
-            android:src="@mipmap/ic_zoom_in_black_36dp" />-->
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@null" />
+            android:src="@mipmap/ic_zoom_in_black_36dp" />
 
         <ImageButton
             android:layout_width="0dp"
