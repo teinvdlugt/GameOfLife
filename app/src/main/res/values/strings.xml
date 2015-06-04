@@ -12,6 +12,9 @@
     <string name="xs_zoom_out">Zoom out</string>
     <string name="xs_autozoom">Zoom out automatically</string>
     <string name="settings">Settings</string>
-    <string name="speed_key">SPEED</string>
+    <string name="speed_key" translatable="false">SPEED</string>
     <string name="speed">Speed</string>
+    <string name="stroke_width_key" translatable="false">STROKE_WIDTH</string>
+    <string name="stroke_width">Stroke width</string>
+    <string name="stroke_width_dialog_title">Stroke width in pixels</string>
 </resources>

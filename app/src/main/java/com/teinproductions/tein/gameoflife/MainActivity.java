@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
             viewOfLife.stop();
             playPauseButton.setImageResource(R.mipmap.ic_play_arrow_black_36dp);
         } else {
-            resetSpeed();
+            //resetSpeed();
             viewOfLife.start();
             playPauseButton.setImageResource(R.mipmap.ic_pause_black_36dp);
         }
@@ -100,13 +100,31 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
     }
 
-    public void resetSpeed() {
+    @Override
+    protected void onResume() {
+        super.onResume();
+        resetSpeed();
+        resetStrokeWidth();
+    }
+
+    private void resetSpeed() {
         String speed = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString(getString(R.string.speed_key), "100");
         try {
             viewOfLife.setSpeed(Integer.parseInt(speed));
         } catch (NumberFormatException e) {
             viewOfLife.setSpeed(100);
+        }
+    }
+
+    private void resetStrokeWidth() {
+        String speed = PreferenceManager.getDefaultSharedPreferences(this)
+                .getString(getString(R.string.stroke_width_key), "1");
+
+        try {
+            viewOfLife.setStrokeWidth(Integer.parseInt(speed));
+        } catch (NumberFormatException e) {
+            viewOfLife.setStrokeWidth(1);
         }
     }
 }

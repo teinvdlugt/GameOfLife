@@ -31,6 +31,8 @@ public class ViewOfLife extends View {
 
     private int zoomInLeft, zoomInRight, zoomInTop, zoomInBottom;
 
+    Paint gridPaint = new Paint();
+
     /**
      * Alert: invalidate() is not called in this method
      * The rules of Game of Life:
@@ -130,7 +132,7 @@ public class ViewOfLife extends View {
         if (field == null) initField();
 
         drawBlocks(canvas);
-        if (pixelsPerCell >= 12) drawGrid(canvas);
+        if (pixelsPerCell >= 12 && gridPaint.getStrokeWidth() > 0) drawGrid(canvas);
     }
 
     private void initField() {
@@ -169,29 +171,32 @@ public class ViewOfLife extends View {
     }
 
     private void drawGrid(Canvas canvas) {
-        Paint paint = new Paint();
-        paint.setColor(getResources().getColor(android.R.color.black));
+        if (gridPaint == null) {
+            gridPaint = new Paint();
+            gridPaint.setColor(getResources().getColor(android.R.color.black));
+            gridPaint.setStrokeWidth(1);
+        }
 
         int visibleWidth = visibleWidth();
         int visibleHeight = visibleHeight();
 
         // Vertical lines
         for (int x = 0; x < visibleWidth; x++) {
-            canvas.drawLine(x * pixelsPerCell, 0, x * pixelsPerCell, visibleHeight * pixelsPerCell, paint);
+            canvas.drawLine(x * pixelsPerCell, 0, x * pixelsPerCell, visibleHeight * pixelsPerCell, gridPaint);
         }
         // Last vertical line:
         float x = visibleWidth * pixelsPerCell;
         if (x == getWidth()) x--;
-        canvas.drawLine(x, 0, x, visibleHeight * pixelsPerCell, paint);
+        canvas.drawLine(x, 0, x, visibleHeight * pixelsPerCell, gridPaint);
 
         // Horizontal lines
         for (int y = 0; y < visibleHeight; y++) {
-            canvas.drawLine(0, y * pixelsPerCell, visibleWidth * pixelsPerCell, y * pixelsPerCell, paint);
+            canvas.drawLine(0, y * pixelsPerCell, visibleWidth * pixelsPerCell, y * pixelsPerCell, gridPaint);
         }
         // Last horizontal line:
         float y = visibleHeight * pixelsPerCell;
         if (y == getHeight()) y--;
-        canvas.drawLine(0, y, visibleWidth * pixelsPerCell, y, paint);
+        canvas.drawLine(0, y, visibleWidth * pixelsPerCell, y, gridPaint);
     }
 
     @Override
@@ -267,6 +272,9 @@ public class ViewOfLife extends View {
                 startY = stopY;
                 stopY = temp;
             } else if (startY == stopY) return true;
+
+            if (stopY > visibleHeight() - 1) stopY = visibleHeight() - 1;
+            if (stopX > visibleWidth() - 1) stopX = visibleWidth() - 1;
 
             zoomIn(startX, stopX, startY, stopY);
 
@@ -610,6 +618,10 @@ public class ViewOfLife extends View {
         return zoomInBottom - zoomInTop + 1;
     }
 
+
+    public void setStrokeWidth(int strokeWidth) {
+        gridPaint.setStrokeWidth(strokeWidth);
+    }
 
     public float getPixelsPerCell() {
         return pixelsPerCell;
