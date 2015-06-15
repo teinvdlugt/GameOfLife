@@ -9,12 +9,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 
 public class MainActivity extends AppCompatActivity {
 
     private ViewOfLife viewOfLife;
-    private ImageButton playPauseButton, autoZoomButton;
+    private ImageButton playPauseButton, autoZoomButton, clearButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +25,14 @@ public class MainActivity extends AppCompatActivity {
         viewOfLife = (ViewOfLife) findViewById(R.id.view_of_life);
         playPauseButton = (ImageButton) findViewById(R.id.playPause_button);
         autoZoomButton = (ImageButton) findViewById(R.id.auto_zoom_button);
+        clearButton = (ImageButton) findViewById(R.id.clear_button);
+        clearButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                clear();
+                return true;
+            }
+        });
 
         resetSpeed();
     }
@@ -36,10 +45,14 @@ public class MainActivity extends AppCompatActivity {
         viewOfLife.setEditMode(ViewOfLife.EditMode.REMOVE);
     }
 
-    public void onClickClear(View view) {
+    public void clear() {
         viewOfLife.clear();
         viewOfLife.stop();
         playPauseButton.setImageResource(R.mipmap.ic_play_arrow_black_36dp);
+    }
+
+    public void onClickClear(View view) {
+        Toast.makeText(this, getString(R.string.short_click_clear_message), Toast.LENGTH_SHORT).show();
     }
 
     public void onClickPlayPause(View view) {

@@ -13,6 +13,7 @@ public class ViewOfLife extends View {
     private float pixelsPerCell;
 
     private boolean[][] field;
+    private final Object lock = new Object();
 
     private boolean running = false;
 
@@ -42,40 +43,42 @@ public class ViewOfLife extends View {
      * - A living cell with more than three living neighbours, dies.
      */
     private void nextGeneration() {
-        boolean[][] fieldCache = new boolean[field.length][field[0].length];
-        for (int y = 0; y < field.length; y++) {
-            System.arraycopy(field[y], 0, fieldCache[y], 0, field[0].length);
-        }
+        synchronized (lock) {
+            boolean[][] fieldCache = new boolean[field.length][field[0].length];
+            for (int y = 0; y < field.length; y++) {
+                System.arraycopy(field[y], 0, fieldCache[y], 0, field[0].length);
+            }
 
-        boolean autoZoomOut = pixelsPerCell >= 2 && autoZoom;
-        boolean expandLeft = false, expandRight = false, expandTop = false, expandBottom = false;
+            boolean autoZoomOut = pixelsPerCell >= 2 && autoZoom;
+            boolean expandLeft = false, expandRight = false, expandTop = false, expandBottom = false;
 
-        for (int y = 0; y < fieldCache.length; y++) {
-            for (int x = 0; x < fieldCache[0].length; x++) {
-                int neighbours = livingNeighbours(fieldCache, x, y);
-                if (neighbours > 3 || neighbours < 2) field[y][x] = false;
-                if (neighbours == 3) {
-                    field[y][x] = true;
-                }
+            for (int y = 0; y < fieldCache.length; y++) {
+                for (int x = 0; x < fieldCache[0].length; x++) {
+                    int neighbours = livingNeighbours(fieldCache, x, y);
+                    if (neighbours > 3 || neighbours < 2) field[y][x] = false;
+                    if (neighbours == 3) {
+                        field[y][x] = true;
+                    }
 
-                // Check if it is needed to zoom out
-                if (autoZoomOut && field[y][x]) {
-                    if (y < 2) expandTop = true;
-                    if (x > field[0].length - 3) expandRight = true;
-                    if (y > field.length - 3) expandBottom = true;
-                    if (x < 2) expandLeft = true;
+                    // Check if it is needed to zoom out
+                    if (autoZoomOut && field[y][x]) {
+                        if (y < 2) expandTop = true;
+                        if (x > field[0].length - 3) expandRight = true;
+                        if (y > field.length - 3) expandBottom = true;
+                        if (x < 2) expandLeft = true;
+                    }
                 }
             }
-        }
 
-        if (autoZoomOut && (expandTop || expandBottom || expandLeft || expandRight)) {
-            boolean zoomOut = zoomInLeft == 0 && zoomInRight == field[0].length - 1
-                    && zoomInTop == 0 && zoomInBottom == field.length - 1;
-            expandField(expandLeft ? 2 : 0, expandRight ? 2 : 0, expandTop ? 2 : 0, expandBottom ? 2 : 0);
+            if (autoZoomOut && (expandTop || expandBottom || expandLeft || expandRight)) {
+                boolean zoomOut = zoomInLeft == 0 && zoomInRight == field[0].length - 1
+                        && zoomInTop == 0 && zoomInBottom == field.length - 1;
+                expandField(expandLeft ? 2 : 0, expandRight ? 2 : 0, expandTop ? 2 : 0, expandBottom ? 2 : 0);
 
-            if (zoomOut) {
-                // Zoom out
-                zoomFitField();
+                if (zoomOut) {
+                    // Zoom out
+                    zoomFitField();
+                }
             }
         }
     }
@@ -136,20 +139,22 @@ public class ViewOfLife extends View {
     }
 
     private void initField() {
-        pixelsPerCell = 30;
-        int verCells = (int) (getHeight() / pixelsPerCell);
-        int horCells = (int) (getWidth() / pixelsPerCell);
+        synchronized (lock) {
+            pixelsPerCell = 30;
+            int verCells = (int) (getHeight() / pixelsPerCell);
+            int horCells = (int) (getWidth() / pixelsPerCell);
 
-        // Otherwise, the last lines from the grid won't be drawn:
-        if (getHeight() % pixelsPerCell == 0) verCells--;
-        if (getWidth() % pixelsPerCell == 0) horCells--;
+            // Otherwise, the last lines from the grid won't be drawn:
+            if (getHeight() % pixelsPerCell == 0) verCells--;
+            if (getWidth() % pixelsPerCell == 0) horCells--;
 
-        zoomInLeft = 0;
-        zoomInTop = 0;
-        zoomInRight = horCells - 1;
-        zoomInBottom = verCells - 1;
+            zoomInLeft = 0;
+            zoomInTop = 0;
+            zoomInRight = horCells - 1;
+            zoomInBottom = verCells - 1;
 
-        field = new boolean[verCells][horCells];
+            field = new boolean[verCells][horCells];
+        }
     }
 
     private void drawBlocks(Canvas canvas) {
@@ -215,7 +220,7 @@ public class ViewOfLife extends View {
                     previousMovePositionX = event.getX();
                     previousMovePositionY = event.getY();
 
-                    field[y][x] = editMode == EditMode.ADD;
+                    setFieldBoolean(x, y, editMode == EditMode.ADD);
 
                     invalidate();
                 } else if (editMode == EditMode.ZOOM_IN && !zoomingIn) {
@@ -241,10 +246,10 @@ public class ViewOfLife extends View {
 
                 switch (editMode) {
                     case ADD:
-                        field[y][x] = true;
+                        setFieldBoolean(x, y, true);
                         break;
                     case REMOVE:
-                        field[y][x] = false;
+                        setFieldBoolean(x, y, false);
                 }
 
                 invalidate();
@@ -288,7 +293,7 @@ public class ViewOfLife extends View {
         float yDiff = event.getY() - previousMovePositionY;
 
         double lengthOfLine = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
-        int amountOfCells = (int) Math.ceil(lengthOfLine / pixelsPerCell); // TODO is Math.ceil correct?!?
+        int amountOfCells = (int) Math.ceil(lengthOfLine / pixelsPerCell);
 
         if (amountOfCells < 1) return;
 
@@ -309,6 +314,12 @@ public class ViewOfLife extends View {
 
             currX += xSpacing;
             currY += ySpacing;
+        }
+    }
+
+    private void setFieldBoolean(int x, int y, boolean value) {
+        synchronized (lock) {
+            field[y][x] = value;
         }
     }
 
@@ -348,7 +359,9 @@ public class ViewOfLife extends View {
     }
 
     public void clear() {
-        field = new boolean[field.length][field[0].length];
+        synchronized (lock) {
+            field = new boolean[field.length][field[0].length];
+        }
         invalidate();
     }
 
@@ -356,16 +369,18 @@ public class ViewOfLife extends View {
     public void zoomOut() {
         if (pixelsPerCell < 2) return;
 
-        int width = visibleWidth();
-        int pixelsPerCell = (int) this.pixelsPerCell;
-        pixelsPerCell--;
+        synchronized (lock) {
+            int width = visibleWidth();
+            int pixelsPerCell = (int) this.pixelsPerCell;
+            pixelsPerCell--;
 
-        do {
-            width++;
-        } while (getWidth() / width >= pixelsPerCell);
+            do {
+                width++;
+            } while (getWidth() / width >= pixelsPerCell);
 
-        pixelsPerCell = getWidth() / width;
-        zoomOutPixels((int) this.pixelsPerCell - pixelsPerCell);
+            pixelsPerCell = getWidth() / width;
+            zoomOutPixels((int) this.pixelsPerCell - pixelsPerCell);
+        }
     }
 
     public void zoomOutPixels(int amount) {
@@ -384,46 +399,50 @@ public class ViewOfLife extends View {
     }
 
     private void expandField(int expandLeft, int expandRight, int expandTop, int expandBottom) {
-        boolean[][] newField = new boolean[field.length + expandTop + expandBottom]
-                [field[0].length + expandLeft + expandRight];
+        synchronized (lock) {
+            boolean[][] newField = new boolean[field.length + expandTop + expandBottom]
+                    [field[0].length + expandLeft + expandRight];
 
-        for (int y = 0; y < field.length; y++) {
-            // The y index of newField that corresponds to the y index in field:
-            int corrY = y + expandTop;
-            for (int x = 0; x < field[0].length; x++) {
-                // The x index of newField that corresponds to the x index in field:
-                int corrX = x + expandLeft;
-                newField[corrY][corrX] = field[y][x];
+            for (int y = 0; y < field.length; y++) {
+                // The y index of newField that corresponds to the y index in field:
+                int corrY = y + expandTop;
+                for (int x = 0; x < field[0].length; x++) {
+                    // The x index of newField that corresponds to the x index in field:
+                    int corrX = x + expandLeft;
+                    newField[corrY][corrX] = field[y][x];
+                }
             }
+
+            field = newField;
+
+            zoomInTop += expandTop;
+            zoomInBottom += expandTop;
+            zoomInLeft += expandLeft;
+            zoomInRight += expandLeft;
         }
-
-        field = newField;
-
-        zoomInTop += expandTop;
-        zoomInBottom += expandTop;
-        zoomInLeft += expandLeft;
-        zoomInRight += expandLeft;
     }
 
     private void zoomOut(int addLeft, int addRight, int addTop, int addBottom) {
-        int expandLeft = addLeft - zoomInLeft;
-        int expandRight = addRight - field[0].length + zoomInRight + 1;
-        int expandTop = addTop - zoomInTop;
-        int expandBottom = addBottom - field.length + zoomInBottom + 1;
-        if (expandLeft < 0) expandLeft = 0;
-        if (expandRight < 0) expandRight = 0;
-        if (expandTop < 0) expandTop = 0;
-        if (expandBottom < 0) expandBottom = 0;
+        synchronized (lock) {
+            int expandLeft = addLeft - zoomInLeft;
+            int expandRight = addRight - field[0].length + zoomInRight + 1;
+            int expandTop = addTop - zoomInTop;
+            int expandBottom = addBottom - field.length + zoomInBottom + 1;
+            if (expandLeft < 0) expandLeft = 0;
+            if (expandRight < 0) expandRight = 0;
+            if (expandTop < 0) expandTop = 0;
+            if (expandBottom < 0) expandBottom = 0;
 
-        if (expandTop != 0 || expandBottom != 0) {
-            expandField(expandLeft, expandRight, expandTop, expandBottom);
-            //expandFieldY(expandTop, expandBottom, false, false);
+            if (expandTop != 0 || expandBottom != 0) {
+                expandField(expandLeft, expandRight, expandTop, expandBottom);
+                //expandFieldY(expandTop, expandBottom, false, false);
+            }
+
+            zoomInLeft -= addLeft;
+            zoomInRight += addRight;
+            zoomInTop -= addTop;
+            zoomInBottom += addBottom;
         }
-
-        zoomInLeft -= addLeft;
-        zoomInRight += addRight;
-        zoomInTop -= addTop;
-        zoomInBottom += addBottom;
     }
 
 
@@ -431,47 +450,53 @@ public class ViewOfLife extends View {
      * Zooms so that all living cells are visible
      */
     public void zoomFit() {
-        cutFit();
-        zoomFitField();
-        invalidate();
+        synchronized (lock) {
+            cutFit();
+            zoomFitField();
+            invalidate();
+        }
     }
 
     /**
      * Cuts the field to make it as small as possible
      */
     private void cutFit() {
-        int startX = lowestX();
-        int stopX = highestX();
-        int startY = lowestY();
-        int stopY = highestY();
+        synchronized (lock) {
+            int startX = lowestX();
+            int stopX = highestX();
+            int startY = lowestY();
+            int stopY = highestY();
 
-        if (startX == -1 || stopX == -1 || startY == -1 || stopY == -1) {
-            // There is no living cell in the field
-            initField();
-            invalidate();
-            return;
+            if (startX == -1 || stopX == -1 || startY == -1 || stopY == -1) {
+                // There is no living cell in the field
+                initField();
+                invalidate();
+                return;
+            }
+
+            // Add a 'padding' of two if possible:
+            if (startX == 1) startX = 0;
+            if (startX > 1) startX -= 2;
+            if (stopX == field[0].length - 2) stopX = field[0].length - 1;
+            if (stopX < field[0].length - 2) stopX += 2;
+            if (startY == 1) startY = 0;
+            if (startY > 1) startY -= 2;
+            if (stopY == field.length - 2) stopY = field.length - 1;
+            if (stopY < field.length - 2) stopY += 2;
+
+            cut(startX, stopX, startY, stopY);
         }
-
-        // Add a 'padding' of two if possible:
-        if (startX == 1) startX = 0;
-        if (startX > 1) startX -= 2;
-        if (stopX == field[0].length - 2) stopX = field[0].length - 1;
-        if (stopX < field[0].length - 2) stopX += 2;
-        if (startY == 1) startY = 0;
-        if (startY > 1) startY -= 2;
-        if (stopY == field.length - 2) stopY = field.length - 1;
-        if (stopY < field.length - 2) stopY += 2;
-
-        cut(startX, stopX, startY, stopY);
     }
 
     private int lowestX() {
         int lowestX = -1;
 
-        for (boolean[] row : field) {
-            for (int x = 0; x < field[0].length; x++) {
-                if (x >= lowestX && lowestX != -1) break;
-                if (row[x]) lowestX = x;
+        synchronized (lock) {
+            for (boolean[] row : field) {
+                for (int x = 0; x < field[0].length; x++) {
+                    if (x >= lowestX && lowestX != -1) break;
+                    if (row[x]) lowestX = x;
+                }
             }
         }
 
@@ -481,10 +506,12 @@ public class ViewOfLife extends View {
     private int highestX() {
         int highestX = -1;
 
-        for (boolean[] row : field) {
-            for (int x = field[0].length - 1; x >= 0; x--) {
-                if (x <= highestX) break;
-                if (row[x]) highestX = x;
+        synchronized (lock) {
+            for (boolean[] row : field) {
+                for (int x = field[0].length - 1; x >= 0; x--) {
+                    if (x <= highestX) break;
+                    if (row[x]) highestX = x;
+                }
             }
         }
 
@@ -492,10 +519,12 @@ public class ViewOfLife extends View {
     }
 
     private int lowestY() {
-        for (int y = 0; y < field.length; y++) {
-            // If this row contains a true, then immediately return that
-            for (int x = 0; x < field[0].length; x++) {
-                if (field[y][x]) return y;
+        synchronized (lock) {
+            for (int y = 0; y < field.length; y++) {
+                // If this row contains a true, then immediately return that
+                for (int x = 0; x < field[0].length; x++) {
+                    if (field[y][x]) return y;
+                }
             }
         }
 
@@ -503,9 +532,11 @@ public class ViewOfLife extends View {
     }
 
     private int highestY() {
-        for (int y = field.length - 1; y >= 0; y--) {
-            for (int x = 0; x < field[0].length; x++) {
-                if (field[y][x]) return y;
+        synchronized (lock) {
+            for (int y = field.length - 1; y >= 0; y--) {
+                for (int x = 0; x < field[0].length; x++) {
+                    if (field[y][x]) return y;
+                }
             }
         }
 
@@ -513,109 +544,123 @@ public class ViewOfLife extends View {
     }
 
     private void cut(int startX, int stopX, int startY, int stopY) {
-        boolean[][] newField = new boolean[stopY - startY + 1][stopX - startX + 1];
+        synchronized (lock) {
+            boolean[][] newField = new boolean[stopY - startY + 1][stopX - startX + 1];
 
-        for (int y = 0; y < newField.length; y++) {
-            // The y index in field that corresponds with the y index in newField
-            int corrY = y + startY;
-            for (int x = 0; x < newField[0].length; x++) {
-                // The x index in field that corresponds with the x index in newField
-                int corrX = x + startX;
-                newField[y][x] = field[corrY][corrX];
+            for (int y = 0; y < newField.length; y++) {
+                // The y index in field that corresponds with the y index in newField
+                int corrY = y + startY;
+                for (int x = 0; x < newField[0].length; x++) {
+                    // The x index in field that corresponds with the x index in newField
+                    int corrX = x + startX;
+                    newField[y][x] = field[corrY][corrX];
+                }
             }
-        }
 
-        field = newField;
+            field = newField;
+        }
     }
 
     private void zoomFitField() {
-        zoomInLeft = 0;
-        zoomInRight = field[0].length - 1;
-        zoomInTop = 0;
-        zoomInBottom = field.length - 1;
+        synchronized (lock) {
+            zoomInLeft = 0;
+            zoomInRight = field[0].length - 1;
+            zoomInTop = 0;
+            zoomInBottom = field.length - 1;
 
-        int pPCX = getWidth() / field[0].length;
-        int pPCY = getHeight() / field.length;
-        pixelsPerCell = pPCX < pPCY ? pPCX : pPCY;
+            int pPCX = getWidth() / field[0].length;
+            int pPCY = getHeight() / field.length;
+            pixelsPerCell = pPCX < pPCY ? pPCX : pPCY;
 
-        fillXSpace();
-        fillYSpace();
+            fillXSpace();
+            fillYSpace();
+        }
     }
 
     private void zoomIn(int startX, int stopX, int startY, int stopY) {
-        // The following order can't be changed, because when
-        // zoomInLeft changes, visibleWidth() also changes
-        zoomInRight -= visibleWidth() - stopX - 1;
-        zoomInLeft += startX;
-        zoomInBottom -= visibleHeight() - stopY - 1;
-        zoomInTop += startY;
+        synchronized (lock) {
+            // The following order can't be changed, because when
+            // zoomInLeft changes, visibleWidth() also changes
+            zoomInRight -= visibleWidth() - stopX - 1;
+            zoomInLeft += startX;
+            zoomInBottom -= visibleHeight() - stopY - 1;
+            zoomInTop += startY;
 
-        int pPCX = getWidth() / visibleWidth();
-        int pPCY = getHeight() / visibleHeight();
-        pixelsPerCell = pPCX < pPCY ? pPCX : pPCY;
+            int pPCX = getWidth() / visibleWidth();
+            int pPCY = getHeight() / visibleHeight();
+            pixelsPerCell = pPCX < pPCY ? pPCX : pPCY;
 
-        fillXSpace();
-        fillYSpace();
+            fillXSpace();
+            fillYSpace();
 
-        invalidate();
+            invalidate();
+        }
     }
 
 
     private void fillXSpace() {
-        int cellsX = (int) (getWidth() / pixelsPerCell);
-        int diffX = cellsX - visibleWidth();
+        synchronized (lock) {
+            int cellsX = (int) (getWidth() / pixelsPerCell);
+            int diffX = cellsX - visibleWidth();
 
-        if (diffX <= 0) return;
+            if (diffX <= 0) return;
 
-        boolean modulusLeft = randomBoolean();
-        int addLeft = diffX / 2 + (modulusLeft ? diffX % 2 : 0);
-        int addRight = diffX / 2 + (modulusLeft ? 0 : diffX % 2);
+            boolean modulusLeft = randomBoolean();
+            int addLeft = diffX / 2 + (modulusLeft ? diffX % 2 : 0);
+            int addRight = diffX / 2 + (modulusLeft ? 0 : diffX % 2);
 
-        // Expand the field if needed
-        int expandLeft = addLeft - zoomInLeft;
-        int expandRight = addRight - field[0].length + zoomInRight + 1;
-        if (expandLeft < 0) expandLeft = 0;
-        if (expandRight < 0) expandRight = 0;
-        if (expandLeft != 0 || expandRight != 0) {
-            expandField(expandLeft, expandRight, 0, 0);
-            //expandFieldX(expandLeft, expandRight, false, false);
+            // Expand the field if needed
+            int expandLeft = addLeft - zoomInLeft;
+            int expandRight = addRight - field[0].length + zoomInRight + 1;
+            if (expandLeft < 0) expandLeft = 0;
+            if (expandRight < 0) expandRight = 0;
+            if (expandLeft != 0 || expandRight != 0) {
+                expandField(expandLeft, expandRight, 0, 0);
+                //expandFieldX(expandLeft, expandRight, false, false);
+            }
+
+            zoomInLeft -= addLeft;
+            zoomInRight += addRight;
         }
-
-        zoomInLeft -= addLeft;
-        zoomInRight += addRight;
     }
 
     private void fillYSpace() {
-        int cellsY = (int) (getHeight() / pixelsPerCell);
-        int diffY = cellsY - visibleHeight();
+        synchronized (lock) {
+            int cellsY = (int) (getHeight() / pixelsPerCell);
+            int diffY = cellsY - visibleHeight();
 
-        if (diffY <= 0) return;
+            if (diffY <= 0) return;
 
-        boolean modulusTop = randomBoolean();
-        int addTop = diffY / 2 + (modulusTop ? diffY % 2 : 0);
-        int addBottom = diffY / 2 + (modulusTop ? 0 : diffY % 2);
+            boolean modulusTop = randomBoolean();
+            int addTop = diffY / 2 + (modulusTop ? diffY % 2 : 0);
+            int addBottom = diffY / 2 + (modulusTop ? 0 : diffY % 2);
 
-        // Expand the field if needed
-        int expandTop = addTop - zoomInTop;
-        int expandBottom = addBottom - field.length + zoomInBottom + 1;
-        if (expandTop < 0) expandTop = 0;
-        if (expandBottom < 0) expandBottom = 0;
-        if (expandTop != 0 || expandBottom != 0) {
-            expandField(0, 0, expandTop, expandBottom);
-            //expandFieldY(expandTop, expandBottom, false, false);
+            // Expand the field if needed
+            int expandTop = addTop - zoomInTop;
+            int expandBottom = addBottom - field.length + zoomInBottom + 1;
+            if (expandTop < 0) expandTop = 0;
+            if (expandBottom < 0) expandBottom = 0;
+            if (expandTop != 0 || expandBottom != 0) {
+                expandField(0, 0, expandTop, expandBottom);
+                //expandFieldY(expandTop, expandBottom, false, false);
+            }
+
+            zoomInTop -= addTop;
+            zoomInBottom += addBottom;
         }
-
-        zoomInTop -= addTop;
-        zoomInBottom += addBottom;
     }
 
 
     public int visibleWidth() {
-        return zoomInRight - zoomInLeft + 1;
+        synchronized (lock) {
+            return zoomInRight - zoomInLeft + 1;
+        }
     }
 
     public int visibleHeight() {
-        return zoomInBottom - zoomInTop + 1;
+        synchronized (lock) {
+            return zoomInBottom - zoomInTop + 1;
+        }
     }
 
 
@@ -625,11 +670,6 @@ public class ViewOfLife extends View {
 
     public float getPixelsPerCell() {
         return pixelsPerCell;
-    }
-
-    public void setPixelsPerCell(float pixelsPerCell) {
-        this.pixelsPerCell = pixelsPerCell;
-        invalidate();
     }
 
     public int getFieldWidth() {
