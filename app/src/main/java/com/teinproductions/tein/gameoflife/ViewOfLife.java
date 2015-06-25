@@ -8,12 +8,21 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+
 public class ViewOfLife extends View {
 
     private float pixelsPerCell;
 
     private boolean[][] field;
     private final Object lock = new Object();
+
+    private boolean[][] initialState;
+    private long currentGen = 0;
+    private GenerationListener genListener;
+
+    interface GenerationListener {
+        void generationChanged(long newGen);
+    }
 
     private boolean running = false;
 
@@ -42,12 +51,9 @@ public class ViewOfLife extends View {
      * - A living cell with less than two living neighbours, dies.
      * - A living cell with more than three living neighbours, dies.
      */
-    private void nextGeneration() {
+    public void nextGeneration() {
         synchronized (lock) {
-            boolean[][] fieldCache = new boolean[field.length][field[0].length];
-            for (int y = 0; y < field.length; y++) {
-                System.arraycopy(field[y], 0, fieldCache[y], 0, field[0].length);
-            }
+            boolean[][] fieldCache = clone(field);
 
             boolean autoZoomOut = pixelsPerCell >= 2 && autoZoom;
             boolean expandLeft = false, expandRight = false, expandTop = false, expandBottom = false;
@@ -76,11 +82,13 @@ public class ViewOfLife extends View {
                 expandField(expandLeft ? 2 : 0, expandRight ? 2 : 0, expandTop ? 2 : 0, expandBottom ? 2 : 0);
 
                 if (zoomOut) {
-                    // Zoom out
                     zoomFitField();
                 }
             }
         }
+
+        currentGen++;
+        updateGeneration();
     }
 
     private int livingNeighbours(boolean[][] field, int x, int y) {
@@ -154,6 +162,10 @@ public class ViewOfLife extends View {
             zoomInBottom = verCells - 1;
 
             field = new boolean[verCells][horCells];
+            initialState = new boolean[verCells][horCells];
+
+            currentGen = 0;
+            updateGeneration();
         }
     }
 
@@ -319,7 +331,10 @@ public class ViewOfLife extends View {
 
     private void setFieldBoolean(int x, int y, boolean value) {
         synchronized (lock) {
+            currentGen = 0;
+            updateGeneration();
             field[y][x] = value;
+            storeInitialState();
         }
     }
 
@@ -361,6 +376,10 @@ public class ViewOfLife extends View {
     public void clear() {
         synchronized (lock) {
             field = new boolean[field.length][field[0].length];
+            initialState = new boolean[field.length][field[0].length];
+
+            currentGen = 0;
+            updateGeneration();
         }
         invalidate();
     }
@@ -663,6 +682,20 @@ public class ViewOfLife extends View {
         }
     }
 
+    private void storeInitialState() {
+        synchronized (lock) {
+            initialState = clone(field);
+        }
+    }
+
+    public void restoreInitialState() {
+        synchronized (lock) {
+            field = clone(initialState);
+            currentGen = 0;
+            updateGeneration();
+            zoomFit();
+        }
+    }
 
     public void setStrokeWidth(int strokeWidth) {
         gridPaint.setStrokeWidth(strokeWidth);
@@ -678,6 +711,21 @@ public class ViewOfLife extends View {
 
     public int getFieldHeight() {
         return field.length;
+    }
+
+    public void setGenListener(GenerationListener genListener) {
+        this.genListener = genListener;
+    }
+
+    private void updateGeneration() {
+        if (genListener != null) {
+            post(new Runnable() {
+                @Override
+                public void run() {
+                    genListener.generationChanged(currentGen);
+                }
+            });
+        }
     }
 
     public void setEditMode(EditMode editMode) {
@@ -723,5 +771,13 @@ public class ViewOfLife extends View {
 
     public static boolean randomBoolean() {
         return Math.floor(Math.random() * 2) == 1;
+    }
+
+    public static boolean[][] clone(boolean[][] from) {
+        boolean[][] result = new boolean[from.length][from[0].length];
+        for (int y = 0; y < from.length; y++) {
+            System.arraycopy(from[y], 0, result[y], 0, from[0].length);
+        }
+        return result;
     }
 }

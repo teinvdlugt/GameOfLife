@@ -13,6 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:baselineAligned="false"
         android:orientation="horizontal">
 
         <FrameLayout
@@ -29,6 +30,16 @@
                 android:contentDescription="@string/xs_zoom_in"
                 android:onClick="onClickZoomIn"
                 android:src="@mipmap/ic_zoom_in_black_36dp" />
+
+            <ImageButton
+                android:id="@+id/nextGenButton"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_gravity="center"
+                android:background="@drawable/circle_background"
+                android:contentDescription="@string/xs_next_generation"
+                android:onClick="onClickNextGen"
+                android:src="@mipmap/ic_forward_black_36dp" />
         </FrameLayout>
 
         <FrameLayout
@@ -37,6 +48,7 @@
             android:layout_weight="1">
 
             <ImageButton
+                android:id="@+id/zoomOutButton"
                 android:layout_width="45dp"
                 android:layout_height="45dp"
                 android:layout_gravity="center"
@@ -44,6 +56,16 @@
                 android:contentDescription="@string/xs_zoom_out"
                 android:onClick="onClickZoomOut"
                 android:src="@mipmap/ic_zoom_out_black_36dp" />
+
+            <ImageButton
+                android:id="@+id/initialStateButton"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_gravity="center"
+                android:background="@drawable/circle_background"
+                android:contentDescription="@string/xs_initial_state"
+                android:onClick="onClickInitialState"
+                android:src="@mipmap/ic_skip_previous_black_36dp" />
         </FrameLayout>
 
         <FrameLayout
@@ -52,6 +74,7 @@
             android:layout_weight="1">
 
             <ImageButton
+                android:id="@+id/zoomFitButton"
                 android:layout_width="45dp"
                 android:layout_height="45dp"
                 android:layout_gravity="center"
@@ -59,6 +82,14 @@
                 android:contentDescription="@string/xs_zoom_fit"
                 android:onClick="onClickZoomFit"
                 android:src="@mipmap/ic_fullscreen_black_36dp" />
+
+            <TextView
+                android:id="@+id/generation_textView"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:gravity="center"
+                android:textStyle="bold"
+                tools:text="345" />
         </FrameLayout>
 
         <FrameLayout
@@ -103,6 +134,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:baselineAligned="false"
         android:orientation="horizontal">
 
         <FrameLayout

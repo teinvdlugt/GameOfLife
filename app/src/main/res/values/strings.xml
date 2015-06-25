@@ -17,5 +17,7 @@
     <string name="stroke_width_key" translatable="false">STROKE_WIDTH</string>
     <string name="stroke_width">Stroke width</string>
     <string name="stroke_width_dialog_title">Stroke width in pixels</string>
-    <string name="short_click_clear_message">Long click the button to clear the field</string>
+    <string name="short_click_clear_message">Click and hold the button to clear the field</string>
+    <string name="xs_next_generation">Next generation</string>
+    <string name="xs_initial_state">Initial state</string>
 </resources>
