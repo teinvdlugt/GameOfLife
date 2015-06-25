@@ -1,18 +1,19 @@
 package com.teinproductions.tein.gameoflife;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
-public class MainActivity extends AppCompatActivity implements ViewOfLife.GenerationListener {
+public class MainActivity extends AppCompatActivity implements ViewOfLife.ActivityInterface {
 
     private ViewOfLife viewOfLife;
     private ImageButton playPauseButton, autoZoomButton, clearButton;
@@ -38,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Genera
         initialStateButton = (ImageButton) findViewById(R.id.initialStateButton);
         generationTV = (TextView) findViewById(R.id.generation_textView);
 
-        viewOfLife.setGenListener(this);
+        viewOfLife.setActivityInterface(this);
         clearButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -167,6 +168,7 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Genera
         viewOfLife.stop();
         viewOfLife.clear();
         playPauseButton.setImageResource(R.mipmap.ic_play_arrow_black_36dp);
+        lockScreenOrientation(false);
     }
 
     public void onClickClear(View view) {
@@ -189,7 +191,6 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Genera
 
     public void onClickZoomOut(View view) {
         viewOfLife.zoomOut();
-        Log.d("sizes", "height: " + viewOfLife.getFieldHeight() + ", width: " + viewOfLife.getFieldWidth());
     }
 
     public void onClickAutoZoom(View view) {
@@ -204,6 +205,22 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Genera
 
     public void onClickSettings(View view) {
         startActivity(new Intent(this, SettingsActivity.class));
+    }
+
+    private void lockScreenOrientation(boolean lock) {
+        if (lock) {
+            int orientation = getResources().getConfiguration().orientation;
+            switch (orientation) {
+                case Configuration.ORIENTATION_PORTRAIT:
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                    break;
+                case Configuration.ORIENTATION_LANDSCAPE:
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                    break;
+            }
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+        }
     }
 
     @Override
@@ -269,9 +286,14 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Genera
     }
 
     @Override
-    public void generationChanged(long newGen) {
+    public void onGenerationChanged(long newGen) {
         //String gen = "" + newGen;
         //float textSize = generationTV.getWidth() / newGen;
         generationTV.setText("" + newGen);
+    }
+
+    @Override
+    public void onEdited() {
+        lockScreenOrientation(true);
     }
 }

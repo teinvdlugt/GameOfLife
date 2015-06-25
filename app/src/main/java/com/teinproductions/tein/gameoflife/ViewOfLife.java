@@ -18,10 +18,11 @@ public class ViewOfLife extends View {
 
     private boolean[][] initialState;
     private long currentGen = 0;
-    private GenerationListener genListener;
+    private ActivityInterface activityInterface;
 
-    interface GenerationListener {
-        void generationChanged(long newGen);
+    interface ActivityInterface {
+        void onGenerationChanged(long newGen);
+        void onEdited();
     }
 
     private boolean running = false;
@@ -233,6 +234,7 @@ public class ViewOfLife extends View {
                     previousMovePositionY = event.getY();
 
                     setFieldBoolean(x, y, editMode == EditMode.ADD);
+                    if (editMode == EditMode.ADD) activityInterface.onEdited();
 
                     invalidate();
                 } else if (editMode == EditMode.ZOOM_IN && !zoomingIn) {
@@ -259,6 +261,7 @@ public class ViewOfLife extends View {
                 switch (editMode) {
                     case ADD:
                         setFieldBoolean(x, y, true);
+                        activityInterface.onEdited();
                         break;
                     case REMOVE:
                         setFieldBoolean(x, y, false);
@@ -713,16 +716,16 @@ public class ViewOfLife extends View {
         return field.length;
     }
 
-    public void setGenListener(GenerationListener genListener) {
-        this.genListener = genListener;
+    public void setActivityInterface(ActivityInterface activityInterface) {
+        this.activityInterface = activityInterface;
     }
 
     private void updateGeneration() {
-        if (genListener != null) {
+        if (activityInterface != null) {
             post(new Runnable() {
                 @Override
                 public void run() {
-                    genListener.generationChanged(currentGen);
+                    activityInterface.onGenerationChanged(currentGen);
                 }
             });
         }
