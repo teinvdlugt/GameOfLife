@@ -16,8 +16,8 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity implements ViewOfLife.ActivityInterface {
 
     private ViewOfLife viewOfLife;
-    private ImageButton playPauseButton, autoZoomButton, clearButton;
-    private ImageButton pencilButton, eraseButton, zoomInButton, zoomOutButton, zoomFitButton;
+    private ImageButton playPauseButton, clearButton;
+    private ImageButton pencilButton, eraseButton;
     private ImageButton nextGenButton, initialStateButton;
     private TextView generationTV;
 
@@ -67,101 +67,22 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Activi
         showZoomButtonSection();*/
     }
 
-    private void showZoomButtonSection() {
-        /*Log.d("COFFEEE", "showZoomButtonSection");
-        int duration = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-        for (final View view : new View[]{prevGenButton, nextGenButton, initialStateButton, generationTV}) {
-            view.animate().alpha(0f).setDuration(duration).setListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator animation) {*//*ignored*//*}
-
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    view.setVisibility(View.GONE);
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animation) {*//*ignored*//*}
-
-                @Override
-                public void onAnimationRepeat(Animator animation) {*//*ignored*//*}
-            });
-        }
-
-        for (View view : new View[]{zoomInButton, zoomOutButton, zoomFitButton, autoZoomButton}) {
-            view.setAlpha(0f);
-            view.setVisibility(View.VISIBLE);
-            view.animate().alpha(1f).setDuration(duration);
-        }*/
-
-        zoomOutButton.setVisibility(View.VISIBLE);
-        zoomInButton.setVisibility(View.VISIBLE);
-        zoomFitButton.setVisibility(View.VISIBLE);
-        autoZoomButton.setVisibility(View.VISIBLE);
-
-        nextGenButton.setVisibility(View.GONE);
-        initialStateButton.setVisibility(View.GONE);
-        generationTV.setVisibility(View.GONE);
-    }
-
-    private void showGenerationButtonSection() {
-        /*Log.d("COFFEE", "showGenerationButtonSection");
-        int duration = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-        for (final View view : new View[]{zoomInButton, zoomOutButton, zoomFitButton, autoZoomButton}) {
-            view.animate().alpha(0f).setDuration(duration).setListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator animation) {*//*ignored*//*}
-
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    view.setVisibility(View.GONE);
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animation) {*//*ignored*//*}
-
-                @Override
-                public void onAnimationRepeat(Animator animation) {*//*ignored*//*}
-            });
-        }
-
-        for (View view : new View[]{prevGenButton, nextGenButton, initialStateButton, generationTV}) {
-            view.setAlpha(0f);
-            view.setVisibility(View.VISIBLE);
-            view.animate().alpha(1f).setDuration(duration);
-        }*/
-
-        zoomOutButton.setVisibility(View.GONE);
-        zoomInButton.setVisibility(View.GONE);
-        zoomFitButton.setVisibility(View.GONE);
-        autoZoomButton.setVisibility(View.GONE);
-
-        nextGenButton.setVisibility(View.VISIBLE);
-        initialStateButton.setVisibility(View.VISIBLE);
-        generationTV.setVisibility(View.VISIBLE);
-    }
-
     public void onClickPencil(View view) {
         viewOfLife.setEditMode(ViewOfLife.EditMode.ADD);
         pencilButton.setSelected(true);
         eraseButton.setSelected(false);
-        zoomInButton.setSelected(false);
     }
 
     public void onClickErase(View view) {
         viewOfLife.setEditMode(ViewOfLife.EditMode.REMOVE);
         pencilButton.setSelected(false);
         eraseButton.setSelected(true);
-        zoomInButton.setSelected(false);
     }
 
     public void onClickZoomIn(View view) {
         viewOfLife.setEditMode(ViewOfLife.EditMode.ZOOM_IN);
         pencilButton.setSelected(false);
         eraseButton.setSelected(false);
-        zoomInButton.setSelected(true);
     }
 
     public void clear() {
@@ -182,24 +103,6 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Activi
         } else {
             viewOfLife.start();
             playPauseButton.setImageResource(R.mipmap.ic_pause_black_36dp);
-        }
-    }
-
-    public void onClickZoomFit(View view) {
-        viewOfLife.zoomFit();
-    }
-
-    public void onClickZoomOut(View view) {
-        viewOfLife.zoomOut();
-    }
-
-    public void onClickAutoZoom(View view) {
-        if (viewOfLife.isAutoZoom()) {
-            viewOfLife.setAutoZoom(false);
-            autoZoomButton.setSelected(false);
-        } else {
-            viewOfLife.setAutoZoom(true);
-            autoZoomButton.setSelected(true);
         }
     }
 
