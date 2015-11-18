@@ -4,6 +4,8 @@ package com.teinproductions.tein.gameoflife;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.os.Build;
+import android.support.annotation.ColorRes;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -15,8 +17,13 @@ public class ViewOfLife2 extends View {
 
     private int cellWidth = 30;
     private float startX = 0, startY = 0;
+    /**
+     * 0: x position
+     * 1: y position
+     * 2: alive [0|1]
+     */
     private List<short[]> cells = new ArrayList<>();
-    private Paint gridPaint;
+    private Paint gridPaint, cellPaint;
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -33,7 +40,34 @@ public class ViewOfLife2 extends View {
             canvas.drawLine(0, y, width, y, gridPaint);
         }
 
-        // TODO: 18-11-2015 Draw alive cells
+        short cellX = (short) (roundAwayFromZero(startX) - (startX >= 0 ? 1 : 0));
+        short cellYStart = (short) (roundAwayFromZero(startY) - (startY >= 0 ? 1 : 0));
+        int pixelXStart = firstVerLine - cellWidth;
+        int pixelYStart = firstHorLine - cellWidth;
+
+        for (int x = pixelXStart + 1; x < width; x += cellWidth) {
+            short cellY = cellYStart;
+            for (int y = pixelYStart + 1; y < height; y += cellWidth) {
+                if (isAlive(cellX, cellY)) {
+                    canvas.drawRect(x, y, x + cellWidth, y + cellWidth, cellPaint);
+                }
+                cellY++;
+            }
+            cellX++;
+        }
+    }
+
+    private boolean isAlive(short x, short y) {
+        for (short[] cell : cells)
+            if (cell[0] == x && cell[1] == y) {
+                return cell[2] == 1;
+            }
+        return false;
+    }
+
+    private static short roundAwayFromZero(float i) {
+        if (i > 0) return (short) Math.ceil(i);
+        else return (short) Math.floor(i);
     }
 
     private float prevXDrag, prevYDrag;
@@ -63,6 +97,17 @@ public class ViewOfLife2 extends View {
     public void init() {
         gridPaint = new Paint();
         gridPaint.setStyle(Paint.Style.STROKE);
+
+        cellPaint = new Paint();
+        cellPaint.setColor(getColor(R.color.block_color));
+        cellPaint.setStyle(Paint.Style.FILL);
+
+        cells.add(new short[]{0, 0, 1});
+        cells.add(new short[]{1, 1, 1});
+        cells.add(new short[]{2, 2, 1});
+        cells.add(new short[]{2, 3, 1});
+        cells.add(new short[]{2, 4, 1});
+        cells.add(new short[]{2, 5, 1});
     }
 
     public ViewOfLife2(Context context) {
@@ -78,5 +123,11 @@ public class ViewOfLife2 extends View {
     public ViewOfLife2(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
+    }
+
+
+    private int getColor(@ColorRes int colorId) {
+        if (Build.VERSION.SDK_INT >= 23) return getContext().getColor(colorId);
+        else return getContext().getResources().getColor(colorId);
     }
 }
