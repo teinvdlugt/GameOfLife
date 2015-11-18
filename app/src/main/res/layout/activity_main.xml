@@ -124,7 +124,7 @@
         </FrameLayout>
     </LinearLayout>
 
-    <com.teinproductions.tein.gameoflife.ViewOfLife
+    <com.teinproductions.tein.gameoflife.ViewOfLife2
         android:id="@+id/view_of_life"
         android:layout_width="match_parent"
         android:layout_height="0dp"

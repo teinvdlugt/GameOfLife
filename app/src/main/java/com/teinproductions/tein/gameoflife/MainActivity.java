@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Activi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        viewOfLife = (ViewOfLife) findViewById(R.id.view_of_life);
+        /*viewOfLife = (ViewOfLife) findViewById(R.id.view_of_life);
         playPauseButton = (ImageButton) findViewById(R.id.playPause_button);
         autoZoomButton = (ImageButton) findViewById(R.id.auto_zoom_button);
         clearButton = (ImageButton) findViewById(R.id.clear_button);
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Activi
         pencilButton.setSelected(true);
         viewOfLife.setAutoZoom(true);
         autoZoomButton.setSelected(true);
-        showZoomButtonSection();
+        showZoomButtonSection();*/
     }
 
     private void showZoomButtonSection() {
@@ -226,38 +226,38 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Activi
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if (hasFocus && Build.VERSION.SDK_INT >= 19) {
+        /*if (hasFocus && Build.VERSION.SDK_INT >= 19) {
             viewOfLife.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                     | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                     | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                     | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                     | View.SYSTEM_UI_FLAG_FULLSCREEN
                     | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-        }
+        }*/
     }
 
     @Override
     protected void onPause() {
-        viewOfLife.stop();
-        playPauseButton.setImageResource(R.mipmap.ic_play_arrow_black_36dp);
+        //viewOfLife.stop();
+        //playPauseButton.setImageResource(R.mipmap.ic_play_arrow_black_36dp);
         super.onPause();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        resetSpeed();
-        resetStrokeWidth();
+        //resetSpeed();
+        //resetStrokeWidth();
     }
 
     private void resetSpeed() {
-        String speed = PreferenceManager.getDefaultSharedPreferences(this)
+        /*String speed = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString(getString(R.string.speed_key), "100");
         try {
             viewOfLife.setSpeed(Integer.parseInt(speed));
         } catch (NumberFormatException e) {
             viewOfLife.setSpeed(100);
-        }
+        }*/
     }
 
     private void resetStrokeWidth() {
