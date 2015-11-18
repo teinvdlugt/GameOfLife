@@ -1,215 +1,121 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_marginRight="@dimen/activity_vertical_margin"
-        android:orientation="vertical"
-        tools:ignore="RtlHardcoded">
-
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1">
-
-            <ImageButton
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_gravity="center"
-                android:background="@drawable/circle_background"
-                android:contentDescription="@string/settings"
-                android:onClick="onClickSettings"
-                android:src="@mipmap/ic_settings_black_36dp" />
-        </FrameLayout>
-
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1">
-
-            <ImageButton
-                android:id="@+id/auto_zoom_button"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_gravity="center"
-                android:background="@drawable/circle_background"
-                android:contentDescription="@string/xs_autozoom"
-                android:onClick="onClickAutoZoom"
-                android:src="@mipmap/ic_autozoom_black_36dp" />
-        </FrameLayout>
-
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1">
-
-            <ImageButton
-                android:id="@+id/zoomFitButton"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_gravity="center"
-                android:background="@drawable/circle_background"
-                android:contentDescription="@string/xs_zoom_fit"
-                android:onClick="onClickZoomFit"
-                android:src="@mipmap/ic_fullscreen_black_36dp" />
-
-            <TextView
-                android:id="@+id/generation_textView"
-                android:layout_width="45dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:textStyle="bold"
-                tools:text="345" />
-        </FrameLayout>
-
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1">
-
-            <ImageButton
-                android:id="@+id/zoomOutButton"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_gravity="center"
-                android:background="@drawable/circle_background"
-                android:contentDescription="@string/xs_zoom_out"
-                android:onClick="onClickZoomOut"
-                android:src="@mipmap/ic_zoom_out_black_36dp" />
-
-            <ImageButton
-                android:id="@+id/initialStateButton"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_gravity="center"
-                android:background="@drawable/circle_background"
-                android:contentDescription="@string/xs_initial_state"
-                android:onClick="onClickInitialState"
-                android:src="@mipmap/ic_skip_previous_black_36dp" />
-        </FrameLayout>
-
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1">
-
-            <ImageButton
-                android:id="@+id/zoomInButton"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_gravity="center"
-                android:background="@drawable/circle_background"
-                android:contentDescription="@string/xs_zoom_in"
-                android:onClick="onClickZoomIn"
-                android:src="@mipmap/ic_zoom_in_black_36dp" />
-
-            <ImageButton
-                android:id="@+id/nextGenButton"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_gravity="center"
-                android:background="@drawable/circle_background"
-                android:contentDescription="@string/xs_next_generation"
-                android:onClick="onClickNextGen"
-                android:src="@mipmap/ic_forward_black_36dp" />
-        </FrameLayout>
-    </LinearLayout>
-
-
-    <com.teinproductions.tein.gameoflife.ViewOfLife
+    <com.teinproductions.tein.gameoflife.ViewOfLife2
         android:id="@+id/view_of_life"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1" />
-
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_marginLeft="@dimen/activity_vertical_margin"
-        android:orientation="vertical"
-        tools:ignore="RtlHardcoded">
+        android:layout_gravity="start"
+        android:orientation="vertical">
 
-        <FrameLayout
-            android:layout_width="wrap_content"
+        <ImageButton
+            android:layout_width="45dp"
             android:layout_height="0dp"
-            android:layout_weight="1">
-
-            <ImageButton
-                android:id="@+id/playPause_button"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_gravity="center"
-                android:background="@drawable/circle_background"
-                android:contentDescription="@string/xs_start_or_stop"
-                android:onClick="onClickPlayPause"
-                android:src="@mipmap/ic_play_arrow_black_36dp" />
-        </FrameLayout>
-
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1">
-
-            <ImageButton
-                android:id="@+id/clear_button"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_gravity="center"
-                android:background="@drawable/circle_background"
-                android:contentDescription="@string/xs_clear"
-                android:onClick="onClickClear"
-                android:src="@mipmap/ic_clear_black_36dp" />
-        </FrameLayout>
-
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
+            android:layout_gravity="center"
             android:layout_weight="1"
-            tools:ignore="UselessLeaf" />
+            android:background="?selectableItemBackgroundBorderless"
+            android:contentDescription="@string/settings"
+            android:onClick="onClickSettings"
+            android:src="@mipmap/ic_settings_black_36dp" />
 
-        <FrameLayout
+        <android.support.v4.widget.Space
             android:layout_width="wrap_content"
             android:layout_height="0dp"
-            android:layout_weight="1">
+            android:layout_weight="1" />
 
-            <ImageButton
-                android:id="@+id/eraseButton"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_gravity="center"
-                android:background="@drawable/circle_background"
-                android:contentDescription="@string/xs_eraser"
-                android:onClick="onClickErase"
-                android:src="@mipmap/ic_remove_circle_black_36dp" />
-        </FrameLayout>
-
-        <FrameLayout
-            android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/generation_textView"
+            android:layout_width="45dp"
             android:layout_height="0dp"
-            android:layout_weight="1">
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textStyle="bold"
+            tools:text="345" />
 
-            <ImageButton
-                android:id="@+id/pencilButton"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_gravity="center"
-                android:background="@drawable/circle_background"
-                android:contentDescription="@string/xs_pencil"
-                android:onClick="onClickPencil"
-                android:src="@mipmap/ic_mode_edit_black_36dp" />
-        </FrameLayout>
+        <ImageButton
+            android:id="@+id/initialStateButton"
+            android:layout_width="45dp"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="?selectableItemBackgroundBorderless"
+            android:contentDescription="@string/xs_initial_state"
+            android:onClick="onClickInitialState"
+            android:src="@mipmap/ic_skip_previous_black_36dp" />
+
+        <ImageButton
+            android:id="@+id/nextGenButton"
+            android:layout_width="45dp"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="?selectableItemBackgroundBorderless"
+            android:contentDescription="@string/xs_next_generation"
+            android:onClick="onClickNextGen"
+            android:src="@mipmap/ic_forward_black_36dp" />
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:orientation="vertical">
 
-</LinearLayout>
+        <ImageButton
+            android:id="@+id/playPause_button"
+            android:layout_width="45dp"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="?selectableItemBackgroundBorderless"
+            android:contentDescription="@string/xs_start_or_stop"
+            android:onClick="onClickPlayPause"
+            android:src="@mipmap/ic_play_arrow_black_36dp" />
+
+        <ImageButton
+            android:id="@+id/clear_button"
+            android:layout_width="45dp"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="?selectableItemBackgroundBorderless"
+            android:contentDescription="@string/xs_clear"
+            android:onClick="onClickClear"
+            android:src="@mipmap/ic_clear_black_36dp" />
+
+        <android.support.v4.widget.Space
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/eraseButton"
+            android:layout_width="45dp"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="?selectableItemBackgroundBorderless"
+            android:contentDescription="@string/xs_eraser"
+            android:onClick="onClickErase"
+            android:src="@mipmap/ic_remove_circle_black_36dp" />
+
+        <ImageButton
+            android:id="@+id/pencilButton"
+            android:layout_width="45dp"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="?selectableItemBackgroundBorderless"
+            android:contentDescription="@string/xs_pencil"
+            android:onClick="onClickPencil"
+            android:src="@mipmap/ic_mode_edit_black_36dp" />
+    </LinearLayout>
+</FrameLayout>
