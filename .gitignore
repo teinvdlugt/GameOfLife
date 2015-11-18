@@ -1,11 +1,5 @@
 /.gradle
 /.idea
 /build
-/gradle
-/build.gradle
 /GameofLife.iml
-/gradle.properties
-/gradlew
-/gradlew.bat
-/settings.gradle
 /local.properties
