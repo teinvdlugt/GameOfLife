@@ -94,10 +94,16 @@
             android:onClick="onClickErase"
             android:src="@mipmap/ic_remove_circle_black_36dp" />
 
-        <android.widget.Space
+        <ImageButton
+            android:id="@+id/moveButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_height="45dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="?selectableItemBackgroundBorderless"
+            android:contentDescription="@string/xs_move"
+            android:onClick="onClickMove"
+            android:src="@mipmap/ic_cursor_move_black_36dp" />
 
         <ImageButton
             android:id="@+id/clear_button"

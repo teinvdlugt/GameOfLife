@@ -64,15 +64,15 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Activi
     }
 
     public void onClickPencil(View view) {
-        /*viewOfLife.setEditMode(ViewOfLife.EditMode.ADD);
-        pencilButton.setSelected(true);
-        eraseButton.setSelected(false);*/
+        viewOfLife.setTouchMode(ViewOfLife2.TOUCH_MODE_ADD);
     }
 
     public void onClickErase(View view) {
-        /*viewOfLife.setEditMode(ViewOfLife.EditMode.REMOVE);
-        pencilButton.setSelected(false);
-        eraseButton.setSelected(true);*/
+        viewOfLife.setTouchMode(ViewOfLife2.TOUCH_MODE_REMOVE);
+    }
+
+    public void onClickMove(View view) {
+        viewOfLife.setTouchMode(ViewOfLife2.TOUCH_MODE_MOVE);
     }
 
     public void clear() {

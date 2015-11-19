@@ -20,4 +20,5 @@
     <string name="short_click_clear_message">Click and hold the button to clear the field</string>
     <string name="xs_next_generation">Next generation</string>
     <string name="xs_initial_state">Initial state</string>
+    <string name="xs_move">Move grid</string>
 </resources>

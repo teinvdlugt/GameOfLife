@@ -25,6 +25,11 @@ public class ViewOfLife2 extends View {
     private List<short[]> cells = new ArrayList<>();
     private Paint gridPaint, cellPaint;
 
+    private int touchMode = TOUCH_MODE_MOVE;
+    public static final int TOUCH_MODE_ADD = 0;
+    public static final int TOUCH_MODE_REMOVE = 1;
+    public static final int TOUCH_MODE_MOVE = 2;
+
     @Override
     protected void onDraw(Canvas canvas) {
         int width = getWidth(), height = getHeight();
@@ -71,39 +76,64 @@ public class ViewOfLife2 extends View {
     }
 
     private float prevXDrag = -1, prevYDrag = -1;
-    private boolean dragging = false;
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        float x = event.getX() / cellWidth + startX;
+        float y = event.getY() / cellWidth + startY;
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                prevXDrag = event.getX() / cellWidth + startX;
-                prevYDrag = event.getY() / cellWidth + startY;
-                return true;
-            case MotionEvent.ACTION_MOVE:
-                dragging = true;
-                float x = event.getX() / cellWidth + startX;
-                float y = event.getY() / cellWidth + startY;
-                startX -= x - prevXDrag;
-                // TODO: 18-11-2015 Does startX += x + prevXDrag also work
-                startY -= y - prevYDrag;
-                prevXDrag = x;
-                prevYDrag = y;
-                invalidate();
-                return true;
-            case MotionEvent.ACTION_UP:
-                if (dragging) {
-                    // End of drag
-                    dragging = false;
-                } else {
-                    // End of press, not of drag
-                    short x2 = (short) (event.getX() / cellWidth + startX);
-                    short y2 = (short) (event.getY() / cellWidth + startY);
-                    makeAlive(x2, y2);
-                    invalidate();
+                switch (touchMode) {
+                    case TOUCH_MODE_ADD:
+                        makeAlive((short) x, (short) y);
+                        invalidate();
+                        return true;
+                    case TOUCH_MODE_REMOVE:
+                        makeDead((short) x, (short) y);
+                        invalidate();
+                        return true;
+                    case TOUCH_MODE_MOVE:
+                        prevXDrag = x;
+                        prevYDrag = y;
+                        invalidate();
+                        return true;
+                    default:
+                        return super.onTouchEvent(event);
                 }
-
-                return true;
+            case MotionEvent.ACTION_MOVE:
+                switch (touchMode) {
+                    case TOUCH_MODE_ADD:
+                        makeAlive((short) x, (short) y);
+                        invalidate();
+                        return true;
+                    case TOUCH_MODE_REMOVE:
+                        makeDead((short) x, (short) y);
+                        invalidate();
+                        return true;
+                    case TOUCH_MODE_MOVE:
+                        startX -= x - prevXDrag;
+                        // TODO: 18-11-2015 Does startX += x + prevXDrag also work
+                        startY -= y - prevYDrag;
+                        prevXDrag = x;
+                        prevYDrag = y;
+                        invalidate();
+                        return true;
+                    default:
+                        return super.onTouchEvent(event);
+                }
+            case MotionEvent.ACTION_UP:
+                switch (touchMode) {
+                    case TOUCH_MODE_ADD:
+                        makeAlive((short) x, (short) y);
+                        invalidate();
+                        return true;
+                    case TOUCH_MODE_REMOVE:
+                        makeDead((short) x, (short) y);
+                        invalidate();
+                        return true;
+                    default:
+                        return super.onTouchEvent(event);
+                }
             default:
                 return super.onTouchEvent(event);
         }
@@ -131,6 +161,10 @@ public class ViewOfLife2 extends View {
         // Cell not yet in array
         cells.add(new short[]{x, y, 1, neighbours(x, y)});
         notifyNeighbours(x, y, (byte) 1);
+    }
+
+    private void makeDead(short x, short y) {
+        // TODO: 19-11-2015 Make it work
     }
 
     /**
@@ -190,6 +224,17 @@ public class ViewOfLife2 extends View {
         if (isAlive(x, (short) (y + 1))) neighbours++;
         if (isAlive((short) (x + 1), (short) (y + 1))) neighbours++;
         return neighbours;
+    }
+
+    public int getTouchMode() {
+        return touchMode;
+    }
+
+    public void setTouchMode(int touchMode) {
+        if (!(touchMode == TOUCH_MODE_ADD || touchMode == TOUCH_MODE_REMOVE || touchMode == TOUCH_MODE_MOVE))
+            throw new IllegalArgumentException(
+                    "Parameter touchMode must be one of TOUCH_MODE_ADD, TOUCH_MODE_REMOVE and TOUCH_MODE_MOVE");
+        this.touchMode = touchMode;
     }
 
     public void clear() {
