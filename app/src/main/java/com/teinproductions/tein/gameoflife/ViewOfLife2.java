@@ -164,7 +164,19 @@ public class ViewOfLife2 extends View {
     }
 
     private void makeDead(short x, short y) {
-        // TODO: 19-11-2015 Make it work
+        for (int i = 0; i < cells.size(); i++) {
+            short[] cell = cells.get(i);
+            if (cell[0] == x && cell[1] == y) {
+                if (cell[2] == 1) {
+                    cell[2] = 0;
+                    notifyNeighbours(x, y, (byte) -1);
+                    if (cell[3] == 0) {
+                        cells.remove(i);
+                    }
+                }
+                return;
+            }
+        }
     }
 
     /**
