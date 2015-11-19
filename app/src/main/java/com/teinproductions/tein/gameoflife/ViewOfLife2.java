@@ -70,7 +70,8 @@ public class ViewOfLife2 extends View {
         else return (short) Math.floor(i);
     }
 
-    private float prevXDrag, prevYDrag;
+    private float prevXDrag = -1, prevYDrag = -1;
+    private boolean dragging = false;
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -80,6 +81,7 @@ public class ViewOfLife2 extends View {
                 prevYDrag = event.getY() / cellWidth + startY;
                 return true;
             case MotionEvent.ACTION_MOVE:
+                dragging = true;
                 float x = event.getX() / cellWidth + startX;
                 float y = event.getY() / cellWidth + startY;
                 startX -= x - prevXDrag;
@@ -88,6 +90,19 @@ public class ViewOfLife2 extends View {
                 prevXDrag = x;
                 prevYDrag = y;
                 invalidate();
+                return true;
+            case MotionEvent.ACTION_UP:
+                if (dragging) {
+                    // End of drag
+                    dragging = false;
+                } else {
+                    // End of press, not of drag
+                    short x2 = (short) (event.getX() / cellWidth + startX);
+                    short y2 = (short) (event.getY() / cellWidth + startY);
+                    makeAlive(x2, y2);
+                    invalidate();
+                }
+
                 return true;
             default:
                 return super.onTouchEvent(event);
