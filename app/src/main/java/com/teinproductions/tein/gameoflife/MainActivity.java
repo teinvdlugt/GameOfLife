@@ -15,9 +15,9 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity implements ViewOfLife.ActivityInterface {
 
     private ViewOfLife2 viewOfLife;
-    private ImageButton playPauseButton, clearButton;
+    private ImageButton playPauseButton;
     private ImageButton pencilButton, eraseButton;
-    private ImageButton nextGenButton, initialStateButton;
+    private ImageButton initialStateButton;
     private TextView generationTV;
 
     @Override
@@ -27,14 +27,12 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Activi
 
         viewOfLife = (ViewOfLife2) findViewById(R.id.view_of_life);
         playPauseButton = (ImageButton) findViewById(R.id.playPause_button);
-        clearButton = (ImageButton) findViewById(R.id.clear_button);
         pencilButton = (ImageButton) findViewById(R.id.pencilButton);
         eraseButton = (ImageButton) findViewById(R.id.eraseButton);
-        nextGenButton = (ImageButton) findViewById(R.id.nextGenButton);
         initialStateButton = (ImageButton) findViewById(R.id.initialStateButton);
         generationTV = (TextView) findViewById(R.id.generation_textView);
 
-        clearButton.setOnLongClickListener(new View.OnLongClickListener() {
+        findViewById(R.id.clear_button).setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 clear();
@@ -165,13 +163,13 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Activi
     }
 
     public void onClickNextGen(View view) {
-        /*new Thread(new Runnable() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
                 viewOfLife.nextGeneration();
                 viewOfLife.postInvalidate();
             }
-        }).start();*/
+        }).start();
     }
 
     public void onClickInitialState(View view) {

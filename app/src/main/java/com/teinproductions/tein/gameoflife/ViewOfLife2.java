@@ -21,6 +21,7 @@ public class ViewOfLife2 extends View {
      * 0: x position
      * 1: y position
      * 2: alive [0|1]
+     * 3: num of neighbours
      */
     private List<short[]> cells = new ArrayList<>();
     private Paint gridPaint, cellPaint;
@@ -237,6 +238,35 @@ public class ViewOfLife2 extends View {
         if (isAlive((short) (x + 1), (short) (y + 1))) neighbours++;
         return neighbours;
     }
+
+
+    public void nextGeneration() {
+        List<short[]> cellsBackup = clone(cells);
+        for (int i = 0; i < cellsBackup.size(); i++) {
+            short[] cell = cellsBackup.get(i);
+            if (cell[2] == 0 && cell[3] == 3) {
+                // Don't use makeAlive(x, y) to prevent
+                // many nested loops
+                cells.get(i)[2] = 1;
+                notifyNeighbours(cell[0], cell[1], (byte) 1);
+            } else if (cell[2] == 1 && (cell[3] < 2 || cell[3] > 3)) {
+                // Don't use makeDead(x, y) either
+                cells.get(i)[2] = 0;
+                notifyNeighbours(cell[0], cell[1], (byte) -1);
+                if (cells.get(i)[3] == 0) cells.remove(i);
+            }
+        }
+    }
+
+    private static List<short[]> clone(List<short[]> array) {
+        List<short[]> clone = new ArrayList<>();
+        for (short[] cell : array) {
+            clone.add(new short[]{
+                    cell[0], cell[1], cell[2], cell[3]});
+        }
+        return clone;
+    }
+
 
     public int getTouchMode() {
         return touchMode;
