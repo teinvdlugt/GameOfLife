@@ -75,17 +75,11 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Activi
         eraseButton.setSelected(true);*/
     }
 
-    public void onClickZoomIn(View view) {
-        /*viewOfLife.setEditMode(ViewOfLife.EditMode.ZOOM_IN);
-        pencilButton.setSelected(false);
-        eraseButton.setSelected(false);*/
-    }
-
     public void clear() {
-        /*viewOfLife.stop();
+        //viewOfLife.stop();
         viewOfLife.clear();
         playPauseButton.setImageResource(R.mipmap.ic_play_arrow_black_36dp);
-        lockScreenOrientation(false);*/
+        lockScreenOrientation(false);
     }
 
     public void onClickClear(View view) {

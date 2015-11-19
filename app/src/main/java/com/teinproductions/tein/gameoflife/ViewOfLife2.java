@@ -192,6 +192,12 @@ public class ViewOfLife2 extends View {
         return neighbours;
     }
 
+    public void clear() {
+        cells.clear();
+        startX = startY = 0;
+        invalidate();
+    }
+
     public void init() {
         gridPaint = new Paint();
         gridPaint.setStyle(Paint.Style.STROKE);
