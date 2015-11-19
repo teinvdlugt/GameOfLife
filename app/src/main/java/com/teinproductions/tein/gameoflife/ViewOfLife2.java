@@ -94,6 +94,89 @@ public class ViewOfLife2 extends View {
         }
     }
 
+    /**
+     * Make the cell at the specified location alive, if it
+     * isn't already, and increment the number of neighbours of its
+     * neighbours.
+     *
+     * @param x X position of the cell in the grid
+     * @param y Y position of the cell in the grid
+     */
+    private void makeAlive(short x, short y) {
+        for (short[] cell : cells) {
+            if (cell[0] == x && cell[1] == y) {
+                if (cell[2] == 0) {
+                    cell[2] = 1;
+                    notifyNeighbours(x, y, (byte) 1);
+                }
+                return;
+            }
+        }
+
+        // Cell not yet in array
+        cells.add(new short[]{x, y, 1, neighbours(x, y)});
+        notifyNeighbours(x, y, (byte) 1);
+    }
+
+    /**
+     * Example: if the cell at position x, y became alive,
+     * its neighbours have to be notified (position 3 in their short[]
+     * has to be incremented by one).
+     *
+     * @param x     X position of cell whose neighbours have to be notified
+     * @param y     Y position of cell whose neighbours have to be notified
+     * @param toAdd Should be either 1 of -1; dependant on whether the cell at x, y
+     *              became alive of died.
+     */
+    private void notifyNeighbours(short x, short y, byte toAdd) {
+        incrementNeighbours((short) (x - 1), (short) (y - 1), toAdd);
+        incrementNeighbours(x, (short) (y - 1), toAdd);
+        incrementNeighbours((short) (x + 1), (short) (y - 1), toAdd);
+        incrementNeighbours((short) (x - 1), y, toAdd);
+        incrementNeighbours((short) (x + 1), y, toAdd);
+        incrementNeighbours((short) (x - 1), (short) (y + 1), toAdd);
+        incrementNeighbours(x, (short) (y + 1), toAdd);
+        incrementNeighbours((short) (x + 1), (short) (y + 1), toAdd);
+    }
+
+    /**
+     * Increment the number of neighbours of the cell on a specified location
+     * in the grid by a specified amount. If the cell isn't present yet in the
+     * {@code List<short[]> cells}, it will be added.
+     *
+     * @param x     X position of cell in Game of Life grid
+     * @param y     Y position of cell in Game of Life grid
+     * @param toAdd Amount of neighbours to add
+     */
+    private void incrementNeighbours(short x, short y, byte toAdd) {
+        for (int i = 0; i < cells.size(); i++) {
+            short[] cell = cells.get(i);
+            if (cell[0] == x && cell[1] == y) {
+                cell[3] += toAdd;
+                if (cell[3] == 0 && cell[2] == 0)
+                    cells.remove(i);
+                return;
+            }
+        }
+
+        // Cell not yet in array
+        cells.add(new short[]{x, y, 0, toAdd > 0 ? toAdd : 0});
+    }
+
+    private byte neighbours(short x, short y) {
+        // TODO: 19-11-2015 More efficient way? One loop, which checks each neighbour
+        byte neighbours = 0;
+        if (isAlive((short) (x - 1), (short) (y - 1))) neighbours++;
+        if (isAlive(x, (short) (y - 1))) neighbours++;
+        if (isAlive((short) (x + 1), (short) (y - 1))) neighbours++;
+        if (isAlive((short) (x - 1), y)) neighbours++;
+        if (isAlive((short) (x + 1), y)) neighbours++;
+        if (isAlive((short) (x - 1), (short) (y + 1))) neighbours++;
+        if (isAlive(x, (short) (y + 1))) neighbours++;
+        if (isAlive((short) (x + 1), (short) (y + 1))) neighbours++;
+        return neighbours;
+    }
+
     public void init() {
         gridPaint = new Paint();
         gridPaint.setStyle(Paint.Style.STROKE);
@@ -102,12 +185,12 @@ public class ViewOfLife2 extends View {
         cellPaint.setColor(getColor(R.color.block_color));
         cellPaint.setStyle(Paint.Style.FILL);
 
-        cells.add(new short[]{0, 0, 1});
-        cells.add(new short[]{1, 1, 1});
-        cells.add(new short[]{2, 2, 1});
-        cells.add(new short[]{2, 3, 1});
-        cells.add(new short[]{2, 4, 1});
-        cells.add(new short[]{2, 5, 1});
+        makeAlive((short) 0, (short) 0);
+        makeAlive((short) 1, (short) 1);
+        makeAlive((short) 2, (short) 2);
+        makeAlive((short) 2, (short) 3);
+        makeAlive((short) 2, (short) 4);
+        makeAlive((short) 2, (short) 5);
     }
 
     public ViewOfLife2(Context context) {

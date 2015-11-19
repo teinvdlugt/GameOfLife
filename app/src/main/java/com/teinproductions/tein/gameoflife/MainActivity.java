@@ -5,13 +5,11 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 public class MainActivity extends AppCompatActivity implements ViewOfLife.ActivityInterface {
@@ -36,7 +34,6 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Activi
         initialStateButton = (ImageButton) findViewById(R.id.initialStateButton);
         generationTV = (TextView) findViewById(R.id.generation_textView);
 
-        /*viewOfLife.setActivityInterface(this);
         clearButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -44,6 +41,8 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Activi
                 return true;
             }
         });
+
+        /*viewOfLife.setActivityInterface(this);
         playPauseButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
