@@ -15,7 +15,7 @@ import java.util.List;
 
 public class ViewOfLife2 extends View {
 
-    private int cellWidth = 30;
+    private int cellWidth = 50;
     private float startX = 0, startY = 0;
     /**
      * 0: x position
@@ -24,7 +24,9 @@ public class ViewOfLife2 extends View {
      * 3: num of neighbours
      */
     private List<short[]> cells = new ArrayList<>();
-    private Paint gridPaint, cellPaint;
+    private Paint gridPaint, cellPaint, deadCellPaint;
+
+    private boolean running;
 
     private int touchMode = TOUCH_MODE_MOVE;
     public static final int TOUCH_MODE_ADD = 0;
@@ -54,9 +56,23 @@ public class ViewOfLife2 extends View {
         for (int x = pixelXStart + 1; x < width; x += cellWidth) {
             short cellY = cellYStart;
             for (int y = pixelYStart + 1; y < height; y += cellWidth) {
-                if (isAlive(cellX, cellY)) {
-                    canvas.drawRect(x, y, x + cellWidth, y + cellWidth, cellPaint);
+                boolean isAlive = false, isDocumented = false;
+
+                for (short[] cell : cells) {
+                    if (cell[0] == cellX && cell[1] == cellY) {
+                        isAlive = cell[2] == 1;
+                        isDocumented = true;
+                        break;
+                    }
                 }
+
+                if (isAlive) {
+                    canvas.drawRect(x, y, x + cellWidth, y + cellWidth, cellPaint);
+                } else if (isDocumented) {
+                    // For debugging
+                    canvas.drawRect(x, y, x + cellWidth, y + cellWidth, deadCellPaint);
+                }
+
                 cellY++;
             }
             cellX++;
@@ -170,10 +186,10 @@ public class ViewOfLife2 extends View {
             if (cell[0] == x && cell[1] == y) {
                 if (cell[2] == 1) {
                     cell[2] = 0;
-                    notifyNeighbours(x, y, (byte) -1);
                     if (cell[3] == 0) {
                         cells.remove(i);
                     }
+                    notifyNeighbours(x, y, (byte) -1);
                 }
                 return;
             }
@@ -245,15 +261,9 @@ public class ViewOfLife2 extends View {
         for (int i = 0; i < cellsBackup.size(); i++) {
             short[] cell = cellsBackup.get(i);
             if (cell[2] == 0 && cell[3] == 3) {
-                // Don't use makeAlive(x, y) to prevent
-                // many nested loops
-                cells.get(i)[2] = 1;
-                notifyNeighbours(cell[0], cell[1], (byte) 1);
+                makeAlive(cell[0], cell[1]);
             } else if (cell[2] == 1 && (cell[3] < 2 || cell[3] > 3)) {
-                // Don't use makeDead(x, y) either
-                cells.get(i)[2] = 0;
-                notifyNeighbours(cell[0], cell[1], (byte) -1);
-                if (cells.get(i)[3] == 0) cells.remove(i);
+                makeDead(cell[0], cell[1]);
             }
         }
     }
@@ -267,6 +277,31 @@ public class ViewOfLife2 extends View {
         return clone;
     }
 
+    public void start() {
+        running = true;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (running) {
+                    nextGeneration();
+                    postInvalidate();
+                    try {
+                        Thread.sleep(50L);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
+    }
+
+    public void stop() {
+        running = false;
+    }
+
+    public boolean isRunning() {
+        return running;
+    }
 
     public int getTouchMode() {
         return touchMode;
@@ -292,6 +327,10 @@ public class ViewOfLife2 extends View {
         cellPaint = new Paint();
         cellPaint.setColor(getColor(R.color.block_color));
         cellPaint.setStyle(Paint.Style.FILL);
+
+        deadCellPaint = new Paint();
+        deadCellPaint.setColor(getColor(android.R.color.darker_gray));
+        deadCellPaint.setStyle(Paint.Style.FILL);
 
         makeAlive((short) 0, (short) 0);
         makeAlive((short) 1, (short) 1);

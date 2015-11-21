@@ -85,13 +85,13 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Activi
     }
 
     public void onClickPlayPause(View view) {
-        /*if (viewOfLifer.isRunning()) {
+        if (viewOfLife.isRunning()) {
             viewOfLife.stop();
             playPauseButton.setImageResource(R.mipmap.ic_play_arrow_black_36dp);
         } else {
             viewOfLife.start();
             playPauseButton.setImageResource(R.mipmap.ic_pause_black_36dp);
-        }*/
+        }
     }
 
     public void onClickSettings(View view) {
@@ -129,8 +129,8 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Activi
 
     @Override
     protected void onPause() {
-        //viewOfLife.stop();
-        //playPauseButton.setImageResource(R.mipmap.ic_play_arrow_black_36dp);
+        viewOfLife.stop();
+        playPauseButton.setImageResource(R.mipmap.ic_play_arrow_black_36dp);
         super.onPause();
     }
 
