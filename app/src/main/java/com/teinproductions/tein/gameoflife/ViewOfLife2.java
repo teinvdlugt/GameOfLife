@@ -41,15 +41,8 @@ public class ViewOfLife2 extends View {
         int firstVerLine = (int) (cellWidth * (Math.ceil(startX) - startX));
         int firstHorLine = (int) (cellWidth * (Math.ceil(startY) - startY));
 
-        // Vertical grid lines
-        for (float x = firstVerLine; x < width; x += cellWidth) {
-            canvas.drawLine(x, 0, x, height, gridPaint);
-        }
-        // Horizontal grid lines
-        for (float y = firstHorLine; y < height; y += cellWidth) {
-            canvas.drawLine(0, y, width, y, gridPaint);
-        }
 
+        // Draw living cells
         short cellX = (short) (roundAwayFromZero(startX) - (startX >= 0 ? 1 : 0));
         short cellYStart = (short) (roundAwayFromZero(startY) - (startY >= 0 ? 1 : 0));
         int pixelXStart = firstVerLine - cellWidth;
@@ -78,6 +71,16 @@ public class ViewOfLife2 extends View {
                 }
                 cellX++;
             }
+        }
+
+        // Draw grid
+        // Vertical grid lines
+        for (float x = firstVerLine; x < width; x += cellWidth) {
+            canvas.drawLine(x, 0, x, height, gridPaint);
+        }
+        // Horizontal grid lines
+        for (float y = firstHorLine; y < height; y += cellWidth) {
+            canvas.drawLine(0, y, width, y, gridPaint);
         }
     }
 
