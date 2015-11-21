@@ -24,7 +24,9 @@ public class ViewOfLife2 extends View {
      * 3: num of neighbours
      */
     private List<short[]> cells = new ArrayList<>();
-    private Paint gridPaint, cellPaint, deadCellPaint;
+    private final Object lock = new Object();
+    private Paint gridPaint, cellPaint;
+    //private Paint deadCellPaint;
 
     private boolean running;
 
@@ -53,29 +55,29 @@ public class ViewOfLife2 extends View {
         int pixelXStart = firstVerLine - cellWidth;
         int pixelYStart = firstHorLine - cellWidth;
 
-        for (int x = pixelXStart + 1; x < width; x += cellWidth) {
-            short cellY = cellYStart;
-            for (int y = pixelYStart + 1; y < height; y += cellWidth) {
-                boolean isAlive = false, isDocumented = false;
+        synchronized (lock) {
+            for (int x = pixelXStart + 1; x < width; x += cellWidth) {
+                short cellY = cellYStart;
+                for (int y = pixelYStart + 1; y < height; y += cellWidth) {
 
-                for (short[] cell : cells) {
-                    if (cell[0] == cellX && cell[1] == cellY) {
-                        isAlive = cell[2] == 1;
-                        isDocumented = true;
-                        break;
+                    // Check if the cell is alive
+                    for (short[] cell : cells) {
+                        if (cell[0] == cellX && cell[1] == cellY) {
+                            if (cell[2] == 1) {
+                                // Cell is alive
+                                canvas.drawRect(x, y, x + cellWidth, y + cellWidth, cellPaint);
+                            }/* else {
+                                // Cell is dead, draw when debugging
+                                canvas.drawRect(x, y, x + cellWidth, y + cellWidth, deadCellPaint);
+                            }*/
+                            break;
+                        }
                     }
-                }
 
-                if (isAlive) {
-                    canvas.drawRect(x, y, x + cellWidth, y + cellWidth, cellPaint);
-                } else if (isDocumented) {
-                    // For debugging
-                    canvas.drawRect(x, y, x + cellWidth, y + cellWidth, deadCellPaint);
+                    cellY++;
                 }
-
-                cellY++;
+                cellX++;
             }
-            cellX++;
         }
     }
 
@@ -102,11 +104,15 @@ public class ViewOfLife2 extends View {
             case MotionEvent.ACTION_DOWN:
                 switch (touchMode) {
                     case TOUCH_MODE_ADD:
-                        makeAlive((short) x, (short) y);
+                        synchronized (lock) {
+                            makeAlive((short) x, (short) y);
+                        }
                         invalidate();
                         return true;
                     case TOUCH_MODE_REMOVE:
-                        makeDead((short) x, (short) y);
+                        synchronized (lock) {
+                            makeDead((short) x, (short) y);
+                        }
                         invalidate();
                         return true;
                     case TOUCH_MODE_MOVE:
@@ -120,11 +126,15 @@ public class ViewOfLife2 extends View {
             case MotionEvent.ACTION_MOVE:
                 switch (touchMode) {
                     case TOUCH_MODE_ADD:
-                        makeAlive((short) x, (short) y);
+                        synchronized (lock) {
+                            makeAlive((short) x, (short) y);
+                        }
                         invalidate();
                         return true;
                     case TOUCH_MODE_REMOVE:
-                        makeDead((short) x, (short) y);
+                        synchronized (lock) {
+                            makeDead((short) x, (short) y);
+                        }
                         invalidate();
                         return true;
                     case TOUCH_MODE_MOVE:
@@ -141,11 +151,15 @@ public class ViewOfLife2 extends View {
             case MotionEvent.ACTION_UP:
                 switch (touchMode) {
                     case TOUCH_MODE_ADD:
-                        makeAlive((short) x, (short) y);
+                        synchronized (lock) {
+                            makeAlive((short) x, (short) y);
+                        }
                         invalidate();
                         return true;
                     case TOUCH_MODE_REMOVE:
-                        makeDead((short) x, (short) y);
+                        synchronized (lock) {
+                            makeDead((short) x, (short) y);
+                        }
                         invalidate();
                         return true;
                     default:
@@ -257,13 +271,15 @@ public class ViewOfLife2 extends View {
 
 
     public void nextGeneration() {
-        List<short[]> cellsBackup = clone(cells);
-        for (int i = 0; i < cellsBackup.size(); i++) {
-            short[] cell = cellsBackup.get(i);
-            if (cell[2] == 0 && cell[3] == 3) {
-                makeAlive(cell[0], cell[1]);
-            } else if (cell[2] == 1 && (cell[3] < 2 || cell[3] > 3)) {
-                makeDead(cell[0], cell[1]);
+        synchronized (lock) {
+            List<short[]> cellsBackup = clone(cells);
+            for (int i = 0; i < cellsBackup.size(); i++) {
+                short[] cell = cellsBackup.get(i);
+                if (cell[2] == 0 && cell[3] == 3) {
+                    makeAlive(cell[0], cell[1]);
+                } else if (cell[2] == 1 && (cell[3] < 2 || cell[3] > 3)) {
+                    makeDead(cell[0], cell[1]);
+                }
             }
         }
     }
@@ -315,9 +331,11 @@ public class ViewOfLife2 extends View {
     }
 
     public void clear() {
-        cells.clear();
-        startX = startY = 0;
-        invalidate();
+        synchronized (lock) {
+            cells.clear();
+            startX = startY = 0;
+            invalidate();
+        }
     }
 
     public void init() {
@@ -328,9 +346,10 @@ public class ViewOfLife2 extends View {
         cellPaint.setColor(getColor(R.color.block_color));
         cellPaint.setStyle(Paint.Style.FILL);
 
+        /*// For debugging:
         deadCellPaint = new Paint();
         deadCellPaint.setColor(getColor(android.R.color.darker_gray));
-        deadCellPaint.setStyle(Paint.Style.FILL);
+        deadCellPaint.setStyle(Paint.Style.FILL);*/
 
         makeAlive((short) 0, (short) 0);
         makeAlive((short) 1, (short) 1);
