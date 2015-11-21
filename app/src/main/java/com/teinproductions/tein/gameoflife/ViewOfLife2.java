@@ -41,7 +41,6 @@ public class ViewOfLife2 extends View {
         int firstVerLine = (int) (cellWidth * (Math.ceil(startX) - startX));
         int firstHorLine = (int) (cellWidth * (Math.ceil(startY) - startY));
 
-
         // Draw living cells
         short cellX = (short) (roundAwayFromZero(startX) - (startX >= 0 ? 1 : 0));
         short cellYStart = (short) (roundAwayFromZero(startY) - (startY >= 0 ? 1 : 0));
@@ -97,13 +96,15 @@ public class ViewOfLife2 extends View {
         else return (short) Math.floor(i);
     }
 
-    private float prevXDrag = -1, prevYDrag = -1;
+    private float prevXDrag1 = -1, prevYDrag1 = -1;
+    private float prevXDrag2 = -1, prevYDrag2 = -1;
+    private int zoomPointerId1 = -1, zoomPointerId2 = -1;
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX() / cellWidth + startX;
         float y = event.getY() / cellWidth + startY;
-        switch (event.getAction()) {
+        switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
                 switch (touchMode) {
                     case TOUCH_MODE_ADD:
@@ -119,13 +120,21 @@ public class ViewOfLife2 extends View {
                         invalidate();
                         return true;
                     case TOUCH_MODE_MOVE:
-                        prevXDrag = x;
-                        prevYDrag = y;
+                        prevXDrag1 = event.getX();
+                        prevYDrag1 = event.getY();
+                        zoomPointerId1 = event.getPointerId(0);
                         invalidate();
                         return true;
                     default:
-                        return super.onTouchEvent(event);
+                        return false;
                 }
+            case MotionEvent.ACTION_POINTER_DOWN:
+                if (touchMode != TOUCH_MODE_MOVE) return false;
+                if (zoomPointerId2 != -1) return false;
+                zoomPointerId2 = event.getPointerId(event.getActionIndex());
+                int index = event.getActionIndex();
+                prevXDrag2 = event.getX(index);
+                prevYDrag2 = event.getY(index);
             case MotionEvent.ACTION_MOVE:
                 switch (touchMode) {
                     case TOUCH_MODE_ADD:
@@ -141,15 +150,41 @@ public class ViewOfLife2 extends View {
                         invalidate();
                         return true;
                     case TOUCH_MODE_MOVE:
-                        startX -= x - prevXDrag;
-                        // TODO: 18-11-2015 Does startX += x + prevXDrag also work
-                        startY -= y - prevYDrag;
-                        prevXDrag = x;
-                        prevYDrag = y;
+                        if (event.getPointerCount() == 1) {
+                            startX -= x - (prevXDrag1 / cellWidth + startX);
+                            // TODO: 18-11-2015 Does startX += x + prevXDrag also work
+                            startY -= y - (prevYDrag1 / cellWidth + startY);
+                            prevXDrag1 = event.getX();
+                            prevYDrag1 = event.getY();
+                        } else {
+                            int indexCurrent = event.getActionIndex();
+                            int index1 = event.findPointerIndex(zoomPointerId1);
+                            int index2 = event.findPointerIndex(zoomPointerId2);
+                            if (indexCurrent != index1 && indexCurrent != index2) return false;
+                            if (zoomPointerId1 == -1 || zoomPointerId2 == -1 || prevXDrag1 == -1 || prevYDrag1 == -1 ||
+                                    prevXDrag2 == -1 || prevYDrag2 == -1) return false;
+
+                            double distance1 = Math.sqrt(Math.pow(prevXDrag2 - prevXDrag1, 2) +
+                                    Math.pow(prevYDrag2 - prevYDrag1, 2));
+
+                            if (event.getActionIndex() == index1) {
+                                prevXDrag1 = event.getX(index1);
+                                prevYDrag1 = event.getY(index1);
+                            } else {
+                                // event.getActionIndex() equals index2
+                                prevXDrag2 = event.getX(index2);
+                                prevYDrag2 = event.getY(index2);
+                            }
+
+                            double distance2 = Math.sqrt(Math.pow(prevXDrag2 - prevXDrag1, 2) +
+                                    Math.pow(prevYDrag2 - prevYDrag1, 2));
+                            cellWidth *= distance2 / distance1;
+                        }
+
                         invalidate();
                         return true;
                     default:
-                        return super.onTouchEvent(event);
+                        return false;
                 }
             case MotionEvent.ACTION_UP:
                 switch (touchMode) {
@@ -165,11 +200,25 @@ public class ViewOfLife2 extends View {
                         }
                         invalidate();
                         return true;
+                    case TOUCH_MODE_MOVE:
+                        prevXDrag1 = prevXDrag2 = prevYDrag1 = prevYDrag2 =
+                                zoomPointerId2 = zoomPointerId1 = -1;
                     default:
-                        return super.onTouchEvent(event);
+                        return false;
                 }
+            case MotionEvent.ACTION_POINTER_UP:
+                if (touchMode != TOUCH_MODE_MOVE) return false;
+                int pointerIndex = event.getActionIndex();
+                if (pointerIndex == event.findPointerIndex(zoomPointerId1)) {
+                    zoomPointerId1 = -1;
+                    prevXDrag1 = prevYDrag1 = -1;
+                } else if (pointerIndex == event.findPointerIndex(zoomPointerId2)) {
+                    zoomPointerId2 = -1;
+                    prevXDrag2 = prevYDrag2 = -1;
+                } else return false;
+                return true;
             default:
-                return super.onTouchEvent(event);
+                return false;
         }
     }
 
