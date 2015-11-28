@@ -222,11 +222,19 @@ public class ViewOfLife2 extends View {
                 if (touchMode != TOUCH_MODE_MOVE) return false;
                 int pointerIndex = event.getActionIndex();
                 if (pointerIndex == event.findPointerIndex(zoomPointerId1)) {
-                    zoomPointerId1 = -1;
-                    prevXDrag1 = prevYDrag1 = -1;
+                    // Transfer the data of pointer 2 to pointer 1,
+                    zoomPointerId1 = zoomPointerId2;
+                    prevXDrag1 = prevXDrag2;
+                    prevYDrag1 = prevYDrag2;
+
+                    // Get rid of pointer 2
+                    zoomPointerId2 = -1;
+                    prevXDrag2 = prevYDrag2 = -1;
+                    Log.d("hi", "onTouchEvent: pointerId 1");
                 } else if (pointerIndex == event.findPointerIndex(zoomPointerId2)) {
                     zoomPointerId2 = -1;
                     prevXDrag2 = prevYDrag2 = -1;
+                    Log.d("hi", "onTouchEvent: pointerId 2");
                 } else return false;
                 return true;
             default:
