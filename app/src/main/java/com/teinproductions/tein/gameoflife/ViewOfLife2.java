@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.os.Build;
 import android.support.annotation.ColorRes;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -160,25 +161,36 @@ public class ViewOfLife2 extends View {
                             int indexCurrent = event.getActionIndex();
                             int index1 = event.findPointerIndex(zoomPointerId1);
                             int index2 = event.findPointerIndex(zoomPointerId2);
-                            if (indexCurrent != index1 && indexCurrent != index2) return false;
-                            if (zoomPointerId1 == -1 || zoomPointerId2 == -1 || prevXDrag1 == -1 || prevYDrag1 == -1 ||
+                            if ((indexCurrent != index1 && indexCurrent != index2) || zoomPointerId1 == -1 ||
+                                    zoomPointerId2 == -1 || prevXDrag1 == -1 || prevYDrag1 == -1 ||
                                     prevXDrag2 == -1 || prevYDrag2 == -1) return false;
 
                             double distance1 = Math.sqrt(Math.pow(prevXDrag2 - prevXDrag1, 2) +
                                     Math.pow(prevYDrag2 - prevYDrag1, 2));
+                            double centerPointX1 = (prevXDrag1 + prevXDrag2) / 2d;
+                            double centerPointY1 = (prevYDrag1 + prevYDrag2) / 2d;
+                            double centerPointX1Cell = centerPointX1 / cellWidth + startX;
+                            double centerPointY1Cell = centerPointY1 / cellWidth + startY;
 
-                            if (event.getActionIndex() == index1) {
-                                prevXDrag1 = event.getX(index1);
-                                prevYDrag1 = event.getY(index1);
-                            } else {
-                                // event.getActionIndex() equals index2
-                                prevXDrag2 = event.getX(index2);
-                                prevYDrag2 = event.getY(index2);
-                            }
+                            prevXDrag1 = event.getX(index1);
+                            prevYDrag1 = event.getY(index1);
+                            prevXDrag2 = event.getX(index2);
+                            prevYDrag2 = event.getY(index2);
 
+                            // Change cellWidth
                             double distance2 = Math.sqrt(Math.pow(prevXDrag2 - prevXDrag1, 2) +
                                     Math.pow(prevYDrag2 - prevYDrag1, 2));
                             cellWidth *= distance2 / distance1;
+
+                            // Change startX and startY
+                            double centerPointX2 = (prevXDrag1 + prevXDrag2) / 2d;
+                            double centerPointY2 = (prevYDrag1 + prevYDrag2) / 2d;
+                            // The cell at grid-position (centerPointX1Cell, centerPointY1Cell) has to
+                            // move to pixel-position (centerPointX2, centerPointY2)
+                            double cellsLeft = centerPointX2 / cellWidth;
+                            startX = (float) (centerPointX1Cell - cellsLeft);
+                            double cellsAbove = centerPointY2 / cellWidth;
+                            startY = (float) (centerPointY1Cell - cellsAbove);
                         }
 
                         invalidate();
