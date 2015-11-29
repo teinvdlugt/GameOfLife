@@ -6,6 +6,7 @@ import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -20,6 +21,7 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Activi
     private ImageButton pencilButton, eraseButton;
     private ImageButton initialStateButton;
     private TextView generationTV;
+    private CoordinatorLayout coordinatorLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Activi
         eraseButton = (ImageButton) findViewById(R.id.eraseButton);
         initialStateButton = (ImageButton) findViewById(R.id.initialStateButton);
         generationTV = (TextView) findViewById(R.id.generation_textView);
+        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
 
         findViewById(R.id.clear_button).setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -43,26 +46,6 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Activi
         });
 
         reloadPreferenceValues();
-
-        /*viewOfLife.setActivityInterface(this);
-        playPauseButton.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (zoomOutButton.getVisibility() == View.VISIBLE
-                        && nextGenButton.getVisibility() == View.GONE)
-                    showGenerationButtonSection();
-                else showZoomButtonSection();
-                return true;
-            }
-        });
-
-        resetSpeed();
-
-        viewOfLife.setEditMode(ViewOfLife.EditMode.ADD);
-        pencilButton.setSelected(true);
-        viewOfLife.setAutoZoom(true);
-        autoZoomButton.setSelected(true);
-        showZoomButtonSection();*/
     }
 
     public void onClickPencil(View view) {
@@ -85,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Activi
     }
 
     public void onClickClear(View view) {
-        Snackbar.make(viewOfLife, getString(R.string.short_click_clear_message), Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(coordinatorLayout, getString(R.string.short_click_clear_message), Snackbar.LENGTH_SHORT).show();
     }
 
     public void onClickPlayPause(View view) {

@@ -9,122 +9,130 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <LinearLayout
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/coordinatorLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
-        android:baselineAligned="false"
-        android:orientation="horizontal">
+        android:layout_height="match_parent">
 
-        <ImageButton
-            android:id="@+id/nextGenButton"
-            android:layout_width="0dp"
-            android:layout_height="45dp"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:background="?selectableItemBackgroundBorderless"
-            android:contentDescription="@string/xs_next_generation"
-            android:onClick="onClickNextGen"
-            android:src="@mipmap/ic_forward_black_36dp" />
-
-        <ImageButton
-            android:id="@+id/initialStateButton"
-            android:layout_width="0dp"
-            android:layout_height="45dp"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:background="?selectableItemBackgroundBorderless"
-            android:contentDescription="@string/xs_initial_state"
-            android:onClick="onClickInitialState"
-            android:src="@mipmap/ic_skip_previous_black_36dp" />
-
-        <TextView
-            android:id="@+id/generation_textView"
-            android:layout_width="0dp"
-            android:layout_height="45dp"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:textStyle="bold"
-            tools:text="345" />
-
-        <android.widget.Space
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_gravity="top"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:baselineAligned="false"
+            android:orientation="horizontal">
 
-        <ImageButton
-            android:layout_width="0dp"
-            android:layout_height="45dp"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:background="?selectableItemBackgroundBorderless"
-            android:contentDescription="@string/settings"
-            android:onClick="onClickSettings"
-            android:src="@mipmap/ic_settings_black_36dp" />
-    </LinearLayout>
+            <ImageButton
+                android:id="@+id/nextGenButton"
+                android:layout_width="0dp"
+                android:layout_height="45dp"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="?selectableItemBackgroundBorderless"
+                android:contentDescription="@string/xs_next_generation"
+                android:onClick="onClickNextGen"
+                android:src="@mipmap/ic_forward_black_36dp" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:baselineAligned="false"
-        android:orientation="horizontal">
+            <ImageButton
+                android:id="@+id/initialStateButton"
+                android:layout_width="0dp"
+                android:layout_height="45dp"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="?selectableItemBackgroundBorderless"
+                android:contentDescription="@string/xs_initial_state"
+                android:onClick="onClickInitialState"
+                android:src="@mipmap/ic_skip_previous_black_36dp" />
 
-        <ImageButton
-            android:id="@+id/pencilButton"
-            android:layout_width="0dp"
-            android:layout_height="45dp"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:background="?selectableItemBackgroundBorderless"
-            android:contentDescription="@string/xs_pencil"
-            android:onClick="onClickPencil"
-            android:src="@mipmap/ic_mode_edit_black_36dp" />
+            <TextView
+                android:id="@+id/generation_textView"
+                android:layout_width="0dp"
+                android:layout_height="45dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textStyle="bold"
+                tools:text="345" />
 
-        <ImageButton
-            android:id="@+id/eraseButton"
-            android:layout_width="0dp"
-            android:layout_height="45dp"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:background="?selectableItemBackgroundBorderless"
-            android:contentDescription="@string/xs_eraser"
-            android:onClick="onClickErase"
-            android:src="@mipmap/ic_remove_circle_black_36dp" />
+            <android.widget.Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
 
-        <ImageButton
-            android:id="@+id/moveButton"
-            android:layout_width="0dp"
-            android:layout_height="45dp"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:background="?selectableItemBackgroundBorderless"
-            android:contentDescription="@string/xs_move"
-            android:onClick="onClickMove"
-            android:src="@mipmap/ic_cursor_move_black_36dp" />
+            <ImageButton
+                android:layout_width="0dp"
+                android:layout_height="45dp"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="?selectableItemBackgroundBorderless"
+                android:contentDescription="@string/settings"
+                android:onClick="onClickSettings"
+                android:src="@mipmap/ic_settings_black_36dp" />
+        </LinearLayout>
 
-        <ImageButton
-            android:id="@+id/clear_button"
-            android:layout_width="0dp"
-            android:layout_height="45dp"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:background="?selectableItemBackgroundBorderless"
-            android:contentDescription="@string/xs_clear"
-            android:onClick="onClickClear"
-            android:src="@mipmap/ic_clear_black_36dp" />
+        <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:baselineAligned="false"
+            android:orientation="horizontal"
+            app:layout_behavior="com.teinproductions.tein.gameoflife.FABBehavior">
 
-        <ImageButton
-            android:id="@+id/playPause_button"
-            android:layout_width="0dp"
-            android:layout_height="45dp"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:background="?selectableItemBackgroundBorderless"
-            android:contentDescription="@string/xs_start_or_stop"
-            android:onClick="onClickPlayPause"
-            android:src="@mipmap/ic_play_arrow_black_36dp" />
-    </LinearLayout>
+            <ImageButton
+                android:id="@+id/pencilButton"
+                android:layout_width="0dp"
+                android:layout_height="45dp"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="?selectableItemBackgroundBorderless"
+                android:contentDescription="@string/xs_pencil"
+                android:onClick="onClickPencil"
+                android:src="@mipmap/ic_mode_edit_black_36dp" />
+
+            <ImageButton
+                android:id="@+id/eraseButton"
+                android:layout_width="0dp"
+                android:layout_height="45dp"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="?selectableItemBackgroundBorderless"
+                android:contentDescription="@string/xs_eraser"
+                android:onClick="onClickErase"
+                android:src="@mipmap/ic_remove_circle_black_36dp" />
+
+            <ImageButton
+                android:id="@+id/moveButton"
+                android:layout_width="0dp"
+                android:layout_height="45dp"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="?selectableItemBackgroundBorderless"
+                android:contentDescription="@string/xs_move"
+                android:onClick="onClickMove"
+                android:src="@mipmap/ic_cursor_move_black_36dp" />
+
+            <ImageButton
+                android:id="@+id/clear_button"
+                android:layout_width="0dp"
+                android:layout_height="45dp"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="?selectableItemBackgroundBorderless"
+                android:contentDescription="@string/xs_clear"
+                android:onClick="onClickClear"
+                android:src="@mipmap/ic_clear_black_36dp" />
+
+            <ImageButton
+                android:id="@+id/playPause_button"
+                android:layout_width="0dp"
+                android:layout_height="45dp"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="?selectableItemBackgroundBorderless"
+                android:contentDescription="@string/xs_start_or_stop"
+                android:onClick="onClickPlayPause"
+                android:src="@mipmap/ic_play_arrow_black_36dp" />
+        </LinearLayout>
+    </android.support.design.widget.CoordinatorLayout>
+
 </FrameLayout>
