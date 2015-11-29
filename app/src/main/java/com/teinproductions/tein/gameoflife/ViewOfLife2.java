@@ -18,6 +18,8 @@ public class ViewOfLife2 extends View {
 
     private int cellWidth = 50;
     private float startX = 0, startY = 0;
+    private int minGridCellWidth = 15;
+
     /**
      * 0: x position
      * 1: y position
@@ -73,14 +75,16 @@ public class ViewOfLife2 extends View {
             }
         }
 
-        // Draw grid
-        // Vertical grid lines
-        for (float x = firstVerLine; x < width; x += cellWidth) {
-            canvas.drawLine(x, 0, x, height, gridPaint);
-        }
-        // Horizontal grid lines
-        for (float y = firstHorLine; y < height; y += cellWidth) {
-            canvas.drawLine(0, y, width, y, gridPaint);
+        if (cellWidth > minGridCellWidth) {
+            // Draw grid
+            // Vertical grid lines
+            for (float x = firstVerLine; x < width; x += cellWidth) {
+                canvas.drawLine(x, 0, x, height, gridPaint);
+            }
+            // Horizontal grid lines
+            for (float y = firstHorLine; y < height; y += cellWidth) {
+                canvas.drawLine(0, y, width, y, gridPaint);
+            }
         }
     }
 
