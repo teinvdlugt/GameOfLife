@@ -20,6 +20,7 @@ public class ViewOfLife2 extends View {
     private float startX = 0, startY = 0;
     private int minGridCellWidth = 15;
 
+    private float defaultCellWidth = 50;
     /**
      * 0: x position
      * 1: y position
@@ -399,6 +400,7 @@ public class ViewOfLife2 extends View {
         synchronized (lock) {
             cells.clear();
             startX = startY = 0;
+            cellWidth = defaultCellWidth;
             invalidate();
         }
     }

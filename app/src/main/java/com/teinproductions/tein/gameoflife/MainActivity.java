@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Activi
     }
 
     public void clear() {
-        //viewOfLife.stop();
+        viewOfLife.stop();
         viewOfLife.clear();
         playPauseButton.setImageResource(R.mipmap.ic_play_arrow_black_36dp);
         lockScreenOrientation(false);
