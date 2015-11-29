@@ -6,13 +6,13 @@
         android:inputType="number"
         android:key="@string/speed_key"
         android:title="@string/speed" />
-    <ListPreference
+    <!--<ListPreference
         android:defaultValue="1"
         android:dialogTitle="@string/stroke_width_dialog_title"
         android:entries="@array/stroke_width_entries"
         android:entryValues="@array/stroke_width_values"
         android:key="@string/stroke_width_key"
-        android:title="@string/stroke_width" />
+        android:title="@string/stroke_width" />-->
     <ListPreference
         android:defaultValue="1"
         android:dialogTitle="Minimum grid space in pixels"

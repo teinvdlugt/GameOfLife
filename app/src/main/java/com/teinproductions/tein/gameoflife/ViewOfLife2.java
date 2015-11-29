@@ -63,7 +63,7 @@ public class ViewOfLife2 extends View {
         }
 
         // DRAW GRID
-        if (cellWidth > minGridCellWidth) {
+        if (cellWidth >= minGridCellWidth) {
             // Vertical grid lines
             for (float x = firstVerLine; x < width; x += cellWidth) {
                 canvas.drawLine(x, 0, x, height, gridPaint);
