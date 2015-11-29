@@ -17,7 +17,7 @@ import java.util.List;
 public class ViewOfLife2 extends View {
 
     private int cellWidth = 50;
-    private float startX = 0, startY = 0;
+    private float startX = Short.MAX_VALUE - 50, startY = 0;
     private int minGridCellWidth = 15;
 
     /**
@@ -44,39 +44,25 @@ public class ViewOfLife2 extends View {
         int firstVerLine = (int) (cellWidth * (Math.ceil(startX) - startX));
         int firstHorLine = (int) (cellWidth * (Math.ceil(startY) - startY));
 
-        // Draw living cells
-        short cellX = (short) (roundAwayFromZero(startX) - (startX >= 0 ? 1 : 0));
-        short cellYStart = (short) (roundAwayFromZero(startY) - (startY >= 0 ? 1 : 0));
-        int pixelXStart = firstVerLine - cellWidth;
-        int pixelYStart = firstHorLine - cellWidth;
+        // DRAW CELLS
+        short xStart = (short) Math.floor(startX);
+        short xEnd = (short) (xStart + width / cellWidth + 1);
+        short yStart = (short) Math.floor(startY);
+        short yEnd = (short) (yStart + height / cellWidth + 1);
 
         synchronized (lock) {
-            for (int x = pixelXStart + 1; x < width; x += cellWidth) {
-                short cellY = cellYStart;
-                for (int y = pixelYStart + 1; y < height; y += cellWidth) {
-
-                    // Check if the cell is alive
-                    for (short[] cell : cells) {
-                        if (cell[0] == cellX && cell[1] == cellY) {
-                            if (cell[2] == 1) {
-                                // Cell is alive
-                                canvas.drawRect(x, y, x + cellWidth, y + cellWidth, cellPaint);
-                            }/* else {
-                                // Cell is dead, draw when debugging
-                                canvas.drawRect(x, y, x + cellWidth, y + cellWidth, deadCellPaint);
-                            }*/
-                            break;
-                        }
-                    }
-
-                    cellY++;
+            for (short[] cell : cells) {
+                if (cell[2] == 1 && cell[0] >= xStart && cell[0] <= xEnd &&
+                        cell[1] >= yStart && cell[1] <= yEnd) {
+                    float left = (cell[0] - startX) * cellWidth;
+                    float top = (cell[1] - startY) * cellWidth;
+                    canvas.drawRect(left, top, left + cellWidth, top + cellWidth, cellPaint);
                 }
-                cellX++;
             }
         }
 
+        // DRAW GRID
         if (cellWidth > minGridCellWidth) {
-            // Draw grid
             // Vertical grid lines
             for (float x = firstVerLine; x < width; x += cellWidth) {
                 canvas.drawLine(x, 0, x, height, gridPaint);
@@ -94,11 +80,6 @@ public class ViewOfLife2 extends View {
                 return cell[2] == 1;
             }
         return false;
-    }
-
-    private static short roundAwayFromZero(float i) {
-        if (i > 0) return (short) Math.ceil(i);
-        else return (short) Math.floor(i);
     }
 
     private float prevXDrag1 = -1, prevYDrag1 = -1;
