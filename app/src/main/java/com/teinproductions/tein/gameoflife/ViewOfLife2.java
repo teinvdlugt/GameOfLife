@@ -16,8 +16,8 @@ import java.util.List;
 
 public class ViewOfLife2 extends View {
 
-    private int cellWidth = 50;
-    private float startX = Short.MAX_VALUE - 50, startY = 0;
+    private float cellWidth = 50;
+    private float startX = 0, startY = 0;
     private int minGridCellWidth = 15;
 
     /**
@@ -150,8 +150,11 @@ public class ViewOfLife2 extends View {
                                     zoomPointerId2 == -1 || prevXDrag1 == -1 || prevYDrag1 == -1 ||
                                     prevXDrag2 == -1 || prevYDrag2 == -1) return false;
 
-                            double distance1 = Math.sqrt(Math.pow(prevXDrag2 - prevXDrag1, 2) +
-                                    Math.pow(prevYDrag2 - prevYDrag1, 2));
+
+                            double xDist1 = prevXDrag2 - prevXDrag1;
+                            double yDist1 = prevYDrag2 - prevYDrag1;
+                            double dist1Sqr = xDist1 * xDist1 + yDist1 * yDist1;
+
                             double centerPointX1 = (prevXDrag1 + prevXDrag2) / 2d;
                             double centerPointY1 = (prevYDrag1 + prevYDrag2) / 2d;
                             double centerPointX1Cell = centerPointX1 / cellWidth + startX;
@@ -162,20 +165,25 @@ public class ViewOfLife2 extends View {
                             prevXDrag2 = event.getX(index2);
                             prevYDrag2 = event.getY(index2);
 
+
                             // Change cellWidth
-                            double distance2 = Math.sqrt(Math.pow(prevXDrag2 - prevXDrag1, 2) +
-                                    Math.pow(prevYDrag2 - prevYDrag1, 2));
-                            cellWidth *= distance2 / distance1;
+                            double xDist2 = prevXDrag2 - prevXDrag1;
+                            double yDist2 = prevYDrag2 - prevYDrag1;
+                            double dist2Sqr = xDist2 * xDist2 + yDist2 * yDist2;
+                            cellWidth *= Math.sqrt(dist2Sqr / dist1Sqr);
+
 
                             // Change startX and startY
                             double centerPointX2 = (prevXDrag1 + prevXDrag2) / 2d;
                             double centerPointY2 = (prevYDrag1 + prevYDrag2) / 2d;
                             // The cell at grid-position (centerPointX1Cell, centerPointY1Cell) has to
                             // move to pixel-position (centerPointX2, centerPointY2)
-                            double cellsLeft = centerPointX2 / cellWidth;
-                            startX = (float) (centerPointX1Cell - cellsLeft);
-                            double cellsAbove = centerPointY2 / cellWidth;
-                            startY = (float) (centerPointY1Cell - cellsAbove);
+                            //
+                            // Written out version:
+                            // double cellsLeft = centerPointX2 / cellWidth;
+                            // startX = (float) (centerPointX1Cell - cellsLeft);
+                            startX = (float) (centerPointX1Cell - centerPointX2 / cellWidth);
+                            startY = (float) (centerPointY1Cell - centerPointY2 / cellWidth);
                         }
 
                         invalidate();
