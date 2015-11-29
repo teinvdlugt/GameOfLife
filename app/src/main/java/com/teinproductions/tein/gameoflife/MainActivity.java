@@ -145,20 +145,20 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Activi
     }
 
     private void reloadPreferenceValues() {
-        //resetSpeed();
+        resetSpeed();
         //resetStrokeWidth();
         resetMinCellWidthGrid();
         resetDefaultCellWidth();
     }
 
     private void resetSpeed() {
-        /*String speed = PreferenceManager.getDefaultSharedPreferences(this)
+        String speed = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString(getString(R.string.speed_key), "100");
         try {
             viewOfLife.setSpeed(Integer.parseInt(speed));
         } catch (NumberFormatException e) {
             viewOfLife.setSpeed(100);
-        }*/
+        }
     }
 
     private void resetStrokeWidth() {

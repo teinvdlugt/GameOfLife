@@ -19,6 +19,7 @@ public class ViewOfLife2 extends View {
     private float cellWidth = 50;
     private float startX = 0, startY = 0;
     private int minGridCellWidth = 15;
+    private long speed = 50;
 
     private float defaultCellWidth = 50;
     /**
@@ -364,12 +365,16 @@ public class ViewOfLife2 extends View {
             @Override
             public void run() {
                 while (running) {
+                    long millis = System.currentTimeMillis();
                     nextGeneration();
                     postInvalidate();
-                    try {
-                        Thread.sleep(50L);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    long sleepTime = speed - System.currentTimeMillis() + millis;
+                    if (sleepTime > 0) {
+                        try {
+                            Thread.sleep(sleepTime);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
@@ -409,6 +414,14 @@ public class ViewOfLife2 extends View {
 
     public void setDefaultCellWidth(float defaultCellWidth) {
         this.defaultCellWidth = defaultCellWidth;
+    }
+
+    public long getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(long speed) {
+        this.speed = speed;
     }
 
     public void clear() {
