@@ -16,4 +16,42 @@
         <item>4</item>
         <item>5</item>
     </string-array>
+
+    <string-array name="min_grid_cell_width_entries">
+        <item>2 px</item>
+        <item>5 px</item>
+        <item>10 px</item>
+        <item>15 px</item>
+        <item>20 px</item>
+        <item>30 px</item>
+        <item>50 px</item>
+    </string-array>
+    <string-array name="min_grid_cell_width_values">
+        <item>2</item>
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>30</item>
+        <item>50</item>
+    </string-array>
+
+    <string-array name="default_cell_width_entries">
+        <item>5 px</item>
+        <item>10 px</item>
+        <item>20 px</item>
+        <item>50 px</item>
+        <item>80 px</item>
+        <item>100 px</item>
+        <item>150 px</item>
+    </string-array>
+    <string-array name="default_cell_width_values">
+        <item>5</item>
+        <item>10</item>
+        <item>20</item>
+        <item>50</item>
+        <item>80</item>
+        <item>100</item>
+        <item>150</item>
+    </string-array>
 </resources>

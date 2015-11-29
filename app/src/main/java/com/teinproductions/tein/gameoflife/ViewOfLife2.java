@@ -30,7 +30,6 @@ public class ViewOfLife2 extends View {
     private List<short[]> cells = new ArrayList<>();
     private final Object lock = new Object();
     private Paint gridPaint, cellPaint;
-    //private Paint deadCellPaint;
 
     private boolean running;
 
@@ -394,6 +393,22 @@ public class ViewOfLife2 extends View {
             throw new IllegalArgumentException(
                     "Parameter touchMode must be one of TOUCH_MODE_ADD, TOUCH_MODE_REMOVE and TOUCH_MODE_MOVE");
         this.touchMode = touchMode;
+    }
+
+    public int getMinGridCellWidth() {
+        return minGridCellWidth;
+    }
+
+    public void setMinGridCellWidth(int minGridCellWidth) {
+        this.minGridCellWidth = minGridCellWidth;
+    }
+
+    public float getDefaultCellWidth() {
+        return defaultCellWidth;
+    }
+
+    public void setDefaultCellWidth(float defaultCellWidth) {
+        this.defaultCellWidth = defaultCellWidth;
     }
 
     public void clear() {

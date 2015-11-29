@@ -5,6 +5,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Activi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
         viewOfLife = (ViewOfLife2) findViewById(R.id.view_of_life);
         playPauseButton = (ImageButton) findViewById(R.id.playPause_button);
@@ -39,6 +41,8 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Activi
                 return true;
             }
         });
+
+        reloadPreferenceValues();
 
         /*viewOfLife.setActivityInterface(this);
         playPauseButton.setOnLongClickListener(new View.OnLongClickListener() {
@@ -137,8 +141,14 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Activi
     @Override
     protected void onResume() {
         super.onResume();
+        reloadPreferenceValues();
+    }
+
+    private void reloadPreferenceValues() {
         //resetSpeed();
         //resetStrokeWidth();
+        resetMinCellWidthGrid();
+        resetDefaultCellWidth();
     }
 
     private void resetSpeed() {
@@ -160,6 +170,26 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Activi
         } catch (NumberFormatException e) {
             viewOfLife.setStrokeWidth(1);
         }*/
+    }
+
+    private void resetMinCellWidthGrid() {
+        String width = PreferenceManager.getDefaultSharedPreferences(this)
+                .getString(getString(R.string.min_cell_width_grid_key), "15");
+        try {
+            viewOfLife.setMinGridCellWidth(Integer.parseInt(width));
+        } catch (NumberFormatException e) {
+            viewOfLife.setMinGridCellWidth(15);
+        }
+    }
+
+    private void resetDefaultCellWidth() {
+        String width = PreferenceManager.getDefaultSharedPreferences(this)
+                .getString(getString(R.string.default_cell_width_key), "50");
+        try {
+            viewOfLife.setDefaultCellWidth(Float.parseFloat(width));
+        } catch (NumberFormatException e) {
+            viewOfLife.setDefaultCellWidth(50f);
+        }
     }
 
     public void onClickNextGen(View view) {
