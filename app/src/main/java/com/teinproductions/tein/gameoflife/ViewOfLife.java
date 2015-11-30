@@ -14,7 +14,7 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ViewOfLife2 extends View {
+public class ViewOfLife extends View {
 
     private float cellWidth = 50;
     private float startX = 0, startY = 0;
@@ -462,17 +462,17 @@ public class ViewOfLife2 extends View {
         cellPaint.setStyle(Paint.Style.FILL);
     }
 
-    public ViewOfLife2(Context context) {
+    public ViewOfLife(Context context) {
         super(context);
         init();
     }
 
-    public ViewOfLife2(Context context, AttributeSet attrs) {
+    public ViewOfLife(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
-    public ViewOfLife2(Context context, AttributeSet attrs, int defStyleAttr) {
+    public ViewOfLife(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
     }

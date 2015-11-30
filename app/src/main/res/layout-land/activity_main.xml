@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <com.teinproductions.tein.gameoflife.ViewOfLife2
+    <com.teinproductions.tein.gameoflife.ViewOfLife
         android:id="@+id/view_of_life"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

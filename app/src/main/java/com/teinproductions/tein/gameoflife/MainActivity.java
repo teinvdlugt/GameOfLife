@@ -11,12 +11,11 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.TextView;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    private ViewOfLife2 viewOfLife;
+    private ViewOfLife viewOfLife;
     private ImageButton playPauseButton;
     private CoordinatorLayout coordinatorLayout;
 
@@ -26,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
-        viewOfLife = (ViewOfLife2) findViewById(R.id.view_of_life);
+        viewOfLife = (ViewOfLife) findViewById(R.id.view_of_life);
         playPauseButton = (ImageButton) findViewById(R.id.playPause_button);
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
 
@@ -42,15 +41,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickPencil(View view) {
-        viewOfLife.setTouchMode(ViewOfLife2.TOUCH_MODE_ADD);
+        viewOfLife.setTouchMode(ViewOfLife.TOUCH_MODE_ADD);
     }
 
     public void onClickErase(View view) {
-        viewOfLife.setTouchMode(ViewOfLife2.TOUCH_MODE_REMOVE);
+        viewOfLife.setTouchMode(ViewOfLife.TOUCH_MODE_REMOVE);
     }
 
     public void onClickMove(View view) {
-        viewOfLife.setTouchMode(ViewOfLife2.TOUCH_MODE_MOVE);
+        viewOfLife.setTouchMode(ViewOfLife.TOUCH_MODE_MOVE);
     }
 
     public void clear() {
