@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void resetSpeed() {
         String speed = PreferenceManager.getDefaultSharedPreferences(this)
-                .getString(getString(R.string.speed_key), "100");
+                .getString(getString(R.string.speed_key), "20");
         try {
             viewOfLife.setSpeed(Integer.parseInt(speed));
         } catch (NumberFormatException e) {

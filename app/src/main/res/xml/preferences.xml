@@ -14,18 +14,17 @@
         android:key="@string/stroke_width_key"
         android:title="@string/stroke_width" />-->
     <ListPreference
-        android:defaultValue="1"
+        android:defaultValue="15"
         android:dialogTitle="Minimum grid space in pixels"
         android:entries="@array/min_grid_cell_width_entries"
         android:entryValues="@array/min_grid_cell_width_values"
         android:key="@string/min_cell_width_grid_key"
         android:title="Minimum cell width to draw grid" />
     <ListPreference
-        android:defaultValue="3"
+        android:defaultValue="50"
         android:dialogTitle="@string/default_cell_width_preference_title"
         android:entries="@array/default_cell_width_entries"
         android:entryValues="@array/default_cell_width_values"
         android:key="@string/default_cell_width_key"
         android:title="@string/default_cell_width_preference_title" />
-    <!-- TODO defaultValue of above two ListPreferences doesn't work -->
 </PreferenceScreen>
