@@ -4,9 +4,4 @@
     <color name="window_background">#ffc7ff6e</color>
     <color name="greenToolbarColor">#ff94c65c</color>
     <color name="greenSystemBarColor">#ff77a251</color>
-
-    <color name="buttonStateSelected">#ffffc700</color>
-    <color name="buttonStatePressed">#ffff9700</color>
-    <color name="buttonStatePressedStateNotSelected">#1e000000</color>
-    <color name="buttonStateNotSelected">#0000</color>
 </resources>
