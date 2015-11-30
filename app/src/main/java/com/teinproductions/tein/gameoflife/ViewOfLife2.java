@@ -98,13 +98,13 @@ public class ViewOfLife2 extends View {
                 switch (touchMode) {
                     case TOUCH_MODE_ADD:
                         synchronized (lock) {
-                            makeAlive((short) x, (short) y);
+                            makeAlive((short) Math.floor(x), (short) Math.floor(y));
                         }
                         invalidate();
                         return true;
                     case TOUCH_MODE_REMOVE:
                         synchronized (lock) {
-                            makeDead((short) x, (short) y);
+                            makeDead((short) Math.floor(x), (short) Math.floor(y));
                         }
                         invalidate();
                         return true;
@@ -128,13 +128,13 @@ public class ViewOfLife2 extends View {
                 switch (touchMode) {
                     case TOUCH_MODE_ADD:
                         synchronized (lock) {
-                            makeAlive((short) x, (short) y);
+                            makeAlive((short) Math.floor(x), (short) Math.floor(y));
                         }
                         invalidate();
                         return true;
                     case TOUCH_MODE_REMOVE:
                         synchronized (lock) {
-                            makeDead((short) x, (short) y);
+                            makeDead((short) Math.floor(x), (short) Math.floor(y));
                         }
                         invalidate();
                         return true;
@@ -198,14 +198,14 @@ public class ViewOfLife2 extends View {
                 switch (touchMode) {
                     case TOUCH_MODE_ADD:
                         synchronized (lock) {
-                            makeAlive((short) x, (short) y);
+                            makeAlive((short) Math.floor(x), (short) Math.floor(y));
                             updateGen0();
                         }
                         invalidate();
                         return true;
                     case TOUCH_MODE_REMOVE:
                         synchronized (lock) {
-                            makeDead((short) x, (short) y);
+                            makeDead((short) Math.floor(x), (short) Math.floor(y));
                             updateGen0();
                         }
                         invalidate();
@@ -460,13 +460,6 @@ public class ViewOfLife2 extends View {
         cellPaint = new Paint();
         cellPaint.setColor(getColor(R.color.block_color));
         cellPaint.setStyle(Paint.Style.FILL);
-
-        makeAlive((short) 0, (short) 0);
-        makeAlive((short) 1, (short) 1);
-        makeAlive((short) 2, (short) 2);
-        makeAlive((short) 2, (short) 3);
-        makeAlive((short) 2, (short) 4);
-        makeAlive((short) 2, (short) 5);
     }
 
     public ViewOfLife2(Context context) {
