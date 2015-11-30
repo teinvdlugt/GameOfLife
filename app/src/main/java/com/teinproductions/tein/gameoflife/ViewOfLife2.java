@@ -32,6 +32,8 @@ public class ViewOfLife2 extends View {
     private final Object lock = new Object();
     private Paint gridPaint, cellPaint;
 
+    private List<short[]> gen0 = new ArrayList<>();
+
     private boolean running;
 
     private int touchMode = TOUCH_MODE_MOVE;
@@ -197,12 +199,14 @@ public class ViewOfLife2 extends View {
                     case TOUCH_MODE_ADD:
                         synchronized (lock) {
                             makeAlive((short) x, (short) y);
+                            updateGen0();
                         }
                         invalidate();
                         return true;
                     case TOUCH_MODE_REMOVE:
                         synchronized (lock) {
                             makeDead((short) x, (short) y);
+                            updateGen0();
                         }
                         invalidate();
                         return true;
@@ -427,8 +431,23 @@ public class ViewOfLife2 extends View {
     public void clear() {
         synchronized (lock) {
             cells.clear();
+            gen0.clear();
             startX = startY = 0;
             cellWidth = defaultCellWidth;
+            invalidate();
+        }
+    }
+
+    public void updateGen0() {
+        synchronized (lock) {
+            gen0 = clone(cells);
+        }
+    }
+
+    public void restoreGen0() {
+        synchronized (lock) {
+            if (gen0 != null)
+                cells = clone(gen0);
             invalidate();
         }
     }
@@ -440,11 +459,6 @@ public class ViewOfLife2 extends View {
         cellPaint = new Paint();
         cellPaint.setColor(getColor(R.color.block_color));
         cellPaint.setStyle(Paint.Style.FILL);
-
-        /*// For debugging:
-        deadCellPaint = new Paint();
-        deadCellPaint.setColor(getColor(android.R.color.darker_gray));
-        deadCellPaint.setStyle(Paint.Style.FILL);*/
 
         makeAlive((short) 0, (short) 0);
         makeAlive((short) 1, (short) 1);

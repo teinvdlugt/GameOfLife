@@ -18,8 +18,6 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Activi
 
     private ViewOfLife2 viewOfLife;
     private ImageButton playPauseButton;
-    private ImageButton pencilButton, eraseButton;
-    private ImageButton initialStateButton;
     private TextView generationTV;
     private CoordinatorLayout coordinatorLayout;
 
@@ -31,9 +29,6 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Activi
 
         viewOfLife = (ViewOfLife2) findViewById(R.id.view_of_life);
         playPauseButton = (ImageButton) findViewById(R.id.playPause_button);
-        pencilButton = (ImageButton) findViewById(R.id.pencilButton);
-        eraseButton = (ImageButton) findViewById(R.id.eraseButton);
-        initialStateButton = (ImageButton) findViewById(R.id.initialStateButton);
         generationTV = (TextView) findViewById(R.id.generation_textView);
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
 
@@ -174,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Activi
     }
 
     public void onClickInitialState(View view) {
-        /*viewOfLife.restoreInitialState();*/
+        viewOfLife.restoreGen0();
     }
 
     @Override
