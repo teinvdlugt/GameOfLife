@@ -141,7 +141,6 @@ public class ViewOfLife extends View {
                     case TOUCH_MODE_MOVE:
                         if (event.getPointerCount() == 1) {
                             startX -= x - (prevXDrag1 / cellWidth + startX);
-                            // TODO: 18-11-2015 Does startX += x + prevXDrag also work
                             startY -= y - (prevYDrag1 / cellWidth + startY);
                             prevXDrag1 = event.getX();
                             prevYDrag1 = event.getY();
@@ -326,16 +325,13 @@ public class ViewOfLife extends View {
     }
 
     private byte neighbours(short x, short y) {
-        // TODO: 19-11-2015 More efficient way? One loop, which checks each neighbour
         byte neighbours = 0;
-        if (isAlive((short) (x - 1), (short) (y - 1))) neighbours++;
-        if (isAlive(x, (short) (y - 1))) neighbours++;
-        if (isAlive((short) (x + 1), (short) (y - 1))) neighbours++;
-        if (isAlive((short) (x - 1), y)) neighbours++;
-        if (isAlive((short) (x + 1), y)) neighbours++;
-        if (isAlive((short) (x - 1), (short) (y + 1))) neighbours++;
-        if (isAlive(x, (short) (y + 1))) neighbours++;
-        if (isAlive((short) (x + 1), (short) (y + 1))) neighbours++;
+        for (short[] cell : cells) {
+            if (cell[2] == 1 && (cell[0] == x - 1 || cell[0] == x || cell[0] == x + 1) &&
+                    (cell[1] == y - 1 || cell[1] == y | cell[1] == y + 1) &&
+                    !(cell[0] == x && cell[1] == y))
+                neighbours++;
+        }
         return neighbours;
     }
 
