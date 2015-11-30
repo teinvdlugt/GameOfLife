@@ -35,17 +35,7 @@
             <android.support.v4.widget.Space
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:layout_weight="1" />
-
-            <TextView
-                android:id="@+id/generation_textView"
-                android:layout_width="45dp"
-                android:layout_height="0dp"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:textStyle="bold"
-                tools:text="345" />
+                android:layout_weight="2" />
 
             <ImageButton
                 android:id="@+id/initialStateButton"

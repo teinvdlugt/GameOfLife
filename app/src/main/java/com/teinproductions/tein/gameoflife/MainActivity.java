@@ -14,11 +14,10 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 
-public class MainActivity extends AppCompatActivity implements ViewOfLife.ActivityInterface {
+public class MainActivity extends AppCompatActivity {
 
     private ViewOfLife2 viewOfLife;
     private ImageButton playPauseButton;
-    private TextView generationTV;
     private CoordinatorLayout coordinatorLayout;
 
     @Override
@@ -29,7 +28,6 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Activi
 
         viewOfLife = (ViewOfLife2) findViewById(R.id.view_of_life);
         playPauseButton = (ImageButton) findViewById(R.id.playPause_button);
-        generationTV = (TextView) findViewById(R.id.generation_textView);
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
 
         findViewById(R.id.clear_button).setOnLongClickListener(new View.OnLongClickListener() {
@@ -172,15 +170,8 @@ public class MainActivity extends AppCompatActivity implements ViewOfLife.Activi
         viewOfLife.restoreGen0();
     }
 
-    @Override
-    public void onGenerationChanged(long newGen) {
-        //String gen = "" + newGen;
-        //float textSize = generationTV.getWidth() / newGen;
-        generationTV.setText("" + newGen);
-    }
-
-    @Override
+    /*@Override
     public void onEdited() {
         lockScreenOrientation(true);
-    }
+    }*/
 }

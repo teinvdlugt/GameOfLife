@@ -445,10 +445,11 @@ public class ViewOfLife2 extends View {
     }
 
     public void restoreGen0() {
-        synchronized (lock) {
-            if (gen0 != null)
+        if (gen0 != null) {
+            synchronized (lock) {
                 cells = clone(gen0);
-            invalidate();
+                invalidate();
+            }
         }
     }
 

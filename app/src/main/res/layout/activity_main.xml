@@ -45,19 +45,10 @@
                 android:onClick="onClickInitialState"
                 android:src="@mipmap/ic_skip_previous_black_36dp" />
 
-            <TextView
-                android:id="@+id/generation_textView"
-                android:layout_width="0dp"
-                android:layout_height="45dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:textStyle="bold"
-                tools:text="345" />
-
             <android.widget.Space
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1" />
+                android:layout_weight="2" />
 
             <ImageButton
                 android:layout_width="0dp"
