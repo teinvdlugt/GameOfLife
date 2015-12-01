@@ -3,10 +3,10 @@
     package="com.teinproductions.tein.gameoflife">
 
     <application
-        android:supportsRtl="true"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
         <activity
@@ -21,7 +21,10 @@
 
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/settings"/>
-    </application>
+            android:label="@string/settings" />
 
+        <activity
+            android:name=".files.FileReaderActivity"
+            android:label="@string/create_from_file_activity_label" />
+    </application>
 </manifest>

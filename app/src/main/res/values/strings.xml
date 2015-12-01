@@ -17,4 +17,10 @@
     <string name="min_cell_width_grid_key" translatable="false">MIN_CELL_WIDTH_GRID</string>
     <string name="default_cell_width_key" translatable="false">DEFAULT_CELL_WIDTH</string>
     <string name="default_cell_width_preference_title">Default cell width</string>
+    <string name="ok">OK</string>
+    <string name="invalid_input_message">Please enter a valid Life 1.05 file.</string>
+    <string name="invalid_input_title">Invalid input</string>
+    <string name="xs_add_from_file">Create from file</string>
+    <string name="parse">Parse</string>
+    <string name="create_from_file_activity_label">Create from file</string>
 </resources>

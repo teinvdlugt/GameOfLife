@@ -12,6 +12,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageButton;
 
+import com.teinproductions.tein.gameoflife.files.FileReaderActivity;
+import com.teinproductions.tein.gameoflife.files.Life;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -167,6 +170,23 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClickInitialState(View view) {
         viewOfLife.restoreGen0();
+    }
+
+    private static final int FILE_READER_ACTIVITY_REQUEST_CODE = 1;
+
+    public void onClickCreateFromFile(View view) {
+        Intent intent = new Intent(this, FileReaderActivity.class);
+        startActivityForResult(intent, FILE_READER_ACTIVITY_REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Life result;
+        if (requestCode == FILE_READER_ACTIVITY_REQUEST_CODE &&
+                resultCode == RESULT_OK &&
+                data != null && (result = (Life) data.getSerializableExtra(FileReaderActivity.LIFE_MODEL_EXTRA)) != null) {
+            viewOfLife.load(result);
+        }
     }
 
     /*@Override

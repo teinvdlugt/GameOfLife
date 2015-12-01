@@ -45,10 +45,21 @@
                 android:onClick="onClickInitialState"
                 android:src="@mipmap/ic_skip_previous_black_36dp" />
 
+            <ImageButton
+                android:id="@+id/addFromFileButton"
+                android:layout_width="0dp"
+                android:layout_height="45dp"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="?selectableItemBackgroundBorderless"
+                android:contentDescription="@string/xs_add_from_file"
+                android:onClick="onClickCreateFromFile"
+                android:src="@mipmap/ic_add_black_36dp" />
+
             <android.widget.Space
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="2" />
+                android:layout_weight="1" />
 
             <ImageButton
                 android:layout_width="0dp"
