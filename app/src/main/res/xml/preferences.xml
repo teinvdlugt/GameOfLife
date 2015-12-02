@@ -27,4 +27,17 @@
         android:entryValues="@array/default_cell_width_values"
         android:key="@string/default_cell_width_key"
         android:title="@string/default_cell_width_preference_title" />
+
+    <PreferenceCategory android:title="Other">
+        <Preference android:title="Rate in Play Store">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="market://details?id=com.teinproductions.tein.gameoflife" />
+        </Preference>
+        <Preference android:title="More apps">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="market://search?q=pub:Tein+van+der+Lugt" />
+        </Preference>
+    </PreferenceCategory>
 </PreferenceScreen>
