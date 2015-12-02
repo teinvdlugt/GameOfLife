@@ -454,8 +454,8 @@ public class ViewOfLife extends View {
     public void load(Life life) {
         running = false;
         cells = life.getCells();
-        checkCellsDocumented();
-        recountNeighbours();
+        /*checkCellsDocumented();
+        recountNeighbours();*/
         updateGen0();
         startX = startY = 0;
         invalidate();

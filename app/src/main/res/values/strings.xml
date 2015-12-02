@@ -23,4 +23,5 @@
     <string name="xs_add_from_file">Create from file</string>
     <string name="parse">Parse</string>
     <string name="create_from_file_activity_label">Create from file</string>
+    <string name="parsing_progress_dialog_message">Parsing...</string>
 </resources>

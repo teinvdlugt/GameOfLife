@@ -1,7 +1,10 @@
 package com.teinproductions.tein.gameoflife.files;
 
 
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -29,8 +32,12 @@ public class FileReaderActivity extends AppCompatActivity {
         et = (EditText) findViewById(R.id.editText);
     }
 
+    private boolean cancelled = false;
+
     public void onClickButton(View view) {
-        if (et.length() == 0) {
+        final String input = et.getText().toString();
+
+        if (input.length() == 0) {
             new AlertDialog.Builder(this)
                     .setTitle(getString(R.string.invalid_input_title))
                     .setMessage(getString(R.string.invalid_input_message))
@@ -39,12 +46,44 @@ public class FileReaderActivity extends AppCompatActivity {
             return;
         }
 
-        Life life = LifeOneOFiveInterpreter.parse(et.getText().toString());
+        final ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setMessage(getString(R.string.parsing_progress_dialog_message));
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                cancelled = true;
+            }
+        });
+        dialog.setIndeterminate(true);
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        dialog.show();
 
-        Intent data = new Intent();
-        data.putExtra(LIFE_MODEL_EXTRA, life);
-        setResult(RESULT_OK, data);
-        finish();
+        new AsyncTask<Void, Void, Life>() {
+            @Override
+            protected Life doInBackground(Void... params) {
+                Life life = LifeOneOFiveInterpreter.parse(input);
+                LifeUtils.documentCells(life.getCells());
+                return life;
+            }
+
+            @Override
+            protected void onPostExecute(Life life) {
+                if (!cancelled) {
+                    try {
+                        dialog.dismiss();
+                    } catch (IllegalArgumentException e) {
+                        e.printStackTrace();
+                    }
+                    Intent data = new Intent();
+                    data.putExtra(LIFE_MODEL_EXTRA, life);
+                    setResult(RESULT_OK, data);
+                    finish();
+                } else {
+                    // Reset for next click on "Parse"
+                    cancelled = false;
+                }
+            }
+        }.execute();
     }
 
     @Override
