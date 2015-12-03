@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="block_color">#ff404aff</color>
+    <color name="default_cell_color">#ff404aff</color>
+    <color name="default_grid_color">#ff000000</color>
+
     <color name="window_background">#ffc7ff6e</color>
     <color name="greenToolbarColor">#ff94c65c</color>
     <color name="greenSystemBarColor">#ff77a251</color>

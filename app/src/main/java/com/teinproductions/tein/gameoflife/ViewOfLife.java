@@ -3,8 +3,11 @@ package com.teinproductions.tein.gameoflife;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
+import android.preference.PreferenceManager;
+import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -493,13 +496,21 @@ public class ViewOfLife extends View {
         }
     }
 
+    public void setCellColor(@ColorInt int color) {
+        cellPaint.setColor(color);
+    }
+
+    public void setGridColor(@ColorInt int color) {
+        gridPaint.setColor(color);
+    }
+
 
     public void init() {
         gridPaint = new Paint();
         gridPaint.setStyle(Paint.Style.STROKE);
 
         cellPaint = new Paint();
-        cellPaint.setColor(getColor(R.color.block_color));
+        cellPaint.setColor(MainActivity.getColor(getContext(), R.color.default_cell_color));
         cellPaint.setStyle(Paint.Style.FILL);
     }
 
@@ -516,11 +527,5 @@ public class ViewOfLife extends View {
     public ViewOfLife(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
-    }
-
-
-    private int getColor(@ColorRes int colorId) {
-        if (Build.VERSION.SDK_INT >= 23) return getContext().getColor(colorId);
-        else return getContext().getResources().getColor(colorId);
     }
 }

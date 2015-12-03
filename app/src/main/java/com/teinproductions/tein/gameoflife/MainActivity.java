@@ -1,11 +1,14 @@
 package com.teinproductions.tein.gameoflife;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.ColorRes;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -126,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
         resetSpeed();
         resetMinCellWidthGrid();
         resetDefaultCellWidth();
+        resetColors();
     }
 
     private void resetSpeed() {
@@ -155,6 +159,49 @@ public class MainActivity extends AppCompatActivity {
             viewOfLife.setDefaultCellWidth(Float.parseFloat(width));
         } catch (NumberFormatException e) {
             viewOfLife.setDefaultCellWidth(50f);
+        }
+    }
+
+    private void resetColors() {
+        // CELL COLOR
+        boolean cellColorNotSet = false;
+        String hex = PreferenceManager.getDefaultSharedPreferences(this)
+                .getString(getString(R.string.cell_color_key), null);
+        if (hex == null) {
+            cellColorNotSet = true;
+        } else {
+            try {
+                viewOfLife.setCellColor(Color.parseColor(hex));
+            } catch (IllegalArgumentException e) {
+                Snackbar.make(coordinatorLayout, "Provide a valid hexadecimal grid color", Snackbar.LENGTH_SHORT).show();
+                cellColorNotSet = true;
+            }
+        }
+
+        if (cellColorNotSet) {
+            viewOfLife.setCellColor(getColor(R.color.default_cell_color));
+        }
+
+
+        // GRID COLOR
+        boolean gridColorNotSet = false;
+        String hex2 = PreferenceManager.getDefaultSharedPreferences(this)
+                .getString(getString(R.string.grid_color_key), null);
+        if (hex2 == null) {
+            gridColorNotSet = true;
+        } else {
+            try {
+                viewOfLife.setGridColor(Color.parseColor(hex2));
+            } catch (IllegalArgumentException e) {
+                if (!cellColorNotSet) {
+                    Snackbar.make(coordinatorLayout, "Provide a valid hexadecimal grid color", Snackbar.LENGTH_SHORT).show();
+                }
+                gridColorNotSet = true;
+            }
+        }
+
+        if (gridColorNotSet) {
+            viewOfLife.setCellColor(getColor(R.color.default_grid_color));
         }
     }
 
@@ -193,4 +240,9 @@ public class MainActivity extends AppCompatActivity {
     public void onEdited() {
         lockScreenOrientation(true);
     }*/
+
+    public static int getColor(Context context, @ColorRes int colorId) {
+        if (Build.VERSION.SDK_INT >= 23) return context.getColor(colorId);
+        else return context.getResources().getColor(colorId);
+    }
 }

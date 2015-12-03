@@ -28,6 +28,22 @@
         android:key="@string/default_cell_width_key"
         android:title="@string/default_cell_width_preference_title" />
 
+    <PreferenceCategory android:title="@string/colors_pref_category">
+        <EditTextPreference
+            android:defaultValue="@color/default_cell_color"
+            android:dialogTitle="@string/cell_color"
+            android:inputType="text"
+            android:key="@string/cell_color_key"
+            android:title="@string/cell_color" />
+        <EditTextPreference
+            android:defaultValue="@color/default_grid_color"
+            android:dialogTitle="@string/grid_color"
+            android:inputType="text"
+            android:key="@string/grid_color_key"
+            android:title="@string/grid_color" />
+    </PreferenceCategory>
+
+
     <PreferenceCategory android:title="Other">
         <Preference android:title="Rate in Play Store">
             <intent
