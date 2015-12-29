@@ -30,4 +30,5 @@
     <string name="colors_pref_category">Colors</string>
     <string name="grid_color">Grid color</string>
     <string name="grid_color_key">GRID_COLOR</string>
+    <string name="reload_index">Reconstruct pattern index</string>
 </resources>

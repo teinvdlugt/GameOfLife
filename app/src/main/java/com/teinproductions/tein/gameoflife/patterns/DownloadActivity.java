@@ -11,6 +11,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,11 +24,14 @@ import com.teinproductions.tein.gameoflife.files.LifeOneOFiveInterpreter;
 import com.teinproductions.tein.gameoflife.files.LifeUtils;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class DownloadActivity extends AppCompatActivity implements PatternAdapter.OnPatternClickListener {
@@ -41,15 +45,33 @@ public class DownloadActivity extends AppCompatActivity implements PatternAdapte
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        String[] names = {"Gosper Glider Gun", "Snail", "Zweiback",
-                "10-engine Cordership", "Seal", "Scrubber"};
-        String[] files = {"gosperglidergun_105.lif", "snail_105.lif", "zweiback_105.lif",
-                "10enginecordership_105.lif", "seal_105.lif", "scrubber_105.lif"};
+        List<String> files = getPatternFileNames();
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        PatternAdapter adapter = new PatternAdapter(names, files, this, this);
+        PatternAdapter adapter = new PatternAdapter(files, files, this, this);
         recyclerView.setAdapter(adapter);
+    }
+
+    private List<String> getPatternFileNames() {
+        try {
+            List<String> result = new ArrayList<>();
+
+            FileInputStream fis = openFileInput(IndexDownloadIntentService.FILE_NAMES_FILE);
+            InputStreamReader isr = new InputStreamReader(fis);
+            BufferedReader buff = new BufferedReader(isr);
+
+            String line;
+            while ((line = buff.readLine()) != null) {
+                result.add(line);
+            }
+
+            fis.close();
+            return result;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ArrayList<>(0);
+        }
     }
 
     @Override
@@ -130,11 +152,20 @@ public class DownloadActivity extends AppCompatActivity implements PatternAdapte
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_download_activity, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
                 return true;
+            case R.id.reload_index:
+                Intent intent = new Intent(this, IndexDownloadIntentService.class);
+                startService(intent);
             default:
                 return false;
         }
@@ -143,7 +174,7 @@ public class DownloadActivity extends AppCompatActivity implements PatternAdapte
 
 class PatternAdapter extends RecyclerView.Adapter<PatternAdapter.ViewHolder> {
 
-    private String[] names, files;
+    private List<String> names, files;
     private Context context;
     private OnPatternClickListener listener;
 
@@ -151,22 +182,12 @@ class PatternAdapter extends RecyclerView.Adapter<PatternAdapter.ViewHolder> {
         void onClickPattern(String file);
     }
 
-    public PatternAdapter(String[] names, String[] files, Context context, OnPatternClickListener listener) {
+    public PatternAdapter(List<String> names, List<String> files, Context context, OnPatternClickListener listener) {
+        if (names.size() != files.size())
+            throw new IllegalArgumentException("names and files are not of the same size");
         this.names = names;
         this.files = files;
         this.context = context;
-        this.listener = listener;
-    }
-
-    public void setLives(String[] names, String[] files) {
-        if (names.length != files.length)
-            throw new IllegalArgumentException("names and files are not of the same size");
-
-        this.names = names;
-        this.files = files;
-    }
-
-    public void setListener(OnPatternClickListener listener) {
         this.listener = listener;
     }
 
@@ -177,12 +198,12 @@ class PatternAdapter extends RecyclerView.Adapter<PatternAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(PatternAdapter.ViewHolder holder, int position) {
-        holder.bind(names[position], files[position]);
+        holder.bind(names.get(position), files.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return names.length;
+        return names.size();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
