@@ -17,6 +17,7 @@ import android.widget.ImageButton;
 
 import com.teinproductions.tein.gameoflife.files.FileReaderActivity;
 import com.teinproductions.tein.gameoflife.files.Life;
+import com.teinproductions.tein.gameoflife.patterns.DownloadActivity;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -220,19 +221,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private static final int FILE_READER_ACTIVITY_REQUEST_CODE = 1;
+    private static final int DOWNLOAD_ACTIVITY_REQUEST_CODE = 2;
 
     public void onClickCreateFromFile(View view) {
-        Intent intent = new Intent(this, FileReaderActivity.class);
-        startActivityForResult(intent, FILE_READER_ACTIVITY_REQUEST_CODE);
+        // Intent intent = new Intent(this, FileReaderActivity.class);
+        // startActivityForResult(intent, FILE_READER_ACTIVITY_REQUEST_CODE);
+        Intent intent = new Intent(this, DownloadActivity.class);
+        startActivityForResult(intent, DOWNLOAD_ACTIVITY_REQUEST_CODE);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Life result;
-        if (requestCode == FILE_READER_ACTIVITY_REQUEST_CODE &&
-                resultCode == RESULT_OK &&
-                data != null && (result = (Life) data.getSerializableExtra(FileReaderActivity.LIFE_MODEL_EXTRA)) != null) {
-            viewOfLife.load(result);
+        if (resultCode == RESULT_OK && data != null
+                && (result = (Life) data.getSerializableExtra(FileReaderActivity.LIFE_MODEL_EXTRA)) != null) {
+            if (requestCode == FILE_READER_ACTIVITY_REQUEST_CODE || requestCode == DOWNLOAD_ACTIVITY_REQUEST_CODE) {
+                viewOfLife.load(result);
+            }
         }
     }
 
