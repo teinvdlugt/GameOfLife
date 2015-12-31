@@ -36,6 +36,9 @@ import java.util.List;
 
 public class DownloadActivity extends AppCompatActivity implements PatternAdapter.OnPatternClickListener {
 
+    private List<String> fileNames = new ArrayList<>();
+    private List<String> patternNames = new ArrayList<>();
+
     @SuppressWarnings("ConstantConditions")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,17 +48,18 @@ public class DownloadActivity extends AppCompatActivity implements PatternAdapte
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        List<String> files = getPatternFileNames();
+        getPatternFileNames();
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        PatternAdapter adapter = new PatternAdapter(files, files, this, this);
+        PatternAdapter adapter = new PatternAdapter(patternNames, fileNames, this, this);
         recyclerView.setAdapter(adapter);
     }
 
-    private List<String> getPatternFileNames() {
+    private void getPatternFileNames() {
         try {
-            List<String> result = new ArrayList<>();
+            fileNames.clear();
+            patternNames.clear();
 
             FileInputStream fis = openFileInput(IndexDownloadIntentService.FILE_NAMES_FILE);
             InputStreamReader isr = new InputStreamReader(fis);
@@ -63,14 +67,16 @@ public class DownloadActivity extends AppCompatActivity implements PatternAdapte
 
             String line;
             while ((line = buff.readLine()) != null) {
-                result.add(line);
+                String[] data = line.split(",");
+                fileNames.add(data[0]);
+                patternNames.add(data[1]);
             }
 
             fis.close();
-            return result;
-        } catch (IOException e) {
+        } catch (IOException | IndexOutOfBoundsException e) {
+            fileNames.clear();
+            patternNames.clear();
             e.printStackTrace();
-            return new ArrayList<>(0);
         }
     }
 

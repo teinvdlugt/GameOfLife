@@ -1,14 +1,10 @@
 package com.teinproductions.tein.gameoflife.patterns;
 
 import android.app.IntentService;
-import android.app.NotificationManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
-
-import com.teinproductions.tein.gameoflife.R;
+import android.util.Log;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -32,6 +28,9 @@ public class IndexDownloadIntentService extends IntentService {
     public static final String FILE_NAMES_FILE = "file_names";
     public static final String BROADCAST_ACTION = "com.teinproductions.tein.gameoflife.INDEX_DOWNLOAD_DONE";
 
+    public static final String PROGRESS_BAR_MAX = "progressBarMax";
+    public static final String PROGRESS_BAR_PROGRESS = "progressBarProgress";
+
     public IndexDownloadIntentService() {
         super("name");
     }
@@ -40,26 +39,34 @@ public class IndexDownloadIntentService extends IntentService {
         super(name);
     }
 
+    private int progressBarMax;
+
     @Override
     protected void onHandleIntent(Intent intent) {
         try {
+            // android.os.Debug.waitForDebugger();
+
             // Download the file index
             String file = downloadFile(BASE_URL);
 
             // Parse the file index
             Document doc = Jsoup.parse(file);
 
-            // Get files names with .lif extension
+            // Get file names of files with .lif extension
             List<String> fileNames = parseSupportedFileNames(doc);
 
-            // Save file names to disk
-            saveFileNames(this, fileNames);
+            progressBarMax = fileNames.size();
 
-            // TODO Parse and save pattern names, descriptions etc.
+            // Get the names of the patterns
+            List<String> patternNames = parsePatternNames(fileNames);
+
+            // Save file names to disk
+            savePatterns(this, fileNames, patternNames);
 
             // Send broadcast that the job is done
             LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(BROADCAST_ACTION));
-        } catch (IOException ignored) {
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -79,11 +86,48 @@ public class IndexDownloadIntentService extends IntentService {
         return result;
     }
 
-    private void saveFileNames(Context context, List<String> fileNames) throws IOException {
+    private List<String> parsePatternNames(List<String> fileNames) throws IOException {
+        List<String> patternNames = new ArrayList<>();
+
+        Intent progressIntent = new Intent(this, IndexDownloadProgressBroadcastReceiver.class);
+        progressIntent.putExtra(PROGRESS_BAR_MAX, progressBarMax);
+
+        for (int i = 0; i < fileNames.size(); i++) {
+            String fileName = fileNames.get(i);
+            try {
+                HttpURLConnection conn = establishConnection(BASE_URL + fileName);
+                InputStream is = conn.getInputStream();
+                BufferedReader buff = new BufferedReader(new InputStreamReader(is));
+
+                String line;
+                while ((line = buff.readLine()) != null) {
+                    int index = line.indexOf("#D Name:");
+                    if (index != -1) {
+                        patternNames.add(line.substring(index + 9));
+                        progressIntent.putExtra(PROGRESS_BAR_PROGRESS, i);
+                        sendBroadcast(progressIntent);
+                        Log.d("1984", "parsePatternNames: " + line);
+                        break;
+                    }
+                }
+
+                conn.disconnect();
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+                patternNames.add(fileName);
+            }
+        }
+
+        return patternNames;
+    }
+
+    private void savePatterns(Context context, List<String> fileNames, List<String> patternNames) throws IOException {
         // Construct file contents
         StringBuilder sb = new StringBuilder();
-        for (String str : fileNames) {
-            sb.append(str).append("\n");
+
+        for (int i = 0; i < fileNames.size(); i++) {
+            sb.append(fileNames.get(i)).append(",").append(patternNames.get(i)).append("\n");
         }
 
         FileOutputStream fos = context.openFileOutput(FILE_NAMES_FILE, Context.MODE_PRIVATE);
@@ -92,17 +136,7 @@ public class IndexDownloadIntentService extends IntentService {
     }
 
     public static String downloadFile(String urlStr) throws IOException {
-        URL url = new URL(urlStr);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setReadTimeout(10000);
-        conn.setConnectTimeout(20000);
-        conn.setRequestMethod("GET");
-        conn.setDoInput(true);
-        conn.connect();
-        int responseCode = conn.getResponseCode();
-
-        if (responseCode < 200 || responseCode >= 400)
-            throw new IOException("response code was " + responseCode);
+        HttpURLConnection conn = establishConnection(urlStr);
 
         InputStream is = conn.getInputStream();
         InputStreamReader reader = new InputStreamReader(is);
@@ -118,17 +152,20 @@ public class IndexDownloadIntentService extends IntentService {
         conn.disconnect();
         return sb.toString();
     }
-}
 
-class IndexDownloadDoneBroadcastReceiver extends BroadcastReceiver {
-    private static final int NOTIFICATION_ID = 1;
+    private static HttpURLConnection establishConnection(String urlStr) throws IOException {
+        URL url = new URL(urlStr);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setReadTimeout(15000);
+        conn.setConnectTimeout(20000);
+        conn.setRequestMethod("GET");
+        conn.setDoInput(true);
+        conn.connect();
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
-                .setContentTitle("Indexing done")
-                .setAutoCancel(true)
-                .setSmallIcon(R.mipmap.ic_launcher);
-        ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)).notify(NOTIFICATION_ID, builder.build());
+        int responseCode = conn.getResponseCode();
+        if (responseCode < 200 || responseCode >= 400)
+            throw new IOException("response code was " + responseCode);
+
+        return conn;
     }
 }

@@ -38,6 +38,6 @@
             android:name=".patterns.IndexDownloadIntentService"
             android:exported="false" />
 
-        <receiver android:name=".patterns.IndexDownloadDoneBroadcastReceiver" />
+        <receiver android:name=".patterns.IndexDownloadProgressBroadcastReceiver" />
     </application>
 </manifest>
