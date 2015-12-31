@@ -26,7 +26,6 @@ public class IndexDownloadIntentService extends IntentService {
     public static final String BASE_URL = "http://gameoflife.netau.net/patterns/";
     public static final String SUPPORTED_FILE_EXT = "105.lif";
     public static final String FILE_NAMES_FILE = "file_names";
-    public static final String BROADCAST_ACTION = "com.teinproductions.tein.gameoflife.INDEX_DOWNLOAD_DONE";
 
     public static final String PROGRESS_BAR_MAX = "progressBarMax";
     public static final String PROGRESS_BAR_PROGRESS = "progressBarProgress";
@@ -62,9 +61,6 @@ public class IndexDownloadIntentService extends IntentService {
 
             // Save file names to disk
             savePatterns(this, fileNames, patternNames);
-
-            // Send broadcast that the job is done
-            LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(BROADCAST_ACTION));
         } catch (IOException e) {
             e.printStackTrace();
         }
