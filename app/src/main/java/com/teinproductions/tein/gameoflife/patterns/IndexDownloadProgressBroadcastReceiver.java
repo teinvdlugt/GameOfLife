@@ -22,7 +22,8 @@ public class IndexDownloadProgressBroadcastReceiver extends BroadcastReceiver {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.mipmap.ic_launcher);
-        if (progress == maxProgress) {
+
+        if (progress == maxProgress - 1) {
             builder.setContentTitle("Game of Life: downloading done");
         } else {
             builder.setContentTitle("Downloading pattern index...")
