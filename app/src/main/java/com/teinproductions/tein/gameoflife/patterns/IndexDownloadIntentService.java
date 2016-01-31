@@ -1,10 +1,14 @@
 package com.teinproductions.tein.gameoflife.patterns;
 
 import android.app.IntentService;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+
+import com.teinproductions.tein.gameoflife.db.DefaultPatternContract;
+import com.teinproductions.tein.gameoflife.db.DefaultPatternDbHelper;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -43,7 +47,7 @@ public class IndexDownloadIntentService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         try {
-            // android.os.Debug.waitForDebugger();
+            android.os.Debug.waitForDebugger();
 
             // Download the file index
             String file = downloadFile(BASE_URL);
@@ -51,7 +55,14 @@ public class IndexDownloadIntentService extends IntentService {
             // Parse the file index
             Document doc = Jsoup.parse(file);
 
-            // Get file names of files with .lif extension
+            DefaultPatternDbHelper dbHelper = new DefaultPatternDbHelper(this);
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+            db.delete(DefaultPatternContract.DefaultPatternEntry.TABLE_NAME, null, null);
+
+            saveSupportedFiles(db, doc);
+
+            db.close();
+            /*// Get file names of files with .lif extension
             List<String> fileNames = parseSupportedFileNames(doc);
 
             progressBarMax = fileNames.size();
@@ -60,9 +71,25 @@ public class IndexDownloadIntentService extends IntentService {
             List<String> patternNames = parsePatternNames(fileNames);
 
             // Save file names to disk
-            savePatterns(this, fileNames, patternNames);
+            savePatterns(this, fileNames, patternNames);*/
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void saveSupportedFiles(SQLiteDatabase db, Document doc) {
+        Element ul = doc.getElementsByTag("ul").first();
+        Elements lis = ul.children();
+        lis.remove(0); // First entry is "Parent Directory"
+
+        ContentValues values = new ContentValues();
+
+        for (Element li : lis) {
+            String fileName = li.text().trim();
+            if (fileName.endsWith(SUPPORTED_FILE_EXT)) {
+                values.put(DefaultPatternContract.DefaultPatternEntry.COLUMN_NAME_URL, fileName);
+                db.insert(DefaultPatternContract.DefaultPatternEntry.TABLE_NAME, null, values);
+            }
         }
     }
 
@@ -160,7 +187,7 @@ public class IndexDownloadIntentService extends IntentService {
 
         int responseCode = conn.getResponseCode();
         if (responseCode < 200 || responseCode >= 400)
-            throw new IOException("response code was " + responseCode);
+            throw new IOException("Response code was " + responseCode);
 
         return conn;
     }

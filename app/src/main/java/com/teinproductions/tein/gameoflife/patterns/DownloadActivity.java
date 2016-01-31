@@ -3,6 +3,9 @@ package com.teinproductions.tein.gameoflife.patterns;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -18,13 +21,14 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.teinproductions.tein.gameoflife.R;
+import com.teinproductions.tein.gameoflife.db.DefaultPatternContract;
+import com.teinproductions.tein.gameoflife.db.DefaultPatternDbHelper;
 import com.teinproductions.tein.gameoflife.files.FileReaderActivity;
 import com.teinproductions.tein.gameoflife.files.Life;
 import com.teinproductions.tein.gameoflife.files.LifeOneOFiveInterpreter;
 import com.teinproductions.tein.gameoflife.files.LifeUtils;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -61,7 +65,24 @@ public class DownloadActivity extends AppCompatActivity implements PatternAdapte
             fileNames.clear();
             patternNames.clear();
 
-            FileInputStream fis = openFileInput(IndexDownloadIntentService.FILE_NAMES_FILE);
+            SQLiteDatabase db = new DefaultPatternDbHelper(this).getReadableDatabase();
+            Cursor c = db.query(
+                    DefaultPatternContract.DefaultPatternEntry.TABLE_NAME,
+                    new String[]{DefaultPatternContract.DefaultPatternEntry.COLUMN_NAME_URL},
+                    null, null, null, null, null);
+
+            if (c.moveToFirst()) {
+                int urlColumnIndex = c.getColumnIndex(DefaultPatternContract.DefaultPatternEntry.COLUMN_NAME_URL);
+                do {
+                    String url = c.getString(urlColumnIndex);
+                    fileNames.add(url);
+                    patternNames.add(url);
+                } while (c.moveToNext());
+            }
+
+            c.close();
+
+            /*FileInputStream fis = openFileInput(IndexDownloadIntentService.FILE_NAMES_FILE);
             InputStreamReader isr = new InputStreamReader(fis);
             BufferedReader buff = new BufferedReader(isr);
 
@@ -72,8 +93,8 @@ public class DownloadActivity extends AppCompatActivity implements PatternAdapte
                 patternNames.add(data[1]);
             }
 
-            fis.close();
-        } catch (IOException | IndexOutOfBoundsException e) {
+            fis.close();*/
+        } catch (/*IOException*/ SQLiteException | IndexOutOfBoundsException e) {
             fileNames.clear();
             patternNames.clear();
             e.printStackTrace();
