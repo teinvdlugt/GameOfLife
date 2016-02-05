@@ -31,4 +31,6 @@
     <string name="grid_color">Grid color</string>
     <string name="grid_color_key">GRID_COLOR</string>
     <string name="reload_index">Reconstruct pattern index</string>
+    <string name="no_patterns">You have to download the pattern index first</string>
+    <string name="download">Download</string>
 </resources>

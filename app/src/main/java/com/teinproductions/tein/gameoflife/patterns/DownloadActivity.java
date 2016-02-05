@@ -38,7 +38,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class DownloadActivity extends AppCompatActivity implements PatternAdapter.OnPatternClickListener {
+public class DownloadActivity extends AppCompatActivity implements PatternAdapter.OnPatternClickListener,
+        NoPatternsAdapter.OnDownloadClickListener {
 
     private List<String> fileNames = new ArrayList<>();
     private List<String> patternNames = new ArrayList<>();
@@ -56,8 +57,14 @@ public class DownloadActivity extends AppCompatActivity implements PatternAdapte
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        PatternAdapter adapter = new PatternAdapter(patternNames, fileNames, this, this);
-        recyclerView.setAdapter(adapter);
+
+        if (fileNames.size() > 0) {
+            PatternAdapter adapter = new PatternAdapter(patternNames, fileNames, this, this);
+            recyclerView.setAdapter(adapter);
+        } else {
+            NoPatternsAdapter adapter = new NoPatternsAdapter(this, this);
+            recyclerView.setAdapter(adapter);
+        }
     }
 
     private void getPatternFileNames() {
@@ -81,19 +88,6 @@ public class DownloadActivity extends AppCompatActivity implements PatternAdapte
             }
 
             c.close();
-
-            /*FileInputStream fis = openFileInput(IndexDownloadIntentService.FILE_NAMES_FILE);
-            InputStreamReader isr = new InputStreamReader(fis);
-            BufferedReader buff = new BufferedReader(isr);
-
-            String line;
-            while ((line = buff.readLine()) != null) {
-                String[] data = line.split(",");
-                fileNames.add(data[0]);
-                patternNames.add(data[1]);
-            }
-
-            fis.close();*/
         } catch (/*IOException*/ SQLiteException | IndexOutOfBoundsException e) {
             fileNames.clear();
             patternNames.clear();
@@ -197,10 +191,15 @@ public class DownloadActivity extends AppCompatActivity implements PatternAdapte
                 return false;
         }
     }
+
+    @Override
+    public void onClickDownload() {
+        Intent intent = new Intent(this, IndexDownloadIntentService.class);
+        startService(intent);
+    }
 }
 
 class PatternAdapter extends RecyclerView.Adapter<PatternAdapter.ViewHolder> {
-
     private List<String> names, files;
     private Context context;
     private OnPatternClickListener listener;
@@ -256,6 +255,45 @@ class PatternAdapter extends RecyclerView.Adapter<PatternAdapter.ViewHolder> {
             nameTV.setText(name);
             urlTV.setText(file);
             this.file = file;
+        }
+    }
+}
+
+class NoPatternsAdapter extends RecyclerView.Adapter<NoPatternsAdapter.ViewHolder> {
+    private Context context;
+    private OnDownloadClickListener listener;
+
+    public NoPatternsAdapter(Context context, OnDownloadClickListener listener) {
+        this.context = context;
+        this.listener = listener;
+    }
+
+    @Override
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.list_item_no_patterns, parent, false));
+    }
+
+    @Override
+    public void onBindViewHolder(ViewHolder holder, int position) {}
+
+    @Override
+    public int getItemCount() {
+        return 1;
+    }
+
+    interface OnDownloadClickListener {
+        void onClickDownload();
+    }
+
+    class ViewHolder extends RecyclerView.ViewHolder {
+        public ViewHolder(View itemView) {
+            super(itemView);
+            itemView.findViewById(R.id.download_button).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (listener != null) listener.onClickDownload();
+                }
+            });
         }
     }
 }

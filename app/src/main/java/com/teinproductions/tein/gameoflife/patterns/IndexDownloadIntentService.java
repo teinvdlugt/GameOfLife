@@ -105,9 +105,9 @@ public class IndexDownloadIntentService extends IntentService {
 
         for (int i = 0; i < fileNames.size(); i++) {
             String fileName = fileNames.get(i);
-            HttpURLConnection conn = establishConnection(BASE_URL + fileName);
-            InputStream is = conn.getInputStream();
             try {
+                HttpURLConnection conn = establishConnection(BASE_URL + fileName);
+                InputStream is = conn.getInputStream();
                 BufferedReader buff = new BufferedReader(new InputStreamReader(is));
 
                 String line;
@@ -119,7 +119,7 @@ public class IndexDownloadIntentService extends IntentService {
                         values.put(DefaultPatternContract.DefaultPatternEntry.COLUMN_NAME_URL, fileName);
                         values.put(DefaultPatternContract.DefaultPatternEntry.COLUMN_NAME_NAME, patternName);
                         db.update(DefaultPatternContract.DefaultPatternEntry.TABLE_NAME, values,
-                                DefaultPatternContract.DefaultPatternEntry.COLUMN_NAME_URL + "=" + fileName, null);
+                                DefaultPatternContract.DefaultPatternEntry.COLUMN_NAME_URL + "=?", new String[]{fileName});
 
                         // Show progress in notification
                         progressIntent.putExtra(PROGRESS_BAR_PROGRESS, i);
@@ -127,11 +127,11 @@ public class IndexDownloadIntentService extends IntentService {
                         break;
                     }
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
+
                 conn.disconnect();
                 is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
