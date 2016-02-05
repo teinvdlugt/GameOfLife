@@ -2,10 +2,9 @@ package com.teinproductions.tein.gameoflife.patterns;
 
 import android.app.IntentService;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
+import android.database.sqlite.SQLiteException;
 
 import com.teinproductions.tein.gameoflife.db.DefaultPatternContract;
 import com.teinproductions.tein.gameoflife.db.DefaultPatternDbHelper;
@@ -16,7 +15,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.BufferedReader;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -44,118 +42,98 @@ public class IndexDownloadIntentService extends IntentService {
 
     private int progressBarMax;
 
+    @SuppressWarnings("TryFinallyCanBeTryWithResources")
     @Override
     protected void onHandleIntent(Intent intent) {
+        android.os.Debug.waitForDebugger();
+
+        DefaultPatternDbHelper dbHelper = new DefaultPatternDbHelper(this);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
         try {
-            android.os.Debug.waitForDebugger();
-
-            // Download the file index
             String file = downloadFile(BASE_URL);
-
-            // Parse the file index
             Document doc = Jsoup.parse(file);
 
-            DefaultPatternDbHelper dbHelper = new DefaultPatternDbHelper(this);
-            SQLiteDatabase db = dbHelper.getWritableDatabase();
             db.delete(DefaultPatternContract.DefaultPatternEntry.TABLE_NAME, null, null);
 
-            saveSupportedFiles(db, doc);
-
-            db.close();
-            /*// Get file names of files with .lif extension
-            List<String> fileNames = parseSupportedFileNames(doc);
+            List<String> fileNames = saveSupportedFiles(db, doc);
 
             progressBarMax = fileNames.size();
 
-            // Get the names of the patterns
-            List<String> patternNames = parsePatternNames(fileNames);
-
-            // Save file names to disk
-            savePatterns(this, fileNames, patternNames);*/
-        } catch (IOException e) {
+            savePatternNames(db, fileNames);
+        } catch (IOException | SQLiteException e) {
             e.printStackTrace();
+        } finally {
+            db.close();
         }
     }
 
-    private void saveSupportedFiles(SQLiteDatabase db, Document doc) {
+    /**
+     * Parse the file names with supported extension, return a list of those file names
+     * and save them to the passed database.
+     *
+     * @param db  Database to save the file names to.
+     * @param doc Jsoup Document to parse the file names from
+     * @return A {@code List<String>} containing the files with supported extension
+     */
+    private List<String> saveSupportedFiles(SQLiteDatabase db, Document doc) {
         Element ul = doc.getElementsByTag("ul").first();
         Elements lis = ul.children();
         lis.remove(0); // First entry is "Parent Directory"
+        List<String> result = new ArrayList<>();
 
         ContentValues values = new ContentValues();
 
         for (Element li : lis) {
             String fileName = li.text().trim();
             if (fileName.endsWith(SUPPORTED_FILE_EXT)) {
+                result.add(fileName);
                 values.put(DefaultPatternContract.DefaultPatternEntry.COLUMN_NAME_URL, fileName);
                 db.insert(DefaultPatternContract.DefaultPatternEntry.TABLE_NAME, null, values);
-            }
-        }
-    }
-
-    private static List<String> parseSupportedFileNames(Document doc) {
-        Element ul = doc.getElementsByTag("ul").first();
-        Elements lis = ul.children();
-        lis.remove(0); // First entry is "Parent Directory"
-
-        List<String> result = new ArrayList<>();
-        for (Element li : lis) {
-            String fileName = li.text().trim();
-            if (fileName.endsWith(SUPPORTED_FILE_EXT)) {
-                result.add(fileName);
             }
         }
 
         return result;
     }
 
-    private List<String> parsePatternNames(List<String> fileNames) throws IOException {
-        List<String> patternNames = new ArrayList<>();
-
+    @SuppressWarnings("TryFinallyCanBeTryWithResources")
+    private void savePatternNames(SQLiteDatabase db, List<String> fileNames) throws IOException {
+        // Create reusable objects instead of allocating many objects in for-loop
         Intent progressIntent = new Intent(this, IndexDownloadProgressBroadcastReceiver.class);
         progressIntent.putExtra(PROGRESS_BAR_MAX, progressBarMax);
+        ContentValues values = new ContentValues();
 
         for (int i = 0; i < fileNames.size(); i++) {
             String fileName = fileNames.get(i);
+            HttpURLConnection conn = establishConnection(BASE_URL + fileName);
+            InputStream is = conn.getInputStream();
             try {
-                HttpURLConnection conn = establishConnection(BASE_URL + fileName);
-                InputStream is = conn.getInputStream();
                 BufferedReader buff = new BufferedReader(new InputStreamReader(is));
 
                 String line;
                 while ((line = buff.readLine()) != null) {
                     int index = line.indexOf("#D Name:");
                     if (index != -1) {
-                        patternNames.add(line.substring(index + 9));
+                        // Update database
+                        String patternName = line.substring(index + 9);
+                        values.put(DefaultPatternContract.DefaultPatternEntry.COLUMN_NAME_URL, fileName);
+                        values.put(DefaultPatternContract.DefaultPatternEntry.COLUMN_NAME_NAME, patternName);
+                        db.update(DefaultPatternContract.DefaultPatternEntry.TABLE_NAME, values,
+                                DefaultPatternContract.DefaultPatternEntry.COLUMN_NAME_URL + "=" + fileName, null);
+
+                        // Show progress in notification
                         progressIntent.putExtra(PROGRESS_BAR_PROGRESS, i);
                         sendBroadcast(progressIntent);
-                        Log.d("1984", "parsePatternNames: " + line);
                         break;
                     }
                 }
-
-                conn.disconnect();
-                is.close();
             } catch (IOException e) {
                 e.printStackTrace();
-                patternNames.add(fileName);
+            } finally {
+                conn.disconnect();
+                is.close();
             }
         }
-
-        return patternNames;
-    }
-
-    private void savePatterns(Context context, List<String> fileNames, List<String> patternNames) throws IOException {
-        // Construct file contents
-        StringBuilder sb = new StringBuilder();
-
-        for (int i = 0; i < fileNames.size(); i++) {
-            sb.append(fileNames.get(i)).append(",").append(patternNames.get(i)).append("\n");
-        }
-
-        FileOutputStream fos = context.openFileOutput(FILE_NAMES_FILE, Context.MODE_PRIVATE);
-        fos.write(sb.toString().getBytes());
-        fos.close();
     }
 
     public static String downloadFile(String urlStr) throws IOException {
