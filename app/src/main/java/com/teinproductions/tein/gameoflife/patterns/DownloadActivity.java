@@ -234,7 +234,7 @@ class PatternAdapter extends RecyclerView.Adapter<PatternAdapter.ViewHolder> {
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        private TextView nameTV;
+        private TextView nameTV, urlTV;
         private ViewGroup itemRoot;
         private String file;
 
@@ -242,6 +242,7 @@ class PatternAdapter extends RecyclerView.Adapter<PatternAdapter.ViewHolder> {
             super(itemView);
 
             nameTV = (TextView) itemView.findViewById(R.id.name_textView);
+            urlTV = (TextView) itemView.findViewById(R.id.url_textView);
             itemRoot = (ViewGroup) itemView.findViewById(R.id.itemRoot);
             itemRoot.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -253,6 +254,7 @@ class PatternAdapter extends RecyclerView.Adapter<PatternAdapter.ViewHolder> {
 
         public void bind(String name, String file) {
             nameTV.setText(name);
+            urlTV.setText(file);
             this.file = file;
         }
     }
