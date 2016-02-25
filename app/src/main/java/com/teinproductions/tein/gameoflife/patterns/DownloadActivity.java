@@ -75,20 +75,23 @@ public class DownloadActivity extends AppCompatActivity implements PatternAdapte
             SQLiteDatabase db = new DefaultPatternDbHelper(this).getReadableDatabase();
             Cursor c = db.query(
                     DefaultPatternContract.DefaultPatternEntry.TABLE_NAME,
-                    new String[]{DefaultPatternContract.DefaultPatternEntry.COLUMN_NAME_URL},
+                    new String[]{DefaultPatternContract.DefaultPatternEntry.COLUMN_NAME_URL,
+                            DefaultPatternContract.DefaultPatternEntry.COLUMN_NAME_NAME},
                     null, null, null, null, null);
 
             if (c.moveToFirst()) {
                 int urlColumnIndex = c.getColumnIndex(DefaultPatternContract.DefaultPatternEntry.COLUMN_NAME_URL);
+                int nameColumnIndex = c.getColumnIndex(DefaultPatternContract.DefaultPatternEntry.COLUMN_NAME_NAME);
                 do {
                     String url = c.getString(urlColumnIndex);
+                    String name = c.getString(nameColumnIndex);
                     fileNames.add(url);
-                    patternNames.add(url);
+                    patternNames.add(name == null ? url : name);
                 } while (c.moveToNext());
             }
 
             c.close();
-        } catch (/*IOException*/ SQLiteException | IndexOutOfBoundsException e) {
+        } catch (SQLiteException | IndexOutOfBoundsException e) {
             fileNames.clear();
             patternNames.clear();
             e.printStackTrace();
