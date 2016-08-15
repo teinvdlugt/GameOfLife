@@ -30,7 +30,12 @@
     <string name="colors_pref_category">Colors</string>
     <string name="grid_color">Grid color</string>
     <string name="grid_color_key">GRID_COLOR</string>
-    <string name="reload_index">Reconstruct pattern index</string>
+    <string name="reload_index">Reload pattern database</string>
     <string name="no_patterns">You have to download the pattern index first</string>
     <string name="download">Download</string>
+    <string name="download_names">Download pattern names…</string>
+    <string name="download_names_dialog_message">This will show the real names of the patterns, instead of file names, in the list with patterns. Because of all 684 patterns the name has to be retrieved from the internet, this can take a long time, but it is executed in the background.</string>
+    <string name="download_names_dialog_title">Download names</string>
+    <string name="begin">Begin</string>
+    <string name="cancel">Cancel</string>
 </resources>

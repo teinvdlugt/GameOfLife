@@ -6,4 +6,9 @@
         android:orderInCategory="100"
         android:title="@string/reload_index"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/download_names"
+        android:orderInCategory="101"
+        android:title="@string/download_names"
+        app:showAsAction="never" />
 </menu>

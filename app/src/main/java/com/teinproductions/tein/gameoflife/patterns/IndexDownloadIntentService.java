@@ -29,9 +29,6 @@ public class IndexDownloadIntentService extends IntentService {
     public static final String SUPPORTED_FILE_EXT = "105.lif";
     public static final String FILE_NAMES_FILE = "file_names";
 
-    public static final String PROGRESS_BAR_MAX = "progressBarMax";
-    public static final String PROGRESS_BAR_PROGRESS = "progressBarProgress";
-
     public IndexDownloadIntentService() {
         super("name");
     }
@@ -39,8 +36,6 @@ public class IndexDownloadIntentService extends IntentService {
     public IndexDownloadIntentService(String name) {
         super(name);
     }
-
-    private int progressBarMax;
 
     @SuppressWarnings("TryFinallyCanBeTryWithResources")
     @Override
@@ -54,13 +49,14 @@ public class IndexDownloadIntentService extends IntentService {
             String file = downloadFile(BASE_URL);
             Document doc = Jsoup.parse(file);
 
+            List<String> fileNames = getSupportFiles(doc);
+
             db.delete(DefaultPatternContract.DefaultPatternEntry.TABLE_NAME, null, null);
-
-            List<String> fileNames = saveSupportedFiles(db, doc);
-
-            progressBarMax = fileNames.size();
-
-            savePatternNames(db, fileNames);
+            ContentValues values = new ContentValues();
+            for (String fileName : fileNames) {
+                values.put(DefaultPatternContract.DefaultPatternEntry.COLUMN_NAME_URL, fileName);
+                db.insert(DefaultPatternContract.DefaultPatternEntry.TABLE_NAME, null, values);
+            }
         } catch (IOException | SQLiteException e) {
             e.printStackTrace();
         } finally {
@@ -72,68 +68,23 @@ public class IndexDownloadIntentService extends IntentService {
      * Parse the file names with supported extension, return a list of those file names
      * and save them to the passed database.
      *
-     * @param db  Database to save the file names to.
      * @param doc Jsoup Document to parse the file names from
      * @return A {@code List<String>} containing the files with supported extension
      */
-    private List<String> saveSupportedFiles(SQLiteDatabase db, Document doc) {
+    private List<String> getSupportFiles(Document doc) {
         Element ul = doc.getElementsByTag("ul").first();
         Elements lis = ul.children();
         lis.remove(0); // First entry is "Parent Directory"
         List<String> result = new ArrayList<>();
 
-        ContentValues values = new ContentValues();
-
         for (Element li : lis) {
             String fileName = li.text().trim();
             if (fileName.endsWith(SUPPORTED_FILE_EXT)) {
                 result.add(fileName);
-                values.put(DefaultPatternContract.DefaultPatternEntry.COLUMN_NAME_URL, fileName);
-                db.insert(DefaultPatternContract.DefaultPatternEntry.TABLE_NAME, null, values);
             }
         }
 
         return result;
-    }
-
-    @SuppressWarnings("TryFinallyCanBeTryWithResources")
-    private void savePatternNames(SQLiteDatabase db, List<String> fileNames) throws IOException {
-        // Create reusable objects instead of allocating many objects in for-loop
-        Intent progressIntent = new Intent(this, IndexDownloadProgressBroadcastReceiver.class);
-        progressIntent.putExtra(PROGRESS_BAR_MAX, progressBarMax);
-        ContentValues values = new ContentValues();
-
-        for (int i = 0; i < fileNames.size(); i++) {
-            String fileName = fileNames.get(i);
-            try {
-                HttpURLConnection conn = establishConnection(BASE_URL + fileName);
-                InputStream is = conn.getInputStream();
-                BufferedReader buff = new BufferedReader(new InputStreamReader(is));
-
-                String line;
-                while ((line = buff.readLine()) != null) {
-                    int index = line.indexOf("#D Name:");
-                    if (index != -1) {
-                        // Update database
-                        String patternName = line.substring(index + 9);
-                        values.put(DefaultPatternContract.DefaultPatternEntry.COLUMN_NAME_URL, fileName);
-                        values.put(DefaultPatternContract.DefaultPatternEntry.COLUMN_NAME_NAME, patternName);
-                        db.update(DefaultPatternContract.DefaultPatternEntry.TABLE_NAME, values,
-                                DefaultPatternContract.DefaultPatternEntry.COLUMN_NAME_URL + "=?", new String[]{fileName});
-
-                        // Show progress in notification
-                        progressIntent.putExtra(PROGRESS_BAR_PROGRESS, i);
-                        sendBroadcast(progressIntent);
-                        break;
-                    }
-                }
-
-                conn.disconnect();
-                is.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     public static String downloadFile(String urlStr) throws IOException {
@@ -154,7 +105,7 @@ public class IndexDownloadIntentService extends IntentService {
         return sb.toString();
     }
 
-    private static HttpURLConnection establishConnection(String urlStr) throws IOException {
+    public static HttpURLConnection establishConnection(String urlStr) throws IOException {
         URL url = new URL(urlStr);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setReadTimeout(15000);

@@ -17,8 +17,8 @@ public class IndexDownloadProgressBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        int maxProgress = intent.getIntExtra(IndexDownloadIntentService.PROGRESS_BAR_MAX, 685);
-        int progress = intent.getIntExtra(IndexDownloadIntentService.PROGRESS_BAR_PROGRESS, 0);
+        int maxProgress = intent.getIntExtra(NamesDownloadService.PROGRESS_BAR_MAX, 685);
+        int progress = intent.getIntExtra(NamesDownloadService.PROGRESS_BAR_PROGRESS, 0);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.mipmap.ic_launcher);
@@ -26,7 +26,7 @@ public class IndexDownloadProgressBroadcastReceiver extends BroadcastReceiver {
         if (progress == maxProgress - 1) {
             builder.setContentTitle("Game of Life: downloading done");
         } else {
-            builder.setContentTitle("Downloading pattern index...")
+            builder.setContentTitle("Downloading pattern names...")
                     .setProgress(maxProgress, progress, false)
                     .setContentText(progress + " / " + maxProgress);
         }

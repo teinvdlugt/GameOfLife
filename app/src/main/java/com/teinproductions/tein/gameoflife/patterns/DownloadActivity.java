@@ -2,6 +2,7 @@ package com.teinproductions.tein.gameoflife.patterns;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -9,6 +10,7 @@ import android.database.sqlite.SQLiteException;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -188,8 +190,20 @@ public class DownloadActivity extends AppCompatActivity implements PatternAdapte
                 finish();
                 return true;
             case R.id.reload_index:
-                Intent intent = new Intent(this, IndexDownloadIntentService.class);
-                startService(intent);
+                startService(new Intent(this, IndexDownloadIntentService.class));
+                return true;
+            case R.id.download_names:
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.download_names_dialog_title)
+                        .setMessage(getString(R.string.download_names_dialog_message))
+                        .setPositiveButton(R.string.begin, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                startService(new Intent(DownloadActivity.this, NamesDownloadService.class));
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, null)
+                        .create().show();
             default:
                 return false;
         }
