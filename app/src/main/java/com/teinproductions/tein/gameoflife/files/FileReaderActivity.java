@@ -61,9 +61,15 @@ public class FileReaderActivity extends AppCompatActivity {
         new AsyncTask<Void, Void, Life>() {
             @Override
             protected Life doInBackground(Void... params) {
-                Life life = LifeOneOFiveInterpreter.parse(input);
-                LifeUtils.documentCells(life.getCells());
-                return life;
+                // Life life = LifeOneOFiveInterpreter.parse(input);
+                try {
+                    Life life = RLEReader.parse(input);
+                    LifeUtils.documentCells(life.getCells());
+                    return life;
+                } catch (FileParseException e) {
+                    e.printStackTrace();
+                    return null;
+                }
             }
 
             @Override
