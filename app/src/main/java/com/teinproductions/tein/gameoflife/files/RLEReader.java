@@ -25,7 +25,7 @@ public class RLEReader {
                 iter.remove();
         }
 
-        // Remove comment lines TODO extract name from comment lines
+        // Remove comment lines
         for (Iterator<String> iter = lines.iterator(); iter.hasNext(); ) {
             if (iter.next().trim().startsWith("#"))
                 iter.remove();
