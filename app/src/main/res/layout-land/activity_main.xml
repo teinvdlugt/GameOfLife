@@ -30,7 +30,7 @@
                 android:background="?selectableItemBackgroundBorderless"
                 android:contentDescription="@string/settings"
                 android:onClick="onClickSettings"
-                android:src="@mipmap/ic_settings_black_36dp" />
+                android:src="@drawable/ic_settings_black_36dp" />
 
             <android.support.v4.widget.Space
                 android:layout_width="wrap_content"
@@ -46,7 +46,7 @@
                 android:background="?selectableItemBackgroundBorderless"
                 android:contentDescription="@string/xs_add_from_file"
                 android:onClick="onClickCreateFromFile"
-                android:src="@mipmap/ic_add_black_36dp" />
+                android:src="@drawable/ic_folder_open_black_36dp" />
 
             <ImageButton
                 android:id="@+id/initialStateButton"
@@ -57,7 +57,7 @@
                 android:background="?selectableItemBackgroundBorderless"
                 android:contentDescription="@string/xs_initial_state"
                 android:onClick="onClickInitialState"
-                android:src="@mipmap/ic_skip_previous_black_36dp" />
+                android:src="@drawable/ic_skip_previous_black_36dp" />
 
             <ImageButton
                 android:id="@+id/nextGenButton"
@@ -68,7 +68,7 @@
                 android:background="?selectableItemBackgroundBorderless"
                 android:contentDescription="@string/xs_next_generation"
                 android:onClick="onClickNextGen"
-                android:src="@mipmap/ic_forward_black_36dp" />
+                android:src="@drawable/ic_arrow_forward_black_36dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -87,7 +87,7 @@
                 android:background="?selectableItemBackgroundBorderless"
                 android:contentDescription="@string/xs_start_or_stop"
                 android:onClick="onClickPlayPause"
-                android:src="@mipmap/ic_play_arrow_black_36dp" />
+                android:src="@drawable/ic_play_arrow_black_36dp" />
 
             <ImageButton
                 android:id="@+id/clear_button"
@@ -98,7 +98,7 @@
                 android:background="?selectableItemBackgroundBorderless"
                 android:contentDescription="@string/xs_clear"
                 android:onClick="onClickClear"
-                android:src="@mipmap/ic_clear_black_36dp" />
+                android:src="@drawable/ic_clear_black_36dp" />
 
             <ImageButton
                 android:id="@+id/moveButton"
@@ -120,7 +120,7 @@
                 android:background="?selectableItemBackgroundBorderless"
                 android:contentDescription="@string/xs_eraser"
                 android:onClick="onClickErase"
-                android:src="@mipmap/ic_remove_circle_black_36dp" />
+                android:src="@drawable/ic_remove_circle_black_36dp" />
 
             <ImageButton
                 android:id="@+id/pencilButton"
@@ -131,8 +131,7 @@
                 android:background="?selectableItemBackgroundBorderless"
                 android:contentDescription="@string/xs_pencil"
                 android:onClick="onClickPencil"
-                android:src="@mipmap/ic_mode_edit_black_36dp" />
+                android:src="@drawable/ic_mode_edit_black_36dp" />
         </LinearLayout>
     </android.support.design.widget.CoordinatorLayout>
-
 </FrameLayout>

@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
     public void clear() {
         viewOfLife.stop();
         viewOfLife.clear();
-        playPauseButton.setImageResource(R.mipmap.ic_play_arrow_black_36dp);
+        playPauseButton.setImageResource(R.drawable.ic_play_arrow_black_36dp);
         lockScreenOrientation(false);
     }
 
@@ -73,10 +73,10 @@ public class MainActivity extends AppCompatActivity {
     public void onClickPlayPause(View view) {
         if (viewOfLife.isRunning()) {
             viewOfLife.stop();
-            playPauseButton.setImageResource(R.mipmap.ic_play_arrow_black_36dp);
+            playPauseButton.setImageResource(R.drawable.ic_play_arrow_black_36dp);
         } else {
             viewOfLife.start();
-            playPauseButton.setImageResource(R.mipmap.ic_pause_black_36dp);
+            playPauseButton.setImageResource(R.drawable.ic_pause_black_36dp);
         }
     }
 
@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         viewOfLife.stop();
-        playPauseButton.setImageResource(R.mipmap.ic_play_arrow_black_36dp);
+        playPauseButton.setImageResource(R.drawable.ic_play_arrow_black_36dp);
         super.onPause();
     }
 
@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (cellColorNotSet) {
-            viewOfLife.setCellColor(getColor(R.color.default_cell_color));
+            viewOfLife.setCellColor(getColor(this, R.color.default_cell_color));
         }
 
 
@@ -202,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (gridColorNotSet) {
-            viewOfLife.setCellColor(getColor(R.color.default_grid_color));
+            viewOfLife.setCellColor(getColor(this, R.color.default_grid_color));
         }
     }
 
