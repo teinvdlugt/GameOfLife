@@ -15,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageButton;
 
+import com.teinproductions.tein.gameoflife.files.ChoosePatternActivity;
 import com.teinproductions.tein.gameoflife.files.FileReaderActivity;
 import com.teinproductions.tein.gameoflife.files.Life;
 
@@ -222,8 +223,9 @@ public class MainActivity extends AppCompatActivity {
     private static final int FILE_READER_ACTIVITY_REQUEST_CODE = 1;
 
     public void onClickCreateFromFile(View view) {
-        Intent intent = new Intent(this, FileReaderActivity.class);
-        startActivityForResult(intent, FILE_READER_ACTIVITY_REQUEST_CODE);
+        startActivity(new Intent(this, ChoosePatternActivity.class));
+        /*Intent intent = new Intent(this, FileReaderActivity.class);
+        startActivityForResult(intent, FILE_READER_ACTIVITY_REQUEST_CODE);*/
     }
 
     @Override
