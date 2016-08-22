@@ -223,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int FILE_READER_ACTIVITY_REQUEST_CODE = 1;
 
     public void onClickCreateFromFile(View view) {
-        startActivity(new Intent(this, ChoosePatternActivity.class));
+        startActivityForResult(new Intent(this, ChoosePatternActivity.class), FILE_READER_ACTIVITY_REQUEST_CODE);
         /*Intent intent = new Intent(this, FileReaderActivity.class);
         startActivityForResult(intent, FILE_READER_ACTIVITY_REQUEST_CODE);*/
     }

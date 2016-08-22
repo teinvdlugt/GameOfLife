@@ -15,9 +15,11 @@ public class PatternAdapter extends RecyclerView.Adapter<PatternAdapter.ViewHold
 
     private Context context;
     private List<RLEPattern> patterns;
+    private OnClickPatternListener listener;
 
-    public PatternAdapter(Context context, List<RLEPattern> patterns) {
+    public PatternAdapter(Context context, OnClickPatternListener listener, List<RLEPattern> patterns) {
         this.context = context;
+        this.listener = listener;
         this.patterns = patterns;
     }
 
@@ -37,7 +39,11 @@ public class PatternAdapter extends RecyclerView.Adapter<PatternAdapter.ViewHold
         return patterns.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public interface OnClickPatternListener {
+        void onClick(RLEPattern pattern);
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder {
         private TextView name, filename;
         private RLEPattern pattern;
 
@@ -60,7 +66,7 @@ public class PatternAdapter extends RecyclerView.Adapter<PatternAdapter.ViewHold
         }
 
         public void onClickItem() {
-
+            if (listener != null) listener.onClick(pattern);
         }
     }
 }
