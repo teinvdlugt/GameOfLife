@@ -14,6 +14,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.teinproductions.tein.gameoflife.files.ChoosePatternActivity;
 import com.teinproductions.tein.gameoflife.files.FileReaderActivity;
@@ -67,7 +68,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickClear(View view) {
-        Snackbar.make(coordinatorLayout, getString(R.string.short_click_clear_message), Snackbar.LENGTH_SHORT).show();
+        /*Snackbar.make(coordinatorLayout, getString(R.string.short_click_clear_message), Snackbar.LENGTH_SHORT).show();*/
+        Toast.makeText(this, R.string.short_click_clear_message, Toast.LENGTH_SHORT).show();
     }
 
     public void onClickPlayPause(View view) {
@@ -174,7 +176,8 @@ public class MainActivity extends AppCompatActivity {
             try {
                 viewOfLife.setCellColor(Color.parseColor(hex));
             } catch (IllegalArgumentException e) {
-                Snackbar.make(coordinatorLayout, "Provide a valid hexadecimal grid color", Snackbar.LENGTH_SHORT).show();
+                Toast.makeText(this, "Provide a valid hexadecimal grid color", Toast.LENGTH_SHORT).show();
+                /*Snackbar.make(coordinatorLayout, "Provide a valid hexadecimal grid color", Snackbar.LENGTH_SHORT).show();*/
                 cellColorNotSet = true;
             }
         }
@@ -195,7 +198,8 @@ public class MainActivity extends AppCompatActivity {
                 viewOfLife.setGridColor(Color.parseColor(hex2));
             } catch (IllegalArgumentException e) {
                 if (!cellColorNotSet) {
-                    Snackbar.make(coordinatorLayout, "Provide a valid hexadecimal grid color", Snackbar.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Provide a valid hexadecimal grid color", Toast.LENGTH_SHORT).show();
+                    /*Snackbar.make(coordinatorLayout, "Provide a valid hexadecimal grid color", Snackbar.LENGTH_SHORT).show();*/
                 }
                 gridColorNotSet = true;
             }
