@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.ColorRes;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageButton;
@@ -197,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 viewOfLife.setGridColor(Color.parseColor(hex2));
             } catch (IllegalArgumentException e) {
-                if (!cellColorNotSet) {
+                if (!cellColorNotSet) { // todo ?
                     Toast.makeText(this, "Provide a valid hexadecimal grid color", Toast.LENGTH_SHORT).show();
                     /*Snackbar.make(coordinatorLayout, "Provide a valid hexadecimal grid color", Snackbar.LENGTH_SHORT).show();*/
                 }
@@ -207,6 +206,29 @@ public class MainActivity extends AppCompatActivity {
 
         if (gridColorNotSet) {
             viewOfLife.setCellColor(getColor(this, R.color.default_grid_color));
+        }
+
+
+        // BACKGROUND COLOR
+        boolean backgroundColorNotSet = false;
+        String hex3 = PreferenceManager.getDefaultSharedPreferences(this)
+                .getString(getString(R.string.background_color_key), null);
+        if (hex3 == null) {
+            backgroundColorNotSet = true;
+        } else {
+            try {
+                viewOfLife.setBackgroundColor(Color.parseColor(hex3));
+            } catch (IllegalArgumentException e) {
+                if (!cellColorNotSet) { // todo ?
+                    Toast.makeText(this, "Provide a valid hexadecimal grid color", Toast.LENGTH_SHORT).show();
+                    /*Snackbar.make(coordinatorLayout, "Provide a valid hexadecimal grid color", Snackbar.LENGTH_SHORT).show();*/
+                }
+                backgroundColorNotSet = true;
+            }
+        }
+
+        if (backgroundColorNotSet) {
+            viewOfLife.setBackgroundColor(getColor(this, R.color.default_background_color));
         }
     }
 

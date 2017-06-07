@@ -30,6 +30,12 @@
 
     <PreferenceCategory android:title="@string/colors_pref_category">
         <EditTextPreference
+            android:defaultValue="@color/default_background_color"
+            android:dialogTitle="@string/background_color"
+            android:inputType="text"
+            android:key="@string/background_color_key"
+            android:title="@string/background_color" />
+        <EditTextPreference
             android:defaultValue="@color/default_cell_color"
             android:dialogTitle="@string/cell_color"
             android:inputType="text"

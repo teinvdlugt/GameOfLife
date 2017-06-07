@@ -31,4 +31,6 @@
     <string name="grid_color_key">GRID_COLOR</string>
     <string name="open_pattern">Open pattern</string>
     <string name="something_went_wrong">Something went wrong</string>
+    <string name="background_color">Background color</string>
+    <string name="background_color_key">BACKGROUND_COLOR</string>
 </resources>

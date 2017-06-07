@@ -2,8 +2,8 @@
 <resources>
     <color name="default_cell_color">#ff404aff</color>
     <color name="default_grid_color">#ff000000</color>
+    <color name="default_background_color">#ff81d7ff</color>
 
-    <color name="window_background">#ffc7ff6e</color>
     <color name="greenToolbarColor">#ff94c65c</color>
     <color name="greenSystemBarColor">#ff77a251</color>
     <color name="colorPrimary">#ff94c65c</color>
