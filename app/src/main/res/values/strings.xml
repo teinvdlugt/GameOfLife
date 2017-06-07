@@ -25,12 +25,14 @@
     <string name="create_from_file_activity_label">Create from file</string>
     <string name="parsing_progress_dialog_message">Parsing...</string>
     <string name="cell_color">Cell color</string>
-    <string name="cell_color_key">CELL_COLOR</string>
+    <string name="cell_color_key">CELL_COLOR_INT</string>
     <string name="colors_pref_category">Colors</string>
     <string name="grid_color">Grid color</string>
-    <string name="grid_color_key">GRID_COLOR</string>
+    <string name="grid_color_key">GRID_COLOR_INT</string>
     <string name="open_pattern">Open pattern</string>
     <string name="something_went_wrong">Something went wrong</string>
     <string name="background_color">Background color</string>
-    <string name="background_color_key">BACKGROUND_COLOR</string>
+    <string name="background_color_key">BACKGROUND_COLOR_INT</string>
+    <string name="reset">Reset</string>
+    <string name="cancel">Cancel</string>
 </resources>

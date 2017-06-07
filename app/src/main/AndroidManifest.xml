@@ -27,7 +27,12 @@
             android:name=".files.FileReaderActivity"
             android:label="@string/create_from_file_activity_label" />
 
-        <activity android:name=".files.ChoosePatternActivity"
+        <activity
+            android:name=".files.ChoosePatternActivity"
             android:label="@string/open_pattern" />
+
+        <activity
+            android:name=".ColorPickerActivity"
+            android:theme="@style/DialogNoTitle" />
     </application>
 </manifest>

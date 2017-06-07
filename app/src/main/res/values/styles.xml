@@ -4,4 +4,8 @@
         <item name="colorPrimaryDark">@color/greenSystemBarColor</item>
         <item name="colorPrimary">@color/colorPrimary</item>
     </style>
+
+    <style name="DialogNoTitle" parent="Theme.AppCompat.Light.Dialog">
+        <item name="windowNoTitle">true</item> <!-- Remove the dialog title -->
+    </style>
 </resources>

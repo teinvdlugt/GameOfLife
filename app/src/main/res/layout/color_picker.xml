@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical">
 
     <View
@@ -30,7 +30,7 @@
         tools:text="255" />
 
     <SeekBar
-        android:id="@+id/r_spinner"
+        android:id="@+id/r_seekBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@id/r_tv"
@@ -38,7 +38,8 @@
         android:layout_toEndOf="@id/r_tv"
         android:layout_toLeftOf="@id/rv_tv"
         android:layout_toRightOf="@id/r_tv"
-        android:layout_toStartOf="@id/rv_tv" />
+        android:layout_toStartOf="@id/rv_tv"
+        android:max="255" />
 
     <TextView
         android:id="@+id/g_tv"
@@ -59,7 +60,7 @@
         tools:text="255" />
 
     <SeekBar
-        android:id="@+id/g_spinner"
+        android:id="@+id/g_seekBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@id/g_tv"
@@ -67,7 +68,8 @@
         android:layout_toEndOf="@id/g_tv"
         android:layout_toLeftOf="@id/gv_tv"
         android:layout_toRightOf="@id/g_tv"
-        android:layout_toStartOf="@id/gv_tv" />
+        android:layout_toStartOf="@id/gv_tv"
+        android:max="255" />
 
     <TextView
         android:id="@+id/b_tv"
@@ -88,7 +90,7 @@
         tools:text="255" />
 
     <SeekBar
-        android:id="@+id/b_spinner"
+        android:id="@+id/b_seekBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@id/b_tv"
@@ -96,5 +98,40 @@
         android:layout_toEndOf="@id/b_tv"
         android:layout_toLeftOf="@id/bv_tv"
         android:layout_toRightOf="@id/b_tv"
-        android:layout_toStartOf="@id/bv_tv" />
+        android:layout_toStartOf="@id/bv_tv"
+        android:max="255" />
+
+    <Button
+        android:id="@+id/ok_button"
+        style="?buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/b_seekBar"
+        android:layout_margin="8dp"
+        android:onClick="onClickOK"
+        android:text="@string/ok" />
+
+    <Button
+        style="?buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/b_seekBar"
+        android:layout_margin="8dp"
+        android:layout_toLeftOf="@id/ok_button"
+        android:layout_toStartOf="@id/ok_button"
+        android:onClick="onClickCancel"
+        android:text="@string/cancel" />
+
+    <Button
+        style="?buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/b_seekBar"
+        android:layout_margin="8dp"
+        android:onClick="onClickReset"
+        android:text="@string/reset" />
 </RelativeLayout>

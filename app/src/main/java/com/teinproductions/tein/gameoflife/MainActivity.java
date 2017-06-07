@@ -2,6 +2,7 @@ package com.teinproductions.tein.gameoflife;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -165,71 +166,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void resetColors() {
-        // CELL COLOR
-        boolean cellColorNotSet = false;
-        String hex = PreferenceManager.getDefaultSharedPreferences(this)
-                .getString(getString(R.string.cell_color_key), null);
-        if (hex == null) {
-            cellColorNotSet = true;
-        } else {
-            try {
-                viewOfLife.setCellColor(Color.parseColor(hex));
-            } catch (IllegalArgumentException e) {
-                Toast.makeText(this, "Provide a valid hexadecimal grid color", Toast.LENGTH_SHORT).show();
-                /*Snackbar.make(coordinatorLayout, "Provide a valid hexadecimal grid color", Snackbar.LENGTH_SHORT).show();*/
-                cellColorNotSet = true;
-            }
-        }
-
-        if (cellColorNotSet) {
-            viewOfLife.setCellColor(getColor(this, R.color.default_cell_color));
-        }
-
-
-        // GRID COLOR
-        boolean gridColorNotSet = false;
-        String hex2 = PreferenceManager.getDefaultSharedPreferences(this)
-                .getString(getString(R.string.grid_color_key), null);
-        if (hex2 == null) {
-            gridColorNotSet = true;
-        } else {
-            try {
-                viewOfLife.setGridColor(Color.parseColor(hex2));
-            } catch (IllegalArgumentException e) {
-                if (!cellColorNotSet) { // todo ?
-                    Toast.makeText(this, "Provide a valid hexadecimal grid color", Toast.LENGTH_SHORT).show();
-                    /*Snackbar.make(coordinatorLayout, "Provide a valid hexadecimal grid color", Snackbar.LENGTH_SHORT).show();*/
-                }
-                gridColorNotSet = true;
-            }
-        }
-
-        if (gridColorNotSet) {
-            viewOfLife.setCellColor(getColor(this, R.color.default_grid_color));
-        }
-
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
 
         // BACKGROUND COLOR
-        boolean backgroundColorNotSet = false;
-        String hex3 = PreferenceManager.getDefaultSharedPreferences(this)
-                .getString(getString(R.string.background_color_key), null);
-        if (hex3 == null) {
-            backgroundColorNotSet = true;
-        } else {
-            try {
-                viewOfLife.setBackgroundColor(Color.parseColor(hex3));
-            } catch (IllegalArgumentException e) {
-                if (!cellColorNotSet) { // todo ?
-                    Toast.makeText(this, "Provide a valid hexadecimal grid color", Toast.LENGTH_SHORT).show();
-                    /*Snackbar.make(coordinatorLayout, "Provide a valid hexadecimal grid color", Snackbar.LENGTH_SHORT).show();*/
-                }
-                backgroundColorNotSet = true;
-            }
-        }
+        int backgroundColor = pref.getInt(getString(R.string.background_color_key),
+                getColor(this, R.color.default_background_color));
+        viewOfLife.setBackgroundColor(backgroundColor);
 
-        if (backgroundColorNotSet) {
-            viewOfLife.setBackgroundColor(getColor(this, R.color.default_background_color));
-        }
+        // CELL COLOR
+        int cellColor = pref.getInt(getString(R.string.cell_color_key),
+                getColor(this, R.color.default_cell_color));
+        viewOfLife.setCellColor(cellColor);
+
+        // GRID COLOR
+        int gridColor = pref.getInt(getString(R.string.grid_color_key),
+                getColor(this, R.color.default_grid_color));
+        viewOfLife.setGridColor(gridColor);
     }
 
     public void onClickNextGen(View view) {
