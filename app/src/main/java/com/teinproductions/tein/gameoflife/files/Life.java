@@ -9,6 +9,12 @@ public class Life implements Serializable {
 
     private String name;
     private List<String> comments;
+    /**
+     * 0: x position
+     * 1: y position
+     * 2: alive [0|1]
+     * 3: num of neighbours
+     */
     private List<short[]> cells;
     private String originalFile;
 

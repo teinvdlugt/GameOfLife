@@ -12,7 +12,7 @@
             android:id="@+id/color_sample_view"
             android:layout_width="match_parent"
             android:layout_height="256dp"
-            android:background="#d9d935" />
+            tools:background="#d9d935" />
 
         <TextView
             android:id="@+id/r_tv"
