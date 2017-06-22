@@ -38,8 +38,9 @@ public class RLEEncoder {
                 .append("\n");
 
         // Write down the comments
-        for (String comment : info.getComments())
-            sb.append("#C ").append(comment).append("\n");
+        if (info.getComments() != null)
+            for (String comment : info.getComments())
+                sb.append("#C ").append(comment).append("\n");
 
         return sb.toString();
     }

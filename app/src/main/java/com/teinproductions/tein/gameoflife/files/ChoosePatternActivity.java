@@ -1,12 +1,18 @@
 package com.teinproductions.tein.gameoflife.files;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,6 +24,8 @@ import android.view.View;
 import com.teinproductions.tein.gameoflife.R;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -36,7 +44,7 @@ public class ChoosePatternActivity extends AppCompatActivity implements PatternA
 
         // Remove the 'save'-FAB when there is nothing to save
         findViewById(R.id.save_fab).setVisibility(
-                getIntent().getExtras().containsKey(CELLS_ARRAY_EXTRA) ? View.VISIBLE : View.GONE);
+                getIntent().getSerializableExtra(CELLS_ARRAY_EXTRA) != null ? View.VISIBLE : View.GONE);
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -122,23 +130,15 @@ public class ChoosePatternActivity extends AppCompatActivity implements PatternA
      * Used to return a Life object from SaveActivity to ChoosePatternActivity
      */
     public static final String LIFE_INFO_EXTRA = "save_info";
-    public static final int SAVE_ACTIVITY_RQ = 42;
+    private static final int SAVE_ACTIVITY_RQ = 42;
 
     public void onClickSave(View view) {
-        if (getIntent().getExtras().containsKey(CELLS_ARRAY_EXTRA)) {
+        if (!getIntent().getExtras().containsKey(CELLS_ARRAY_EXTRA)) {
             Snackbar.make(recyclerView, R.string.cells_array_save_error, Snackbar.LENGTH_LONG).show();
             return;
         }
 
         startActivityForResult(new Intent(this, SaveActivity.class), SAVE_ACTIVITY_RQ);
-
-        // TODO: 21-6-17 Check if there is such an Extra at all
-        List<short[]> cells = (List<short[]>) (getIntent().getSerializableExtra(CELLS_ARRAY_EXTRA));
-        // FOR DEBUG
-        new AlertDialog.Builder(this)
-                .setMessage("Encoded file: \n" + RLEEncoder.encode(cells))
-                .setPositiveButton(R.string.ok, null)
-                .show();
     }
 
     @Override
@@ -154,39 +154,87 @@ public class ChoosePatternActivity extends AppCompatActivity implements PatternA
         }
     }
 
+    private static final int REQUEST_EXTERNAL_STORAGE_RQ = 43;
+    /**
+     * Temporary member variable to keep the String to save, whilst storage permission is requested.
+     */
+    private String tempFile;
+    private String tempFilename;
+
     private void saveLife(final Life info) {
         final ProgressDialog dialog = new ProgressDialog(this);
         dialog.setMessage(getString(R.string.parsing_progress_dialog_message));
-        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                cancelled = true;
-            }
-        });
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setCancelable(false);
         dialog.setIndeterminate(true);
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.show();
 
-        new AsyncTask<Void, Void, Integer>() {
+        new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... params) {
+                try {
+                    return RLEEncoder.constructFile(info,
+                            (List<short[]>) getIntent().getSerializableExtra(CELLS_ARRAY_EXTRA));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
 
             @Override
-            protected Integer doInBackground(Void... params) {
+            protected void onPostExecute(String file) {
+                // Dismiss dialog
                 try {
-                    String file = RLEEncoder.constructFile(info,
-                            (List<short[]>) getIntent().getSerializableExtra(CELLS_ARRAY_EXTRA));
-
-                } catch (Exception e) {
-                    return 0;
+                    dialog.dismiss();
+                } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
                 }
 
-                return 0;
-            }
-
-            @Override
-            protected void onPostExecute(Integer resultCode) {
-                // resultCode: 0 means failed, 1 means succeeded.
-
+                if (file == null) {
+                    Snackbar.make(recyclerView, R.string.something_went_wrong, Snackbar.LENGTH_LONG).show();
+                } else {
+                    // Request permission to external storage, if necessary
+                    if (ContextCompat.checkSelfPermission(ChoosePatternActivity.this,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(ChoosePatternActivity.this,
+                                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                REQUEST_EXTERNAL_STORAGE_RQ);
+                        tempFile = file;
+                        tempFilename = info.getName() + ".rle";
+                    } else {
+                        saveFile(info.getName() + ".rle", file);
+                    }
+                }
             }
         }.execute();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_EXTERNAL_STORAGE_RQ) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted!
+                saveFile(tempFilename, tempFile);
+            } else {
+                // Permission denied
+                Snackbar.make(recyclerView, R.string.permission_denied_save_error, Snackbar.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    private void saveFile(String filename, String contents) {
+        try {
+            File dir = Environment.getExternalStoragePublicDirectory("GameOfLife");
+            boolean dirsMade = dir.mkdirs();
+            File file = new File(dir, filename);
+            FileOutputStream fos = new FileOutputStream(file);
+            fos.write(contents.getBytes());
+            fos.close();
+            Snackbar.make(recyclerView, R.string.pattern_saved, Snackbar.LENGTH_LONG).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Snackbar.make(recyclerView, R.string.something_went_wrong, Snackbar.LENGTH_LONG).show();
+        }
     }
 }

@@ -25,6 +25,7 @@
         android:contentDescription="@string/save"
         android:onClick="onClickSave"
         android:src="@drawable/ic_save_black_24dp"
+        app:backgroundTint="@color/colorAccent"
         app:fabSize="normal" />
 
     <android.support.v7.widget.RecyclerView

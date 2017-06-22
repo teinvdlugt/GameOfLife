@@ -19,6 +19,9 @@ import com.teinproductions.tein.gameoflife.files.ChoosePatternActivity;
 import com.teinproductions.tein.gameoflife.files.FileReaderActivity;
 import com.teinproductions.tein.gameoflife.files.Life;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -200,8 +203,9 @@ public class MainActivity extends AppCompatActivity {
     private static final int FILES_ACTIVITY_REQUEST_CODE = 1;
 
     public void onClickFiles(View view) {
+        ArrayList<short[]> cells = viewOfLife.getCells().isEmpty() ? null : viewOfLife.getCells();
         startActivityForResult(new Intent(this, ChoosePatternActivity.class)
-                .putExtra(ChoosePatternActivity.CELLS_ARRAY_EXTRA, viewOfLife.getCells()), FILES_ACTIVITY_REQUEST_CODE);
+                .putExtra(ChoosePatternActivity.CELLS_ARRAY_EXTRA, cells), FILES_ACTIVITY_REQUEST_CODE);
         /*Intent intent = new Intent(this, FileReaderActivity.class);
         startActivityForResult(intent, FILES_ACTIVITY_REQUEST_CODE);*/
     }

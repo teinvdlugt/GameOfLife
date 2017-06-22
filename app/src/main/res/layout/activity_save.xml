@@ -45,7 +45,7 @@
         android:layout_gravity="end">
 
         <Button
-            android:onClick="onClickSave"
+            android:onClick="onClickCancel"
             style="?buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -53,7 +53,7 @@
             android:text="@string/cancel" />
 
         <Button
-            android:onClick="onClickCancel"
+            android:onClick="onClickSave"
             style="?buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

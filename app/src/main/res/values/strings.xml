@@ -43,4 +43,6 @@
     <string name="save">Save</string>
     <string name="no_pattern_name_given_message">Please give your pattern a name</string>
     <string name="cells_array_save_error">Something went wrong. Nothing to save!</string>
+    <string name="permission_denied_save_error">Couldn\'t save the file because permission was denied.</string>
+    <string name="pattern_saved">Pattern saved!</string>
 </resources>
