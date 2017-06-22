@@ -1,34 +1,59 @@
 package com.teinproductions.tein.gameoflife.files;
 
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
 
 public class RLEEncoder {
 
-    public static String encode(Life life) { // TODO this code can be much optimised by combining for-loops and stuff
-        if (life.getCells().isEmpty()) {
-            return "x = 0, y = 0\n";
-        }
+    public static String constructFile(Life info, List<short[]> cells) {
+        String infoStr = writeInfo(info);
+        String pattern = encode(cells);
+        return infoStr + pattern;
+    }
 
-        // We're going to modify the cells array, so let's make a copy
-        List<short[]> cells = copyCells(life.getCells());
-
-        // The string to return in the end:
+    /**
+     * @param info Life object containing at least a NonNull value in String field name.
+     * @return Concatenation of the name, creator and comments in 'info' and the current timestamp,
+     * to put in the beginning of an RLE file. Returned String has a newline at the end.
+     */
+    static String writeInfo(Life info) {
         StringBuilder sb = new StringBuilder();
 
-        /*// Clear the name of newlines (just to be sure)
-        name = name.replace("\n", " ");
+        // Clear the name and creator of newlines (just to be sure)
+        String name = info.getName().replace("\n", " ");
+        String creator = null;
+        if (info.getCreator() != null) creator = info.getCreator().replace("\n", " ");
 
         // Write the name on the first line
         sb.append("#N ").append(name).append("\n");
 
-        // Split the comments into multiple lines and add them to the file
-        String[] commentsArray = comments.split("\n");
-        for (String comment : commentsArray) {
+        // Write down the creator and timestamp
+        sb.append("#O ").append(creator == null ? "" : creator + ", ")
+                .append(DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG)
+                        .format(Calendar.getInstance().getTime()))
+                .append("\n");
+
+        // Write down the comments
+        for (String comment : info.getComments())
             sb.append("#C ").append(comment).append("\n");
-        }*/
+
+        return sb.toString();
+    }
+
+    static String encode(List<short[]> c) { // TODO this code can be much optimised by combining for-loops and stuff
+        if (c.isEmpty()) {
+            return "x = 0, y = 0\n";
+        }
+
+        // We're going to modify the cells array, so let's make a copy
+        List<short[]> cells = copyCells(c);
+
+        // The string to return in the end:
+        StringBuilder sb = new StringBuilder();
 
         // Clear the Life object from any non-living cells,
         // and find the min and max of x and y.
@@ -100,8 +125,12 @@ public class RLEEncoder {
             }
         }
 
-        // Concluding character for RLE encoding
-        sb.append("!");
+        // And write down the last sequence of adjacent alive cells.
+        if (counter != 0)
+            sb.append(counter == 1 ? "" : counter).append("o");
+
+        // Concluding character and newline
+        sb.append("!\n");
         return sb.toString();
     }
 

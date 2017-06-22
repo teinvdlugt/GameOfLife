@@ -52,8 +52,8 @@
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:background="?selectableItemBackgroundBorderless"
-                android:contentDescription="@string/xs_add_from_file"
-                android:onClick="onClickCreateFromFile"
+                android:contentDescription="@string/xs_files_button"
+                android:onClick="onClickFiles"
                 android:src="@drawable/ic_folder_open_black_36dp" />
 
             <android.widget.Space

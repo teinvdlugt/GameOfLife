@@ -8,6 +8,7 @@ import java.util.List;
 public class Life implements Serializable {
 
     private String name;
+    private String creator;
     private List<String> comments;
     /**
      * 0: x position
@@ -15,7 +16,7 @@ public class Life implements Serializable {
      * 2: alive [0|1]
      * 3: num of neighbours
      */
-    private List<short[]> cells;
+    private ArrayList<short[]> cells;
     private String originalFile;
 
     public String getName() {
@@ -24,6 +25,14 @@ public class Life implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
     }
 
     public List<String> getComments() {
@@ -39,11 +48,11 @@ public class Life implements Serializable {
         comments.add(comment);
     }
 
-    public List<short[]> getCells() {
+    public ArrayList<short[]> getCells() {
         return cells;
     }
 
-    public void setCells(List<short[]> cells) {
+    public void setCells(ArrayList<short[]> cells) {
         this.cells = cells;
     }
 

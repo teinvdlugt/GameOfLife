@@ -35,4 +35,12 @@
     <string name="background_color_key">BACKGROUND_COLOR_INT</string>
     <string name="reset">Reset</string>
     <string name="cancel">Cancel</string>
+    <string name="xs_files_button">Files</string>
+    <string name="pattern_name">Pattern name</string>
+    <string name="file_name">Filename</string>
+    <string name="comments">Comments</string>
+    <string name="creator">Creator</string>
+    <string name="save">Save</string>
+    <string name="no_pattern_name_given_message">Please give your pattern a name</string>
+    <string name="cells_array_save_error">Something went wrong. Nothing to save!</string>
 </resources>

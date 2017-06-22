@@ -56,8 +56,8 @@ public class LifeOneOFiveInterpreter {
         return model;
     }
 
-    private static List<short[]> readCells(List<String> cellLines) {
-        List<short[]> cells = new ArrayList<>();
+    private static ArrayList<short[]> readCells(List<String> cellLines) {
+        ArrayList<short[]> cells = new ArrayList<>();
 
         int lastPIndex = -1;
         for (int i = 0; i < cellLines.size(); i++) {

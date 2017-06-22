@@ -9,7 +9,7 @@ public class RLEReader {
 
     public static Life parse(String file) throws FileParseException {
         Life life = new Life();
-        List<short[]> cells = new ArrayList<>();
+        ArrayList<short[]> cells = new ArrayList<>();
         int width, height;
 
         // Split file into lines

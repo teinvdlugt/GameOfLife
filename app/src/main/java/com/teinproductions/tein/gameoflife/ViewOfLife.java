@@ -3,12 +3,8 @@ package com.teinproductions.tein.gameoflife;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
-import android.os.Build;
-import android.preference.PreferenceManager;
 import android.support.annotation.ColorInt;
-import android.support.annotation.ColorRes;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -33,7 +29,7 @@ public class ViewOfLife extends View {
      * 2: alive [0|1]
      * 3: num of neighbours
      */
-    private List<short[]> cells = new ArrayList<>();
+    private ArrayList<short[]> cells = new ArrayList<>();
     private final Object lock = new Object();
     private Paint gridPaint, cellPaint;
 
@@ -355,8 +351,8 @@ public class ViewOfLife extends View {
         }
     }
 
-    private static List<short[]> clone(List<short[]> array) {
-        List<short[]> clone = new ArrayList<>();
+    private static ArrayList<short[]> clone(List<short[]> array) {
+        ArrayList<short[]> clone = new ArrayList<>();
         for (short[] cell : array) {
             clone.add(new short[]{
                     cell[0], cell[1], cell[2], cell[3]});
@@ -470,6 +466,9 @@ public class ViewOfLife extends View {
         gridPaint.setColor(color);
     }
 
+    public ArrayList<short[]> getCells() {
+        return cells;
+    }
 
     public void init() {
         gridPaint = new Paint();

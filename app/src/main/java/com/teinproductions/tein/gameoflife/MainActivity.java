@@ -197,18 +197,19 @@ public class MainActivity extends AppCompatActivity {
         viewOfLife.restoreGen0();
     }
 
-    private static final int FILE_READER_ACTIVITY_REQUEST_CODE = 1;
+    private static final int FILES_ACTIVITY_REQUEST_CODE = 1;
 
-    public void onClickCreateFromFile(View view) {
-        startActivityForResult(new Intent(this, ChoosePatternActivity.class), FILE_READER_ACTIVITY_REQUEST_CODE);
+    public void onClickFiles(View view) {
+        startActivityForResult(new Intent(this, ChoosePatternActivity.class)
+                .putExtra(ChoosePatternActivity.CELLS_ARRAY_EXTRA, viewOfLife.getCells()), FILES_ACTIVITY_REQUEST_CODE);
         /*Intent intent = new Intent(this, FileReaderActivity.class);
-        startActivityForResult(intent, FILE_READER_ACTIVITY_REQUEST_CODE);*/
+        startActivityForResult(intent, FILES_ACTIVITY_REQUEST_CODE);*/
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Life result;
-        if (requestCode == FILE_READER_ACTIVITY_REQUEST_CODE &&
+        if (requestCode == FILES_ACTIVITY_REQUEST_CODE &&
                 resultCode == RESULT_OK &&
                 data != null && (result = (Life) data.getSerializableExtra(FileReaderActivity.LIFE_MODEL_EXTRA)) != null) {
             viewOfLife.load(result);

@@ -34,5 +34,9 @@
         <activity
             android:name=".ColorPickerActivity"
             android:theme="@style/DialogNoTitle" />
+
+        <activity
+            android:name=".files.SaveActivity"
+            android:theme="@style/DialogNoTitle" />
     </application>
 </manifest>
