@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="default_cell_color">#ff404aff</color>
+    <color name="default_cell_color">#0D47A1</color>
     <color name="default_grid_color">#ff000000</color>
-    <color name="default_background_color">#ff81d7ff</color>
+    <color name="default_background_color">#90caf9</color>
 
-    <color name="greenToolbarColor">#ff94c65c</color>
-    <color name="greenSystemBarColor">#ff77a251</color>
-    <color name="colorPrimary">#ff94c65c</color>
-    <color name="colorAccent">#ffe0e936</color>
+    <color name="colorPrimaryDark">#AFB42B</color>
+    <color name="colorPrimary">#CDDC39</color>
+    <color name="colorAccent">#C6FF00</color>
 </resources>
