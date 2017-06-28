@@ -25,15 +25,19 @@ import com.teinproductions.tein.gameoflife.R;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ChoosePatternActivity extends AppCompatActivity implements PatternAdapter.OnClickPatternListener {
+    public static final String LIFE_MODEL_EXTRA = "life";
 
     private RecyclerView recyclerView;
+    private PatternAdapter adapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,8 +52,40 @@ public class ChoosePatternActivity extends AppCompatActivity implements PatternA
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        PatternAdapter adapter = new PatternAdapter(this, this, RLEPattern.getList(getResources()));
+        adapter = new PatternAdapter(this, this, null);
+        loadAdapter();
         recyclerView.setAdapter(adapter);
+    }
+
+    private void loadAdapter() {
+        List<PatternListable> items = new ArrayList<>();
+        List<RLEPattern> preloaded = RLEPattern.getList(getResources());
+        List<RLEPattern> saved = getSavedPatternsList();
+        if (saved != null && !saved.isEmpty()) {
+            items.add(new Header(getString(R.string.saved_patterns)));
+            items.addAll(saved);
+        }
+        if (preloaded != null && !preloaded.isEmpty()) {
+            items.add(new Header(getString(R.string.preloaded_patterns)));
+            items.addAll(preloaded);
+        }
+        adapter.setData(items);
+    }
+
+    private List<RLEPattern> getSavedPatternsList() {
+        List<RLEPattern> result = new ArrayList<>();
+
+        if (ContextCompat.checkSelfPermission(ChoosePatternActivity.this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            File dir = Environment.getExternalStoragePublicDirectory("GameOfLife");
+            File[] savedFiles = dir.listFiles();
+            if (savedFiles != null)
+                for (File file : savedFiles) {
+                    if (file.isFile() && (file.getName().endsWith(".rle") || file.getName().endsWith(".RLE")))
+                        result.add(new RLEPattern(file.getName().substring(0, file.getName().length() - 4), file.getName(), false));
+                }
+        }
+        return result;
     }
 
     private boolean cancelled = false;
@@ -68,11 +104,24 @@ public class ChoosePatternActivity extends AppCompatActivity implements PatternA
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.show();
 
-        new AsyncTask<String, Void, Life>() {
+        new AsyncTask<RLEPattern, Void, Life>() {
             @Override
-            protected Life doInBackground(String... values) {
+            protected Life doInBackground(RLEPattern... values) {
                 try {
-                    InputStream in = getResources().getAssets().open("patterns/" + values[0]);
+                    InputStream in;
+                    if (values[0].isPreloaded()) {
+                        in = getResources().getAssets().open("patterns/" + values[0].getFilename());
+                    } else {
+                        if (ContextCompat.checkSelfPermission(ChoosePatternActivity.this,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                            File dir = Environment.getExternalStoragePublicDirectory("GameOfLife");
+                            File file = new File(dir, values[0].getFilename());
+                            in = new FileInputStream(file);
+                        } else {
+                            return null;
+                        }
+                    }
+
                     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
                     StringBuilder sb = new StringBuilder();
                     String line;
@@ -101,7 +150,7 @@ public class ChoosePatternActivity extends AppCompatActivity implements PatternA
                             .setPositiveButton(R.string.ok, null)
                             .create().show();
                     else {
-                        setResult(RESULT_OK, new Intent().putExtra(FileReaderActivity.LIFE_MODEL_EXTRA, life));
+                        setResult(RESULT_OK, new Intent().putExtra(LIFE_MODEL_EXTRA, life));
                         finish();
                     }
                 } else {
@@ -109,7 +158,7 @@ public class ChoosePatternActivity extends AppCompatActivity implements PatternA
                     cancelled = false;
                 }
             }
-        }.execute(pattern.getFilename());
+        }.execute(pattern);
     }
 
     @Override

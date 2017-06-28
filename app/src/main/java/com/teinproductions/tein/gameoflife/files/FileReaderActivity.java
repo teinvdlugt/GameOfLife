@@ -17,7 +17,6 @@ import android.widget.EditText;
 import com.teinproductions.tein.gameoflife.R;
 
 public class FileReaderActivity extends AppCompatActivity {
-    public static final String LIFE_MODEL_EXTRA = "life";
 
     EditText et;
 
@@ -81,7 +80,7 @@ public class FileReaderActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                     Intent data = new Intent();
-                    data.putExtra(LIFE_MODEL_EXTRA, life);
+                    data.putExtra(ChoosePatternActivity.LIFE_MODEL_EXTRA, life);
                     setResult(RESULT_OK, data);
                     finish();
                 } else {

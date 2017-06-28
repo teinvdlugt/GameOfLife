@@ -10,16 +10,15 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RLEPattern {
+public class RLEPattern implements PatternListable {
     private String name;
     private String filename;
+    private boolean preloaded;
 
-    public RLEPattern() {
-    }
-
-    public RLEPattern(String name, String filename) {
+    public RLEPattern(String name, String filename, boolean preloaded) {
         this.name = name;
         this.filename = filename;
+        this.preloaded = preloaded;
     }
 
     public String getName() {
@@ -38,6 +37,14 @@ public class RLEPattern {
         this.filename = filename;
     }
 
+    public boolean isPreloaded() {
+        return preloaded;
+    }
+
+    public void setPreloaded(boolean preloaded) {
+        this.preloaded = preloaded;
+    }
+
     private static List<RLEPattern> list;
 
     public static List<RLEPattern> getList(Resources res) {
@@ -49,7 +56,7 @@ public class RLEPattern {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] strings = line.split(",");
-                list.add(new RLEPattern(strings[1], strings[0]));
+                list.add(new RLEPattern(strings[1], strings[0], true));
             }
 
             reader.close();

@@ -47,7 +47,7 @@ public class RLEEncoder {
 
     static String encode(List<short[]> c) { // TODO this code can be much optimised by combining for-loops and stuff
         if (c.isEmpty()) {
-            return "x = 0, y = 0\n";
+            return "x = 0, y = 0,\n";
         }
 
         // We're going to modify the cells array, so let's make a copy
@@ -75,7 +75,7 @@ public class RLEEncoder {
         // Find width and height of the pattern for the first line in the encoding
         int width = maxX - minX + 1;
         int height = maxY - minY + 1;
-        sb.append("x = ").append(width).append(", y = ").append(height).append("\n");
+        sb.append("x = ").append(width).append(", y = ").append(height).append(",\n");
 
         // The cells in the Life array aren't ordered by position.
         sortCellsByPosition(cells);

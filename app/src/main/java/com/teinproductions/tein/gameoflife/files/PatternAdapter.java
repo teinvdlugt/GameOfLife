@@ -11,43 +11,66 @@ import com.teinproductions.tein.gameoflife.R;
 
 import java.util.List;
 
-public class PatternAdapter extends RecyclerView.Adapter<PatternAdapter.ViewHolder> {
+public class PatternAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private static final int ITEM_VIEW_TYPE_PATTERN = 0;
+    private static final int ITEM_VIEW_TYPE_HEADER = 1;
 
     private Context context;
-    private List<RLEPattern> patterns;
+    private List<PatternListable> items;
     private OnClickPatternListener listener;
 
-    public PatternAdapter(Context context, OnClickPatternListener listener, List<RLEPattern> patterns) {
+    public PatternAdapter(Context context, OnClickPatternListener listener, List<PatternListable> items) {
         this.context = context;
         this.listener = listener;
-        this.patterns = patterns;
+        this.items = items;
+    }
+
+    public void setData(List<PatternListable> items) {
+        this.items = items;
+        notifyDataSetChanged();
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.list_item_pattern, parent, false);
-        return new ViewHolder(view);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        switch (viewType) {
+            case ITEM_VIEW_TYPE_PATTERN:
+                View view1 = LayoutInflater.from(context).inflate(R.layout.list_item_pattern, parent, false);
+                return new PatternViewHolder(view1);
+            case ITEM_VIEW_TYPE_HEADER:
+                View view2 = LayoutInflater.from(context).inflate(R.layout.list_item_header, parent, false);
+                return new HeaderViewHolder(view2);
+            default:
+                return null;
+        }
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.bind(patterns.get(position));
+    public int getItemViewType(int position) {
+        return items.get(position) instanceof RLEPattern ? ITEM_VIEW_TYPE_PATTERN : ITEM_VIEW_TYPE_HEADER;
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        if (holder instanceof HeaderViewHolder)
+            ((HeaderViewHolder) holder).tv.setText(((Header) items.get(position)).getText());
+        else if (holder instanceof PatternViewHolder)
+            ((PatternViewHolder) holder).bind((RLEPattern) items.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return patterns.size();
+        return items == null ? 0 : items.size();
     }
 
     public interface OnClickPatternListener {
         void onClick(RLEPattern pattern);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class PatternViewHolder extends RecyclerView.ViewHolder {
         private TextView name, filename;
         private RLEPattern pattern;
 
-        public ViewHolder(View itemView) {
+        public PatternViewHolder(View itemView) {
             super(itemView);
             name = (TextView) itemView.findViewById(R.id.name_textView);
             filename = (TextView) itemView.findViewById(R.id.filename_textView);
@@ -67,6 +90,15 @@ public class PatternAdapter extends RecyclerView.Adapter<PatternAdapter.ViewHold
 
         public void onClickItem() {
             if (listener != null) listener.onClick(pattern);
+        }
+    }
+
+    public class HeaderViewHolder extends RecyclerView.ViewHolder {
+        TextView tv;
+
+        public HeaderViewHolder(View itemView) {
+            super(itemView);
+            tv = (TextView) itemView.findViewById(R.id.textView);
         }
     }
 }

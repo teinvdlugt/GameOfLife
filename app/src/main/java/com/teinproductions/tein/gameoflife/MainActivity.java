@@ -16,11 +16,9 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.teinproductions.tein.gameoflife.files.ChoosePatternActivity;
-import com.teinproductions.tein.gameoflife.files.FileReaderActivity;
 import com.teinproductions.tein.gameoflife.files.Life;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -215,7 +213,7 @@ public class MainActivity extends AppCompatActivity {
         Life result;
         if (requestCode == FILES_ACTIVITY_REQUEST_CODE &&
                 resultCode == RESULT_OK &&
-                data != null && (result = (Life) data.getSerializableExtra(FileReaderActivity.LIFE_MODEL_EXTRA)) != null) {
+                data != null && (result = (Life) data.getSerializableExtra(ChoosePatternActivity.LIFE_MODEL_EXTRA)) != null) {
             viewOfLife.load(result);
         }
     }
