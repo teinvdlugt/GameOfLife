@@ -162,6 +162,37 @@ public class ChoosePatternActivity extends AppCompatActivity implements PatternA
     }
 
     @Override
+    public boolean onLongClick(final RLEPattern pattern) {
+        if (pattern.isPreloaded()) return false;
+
+        if (ContextCompat.checkSelfPermission(ChoosePatternActivity.this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+            return false;
+
+        new AlertDialog.Builder(this)
+                .setMessage(getString(R.string.delete_pattern_message, pattern.getName()))
+                .setPositiveButton(R.string.remove, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        try {
+                            File dir = Environment.getExternalStoragePublicDirectory("GameOfLife");
+                            File file = new File(dir, pattern.getFilename());
+                            if (!file.delete())
+                                throw new SecurityException(); // In order to show the deletion failed message
+                            Snackbar.make(recyclerView, R.string.file_deleted, Snackbar.LENGTH_LONG).show();
+                            loadAdapter();
+                        } catch (SecurityException e) {
+                            Snackbar.make(recyclerView, R.string.file_deletion_failed, Snackbar.LENGTH_LONG).show();
+                        }
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             finish();
@@ -281,6 +312,7 @@ public class ChoosePatternActivity extends AppCompatActivity implements PatternA
             fos.write(contents.getBytes());
             fos.close();
             Snackbar.make(recyclerView, R.string.pattern_saved, Snackbar.LENGTH_LONG).show();
+            loadAdapter();
         } catch (IOException e) {
             e.printStackTrace();
             Snackbar.make(recyclerView, R.string.something_went_wrong, Snackbar.LENGTH_LONG).show();

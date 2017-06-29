@@ -55,7 +55,7 @@ public class SaveActivity extends AppCompatActivity {
     }
 
     private static boolean isValidName(String name) {
-        // Checks whether the string only consists of latin letters, numbers, spaces and dashes.
+        // Checks whether the string only consists of letters, numbers, spaces and dashes.
         for (char ch : name.toCharArray()) {
             if (!(Character.isLetter(ch) || Character.isDigit(ch) || (ch == '-') || (ch == '_') || (ch == ' '))) {
                 return false;

@@ -64,6 +64,7 @@ public class PatternAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     public interface OnClickPatternListener {
         void onClick(RLEPattern pattern);
+        boolean onLongClick(RLEPattern pattern);
     }
 
     public class PatternViewHolder extends RecyclerView.ViewHolder {
@@ -77,7 +78,14 @@ public class PatternAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             itemView.findViewById(R.id.itemRoot).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    onClickItem();
+                    if (listener != null) listener.onClick(pattern);
+                }
+            });
+            itemView.findViewById(R.id.itemRoot).setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    if (listener != null) return listener.onLongClick(pattern);
+                    return false;
                 }
             });
         }
@@ -86,10 +94,6 @@ public class PatternAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             this.pattern = pattern;
             name.setText(pattern.getName());
             filename.setText(pattern.getFilename());
-        }
-
-        public void onClickItem() {
-            if (listener != null) listener.onClick(pattern);
         }
     }
 
