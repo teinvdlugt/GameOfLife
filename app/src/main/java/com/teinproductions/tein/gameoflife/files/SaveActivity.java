@@ -36,6 +36,14 @@ public class SaveActivity extends AppCompatActivity {
             return;
         }
 
+        if (!isValidName(name)) {
+            new AlertDialog.Builder(this)
+                    .setMessage(R.string.invalid_filename_message)
+                    .setPositiveButton(R.string.ok, null)
+                    .show();
+            return;
+        }
+
         Life life = new Life();
         life.setName(name);  // TODO: 22-6-17 Check for invalid characters in file name
         life.setCreator(creator.isEmpty() ? null : creator);
@@ -44,6 +52,16 @@ public class SaveActivity extends AppCompatActivity {
         // TODO: 22-6-17 Check if a file of that name already exists
         setResult(RESULT_OK, new Intent().putExtra(ChoosePatternActivity.LIFE_INFO_EXTRA, life));
         finish();
+    }
+
+    private static boolean isValidName(String name) {
+        // Checks whether the string only consists of latin letters, numbers, spaces and dashes.
+        for (char ch : name.toCharArray()) {
+            if (!(Character.isLetter(ch) || Character.isDigit(ch) || (ch == '-') || (ch == '_') || (ch == ' '))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void onClickCancel(View view) {

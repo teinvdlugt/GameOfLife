@@ -47,4 +47,5 @@
     <string name="pattern_saved">Pattern saved!</string>
     <string name="saved_patterns">Saved</string>
     <string name="preloaded_patterns">Preloaded</string>
+    <string name="invalid_filename_message">Please use only latin letters, numbers, spaces and dashes in your pattern name.</string>
 </resources>
