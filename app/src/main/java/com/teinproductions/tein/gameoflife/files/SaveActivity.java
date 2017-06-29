@@ -45,7 +45,7 @@ public class SaveActivity extends AppCompatActivity {
         }
 
         Life life = new Life();
-        life.setName(name);  // TODO: 22-6-17 Check for invalid characters in file name
+        life.setName(name);
         life.setCreator(creator.isEmpty() ? null : creator);
         life.setComments(comments.isEmpty() ? null : Arrays.asList(comments.split("\n")));
 
