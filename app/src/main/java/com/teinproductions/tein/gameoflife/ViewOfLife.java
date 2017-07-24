@@ -151,8 +151,7 @@ public class ViewOfLife extends View {
                             int index2 = event.findPointerIndex(zoomPointerId2);
                             if ((indexCurrent != index1 && indexCurrent != index2) || zoomPointerId1 == -1 ||
                                     zoomPointerId2 == -1 || prevXDrag1 == -1 || prevYDrag1 == -1 ||
-                                    prevXDrag2 == -1 || prevYDrag2 == -1) return false;
-
+                                    prevXDrag2 == -1 || prevYDrag2 == -1 || index2 == -1 || index1 == -1) return false;
 
                             double xDist1 = prevXDrag2 - prevXDrag1;
                             double yDist1 = prevYDrag2 - prevYDrag1;

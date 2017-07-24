@@ -32,12 +32,22 @@ public class RLEReader {
         }
 
         // Width & height line
-        String xyLine = lines.get(0).trim().replace(" ", "");
-        int comma1 = xyLine.indexOf(",");
-        width = Integer.parseInt(xyLine.substring(2, comma1));
-        int comma2 = xyLine.indexOf(",", comma1 + 1);
-        height = Integer.parseInt(xyLine.substring(comma1 + 3, comma2));
-        lines.remove(0);
+        try {
+            String xyLine = lines.get(0).trim().replace(" ", "");
+            String[] args = xyLine.split(",");
+            int x = -1, y = -1;
+            for (String s : args) {
+                String[] keyValue = s.split("=");
+                if ("x".equals(keyValue[0]) || "X".equals(keyValue[0])) x = Integer.parseInt(keyValue[1]);
+                else if ("y".equals(keyValue[0]) || "Y".equals(keyValue[0])) y = Integer.parseInt(keyValue[1]);
+            }
+            if (x == -1 || y == -1) {
+                throw new FileParseException();
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            throw new FileParseException();
+        }
 
         // Now all that remains is the pattern itself, lets make one line of that.
         StringBuilder rle = new StringBuilder();
