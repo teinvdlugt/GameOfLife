@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.teinproductions.tein.gameoflife.files.ChoosePatternActivity;
 import com.teinproductions.tein.gameoflife.files.Life;
 
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity {
+    private FirebaseAnalytics firebaseAnalytics;
 
     private ViewOfLife viewOfLife;
     private ImageButton playPauseButton;
@@ -32,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         viewOfLife = (ViewOfLife) findViewById(R.id.view_of_life);
         playPauseButton = (ImageButton) findViewById(R.id.playPause_button);
