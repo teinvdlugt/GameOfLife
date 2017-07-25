@@ -151,7 +151,8 @@ public class ViewOfLife extends View {
                             int index2 = event.findPointerIndex(zoomPointerId2);
                             if ((indexCurrent != index1 && indexCurrent != index2) || zoomPointerId1 == -1 ||
                                     zoomPointerId2 == -1 || prevXDrag1 == -1 || prevYDrag1 == -1 ||
-                                    prevXDrag2 == -1 || prevYDrag2 == -1 || index2 == -1 || index1 == -1) return false;
+                                    prevXDrag2 == -1 || prevYDrag2 == -1 || index2 == -1 || index1 == -1)
+                                return false;
 
                             double xDist1 = prevXDrag2 - prevXDrag1;
                             double yDist1 = prevYDrag2 - prevYDrag1;
@@ -454,7 +455,26 @@ public class ViewOfLife extends View {
         cells = life.getCells();
         updateGen0();
         startX = startY = 0;
+        if (life.getWidth() > 0 && life.getHeight() > 0)
+            zoomToDimensions(life.getWidth(), life.getHeight());
         invalidate();
+    }
+
+    /**
+     * Zoom to fit the width and height of the pattern.
+     *
+     * @param width  The amount of cells to at least fit in the horizontal direction
+     * @param height The amount of cells to at least fit in the vertical direction
+     */
+    private void zoomToDimensions(int width, int height) {
+        startX = startY = 0;
+        float cellWidthX = getWidth() / (width + 2); // Leave one empty cell row on either side of the pattern
+        float cellWidthY = getHeight() / (height + 2);
+        float smallest = Math.min(cellWidthX, cellWidthY);
+        cellWidth = smallest < defaultCellWidth ? smallest : defaultCellWidth;
+        // Center the pattern in both directions
+        startX = -(getWidth() / cellWidth - width) / 2f;
+        startY = -(getHeight() / cellWidth - height) / 2f;
     }
 
     public void setCellColor(@ColorInt int color) {

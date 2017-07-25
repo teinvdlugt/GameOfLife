@@ -18,6 +18,11 @@ public class Life implements Serializable {
      */
     private ArrayList<short[]> cells;
     private String originalFile;
+    /**
+     * Width and height of the pattern, specified in an RLE file as "x = ..., y = ..."
+     * Or -1 if they are not known.
+     */
+    private int width = -1, height = -1;
 
     public String getName() {
         return name;
@@ -62,5 +67,21 @@ public class Life implements Serializable {
 
     public void setOriginalFile(String originalFile) {
         this.originalFile = originalFile;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
     }
 }

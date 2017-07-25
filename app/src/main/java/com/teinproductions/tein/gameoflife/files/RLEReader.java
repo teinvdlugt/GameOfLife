@@ -43,14 +43,12 @@ public class RLEReader {
                 else if ("y".equals(keyValue[0]) || "Y".equals(keyValue[0]))
                     y = Integer.parseInt(keyValue[1]);
             }
-            if (x == -1 || y == -1) {
-                throw new FileParseException();
-            }
-            lines.remove(0);
+            life.setWidth(x);
+            life.setHeight(y);
         } catch (NumberFormatException e) {
             e.printStackTrace();
-            throw new FileParseException();
         }
+        lines.remove(0);
 
         // Now all that remains is the pattern itself, lets make one line of that.
         StringBuilder rle = new StringBuilder();
