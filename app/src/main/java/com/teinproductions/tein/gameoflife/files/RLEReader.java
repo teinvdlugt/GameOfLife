@@ -1,6 +1,8 @@
 package com.teinproductions.tein.gameoflife.files;
 
 
+import android.widget.Toast;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -44,6 +46,7 @@ public class RLEReader {
             if (x == -1 || y == -1) {
                 throw new FileParseException();
             }
+            lines.remove(0);
         } catch (NumberFormatException e) {
             e.printStackTrace();
             throw new FileParseException();
