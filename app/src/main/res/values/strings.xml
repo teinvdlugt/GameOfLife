@@ -23,7 +23,7 @@
     <string name="xs_add_from_file">Create from file</string>
     <string name="parse">Parse</string>
     <string name="create_from_file_activity_label">Create from file</string>
-    <string name="parsing_progress_dialog_message">Parsing...</string>
+    <string name="parsing_progress_dialog_message">Parsing…</string>
     <string name="cell_color">Cell color</string>
     <string name="cell_color_key">CELL_COLOR_INT</string>
     <string name="colors_pref_category">Colors</string>

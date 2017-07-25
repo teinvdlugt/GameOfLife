@@ -306,7 +306,7 @@ public class ChoosePatternActivity extends AppCompatActivity implements PatternA
     private void saveFile(String filename, String contents) {
         try {
             File dir = Environment.getExternalStoragePublicDirectory("GameOfLife");
-            boolean dirsMade = dir.mkdirs();
+            dir.mkdirs();
             File file = new File(dir, filename);
             FileOutputStream fos = new FileOutputStream(file);
             fos.write(contents.getBytes());

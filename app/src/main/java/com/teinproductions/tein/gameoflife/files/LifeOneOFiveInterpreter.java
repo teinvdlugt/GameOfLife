@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LifeOneOFiveInterpreter {
+class LifeOneOFiveInterpreter {
 
     public static Life parse(InputStream in) throws IOException {
         InputStreamReader isr = new InputStreamReader(in);

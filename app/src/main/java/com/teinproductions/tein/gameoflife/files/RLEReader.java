@@ -2,6 +2,7 @@ package com.teinproductions.tein.gameoflife.files;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -10,14 +11,11 @@ public class RLEReader {
     public static Life parse(String file) throws FileParseException {
         Life life = new Life();
         ArrayList<short[]> cells = new ArrayList<>();
-        int width, height;
 
         // Split file into lines
         List<String> lines = new ArrayList<>();
         String[] linesArray = file.split("\n");
-        for (String line : linesArray) {
-            lines.add(line);
-        }
+        Collections.addAll(lines, linesArray);
 
         // Remove blank lines
         for (Iterator<String> iter = lines.iterator(); iter.hasNext(); ) {
@@ -38,8 +36,10 @@ public class RLEReader {
             int x = -1, y = -1;
             for (String s : args) {
                 String[] keyValue = s.split("=");
-                if ("x".equals(keyValue[0]) || "X".equals(keyValue[0])) x = Integer.parseInt(keyValue[1]);
-                else if ("y".equals(keyValue[0]) || "Y".equals(keyValue[0])) y = Integer.parseInt(keyValue[1]);
+                if ("x".equals(keyValue[0]) || "X".equals(keyValue[0]))
+                    x = Integer.parseInt(keyValue[1]);
+                else if ("y".equals(keyValue[0]) || "Y".equals(keyValue[0]))
+                    y = Integer.parseInt(keyValue[1]);
             }
             if (x == -1 || y == -1) {
                 throw new FileParseException();
