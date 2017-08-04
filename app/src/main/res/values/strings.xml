@@ -52,4 +52,6 @@
     <string name="remove">Remove</string>
     <string name="file_deletion_failed">File deletion failed</string>
     <string name="file_deleted">File deleted</string>
+    <string name="search">Search</string>
+    <string name="no_results">No results</string>
 </resources>

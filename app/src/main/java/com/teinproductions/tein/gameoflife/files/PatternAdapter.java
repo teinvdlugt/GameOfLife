@@ -14,18 +14,19 @@ import java.util.List;
 public class PatternAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int ITEM_VIEW_TYPE_PATTERN = 0;
     private static final int ITEM_VIEW_TYPE_HEADER = 1;
+    private static final int ITEM_VIEW_TYPE_NO_RESULTS = 2;
 
     private Context context;
     private List<PatternListable> items;
     private OnClickPatternListener listener;
 
-    public PatternAdapter(Context context, OnClickPatternListener listener, List<PatternListable> items) {
+    PatternAdapter(Context context, OnClickPatternListener listener, List<PatternListable> items) {
         this.context = context;
         this.listener = listener;
         this.items = items;
     }
 
-    public void setData(List<PatternListable> items) {
+    void setData(List<PatternListable> items) {
         this.items = items;
         notifyDataSetChanged();
     }
@@ -39,6 +40,9 @@ public class PatternAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             case ITEM_VIEW_TYPE_HEADER:
                 View view2 = LayoutInflater.from(context).inflate(R.layout.list_item_header, parent, false);
                 return new HeaderViewHolder(view2);
+            case ITEM_VIEW_TYPE_NO_RESULTS:
+                View view3 = LayoutInflater.from(context).inflate(R.layout.list_item_no_results, parent, false);
+                return new NoResultsViewHolder(view3);
             default:
                 return null;
         }
@@ -46,7 +50,9 @@ public class PatternAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public int getItemViewType(int position) {
-        return items.get(position) instanceof RLEPattern ? ITEM_VIEW_TYPE_PATTERN : ITEM_VIEW_TYPE_HEADER;
+        if (items.get(position) instanceof RLEPattern) return ITEM_VIEW_TYPE_PATTERN;
+        if (items.get(position) instanceof Header) return ITEM_VIEW_TYPE_HEADER;
+        else return ITEM_VIEW_TYPE_NO_RESULTS;
     }
 
     @Override
@@ -55,6 +61,7 @@ public class PatternAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             ((HeaderViewHolder) holder).tv.setText(((Header) items.get(position)).getText());
         else if (holder instanceof PatternViewHolder)
             ((PatternViewHolder) holder).bind((RLEPattern) items.get(position));
+        // Nothing to bind for NoResultsViewHolder
     }
 
     @Override
@@ -62,12 +69,12 @@ public class PatternAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         return items == null ? 0 : items.size();
     }
 
-    public interface OnClickPatternListener {
+    interface OnClickPatternListener {
         void onClick(RLEPattern pattern);
         boolean onLongClick(RLEPattern pattern);
     }
 
-    public class PatternViewHolder extends RecyclerView.ViewHolder {
+    private class PatternViewHolder extends RecyclerView.ViewHolder {
         private TextView name, filename;
         private RLEPattern pattern;
 
@@ -97,12 +104,18 @@ public class PatternAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
-    public class HeaderViewHolder extends RecyclerView.ViewHolder {
+    private class HeaderViewHolder extends RecyclerView.ViewHolder {
         TextView tv;
 
         public HeaderViewHolder(View itemView) {
             super(itemView);
             tv = (TextView) itemView.findViewById(R.id.textView);
+        }
+    }
+
+    private class NoResultsViewHolder extends RecyclerView.ViewHolder {
+        public NoResultsViewHolder(View itemView) {
+            super(itemView);
         }
     }
 }

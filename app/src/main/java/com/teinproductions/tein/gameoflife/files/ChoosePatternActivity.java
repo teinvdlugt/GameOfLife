@@ -13,13 +13,17 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import com.teinproductions.tein.gameoflife.R;
 
@@ -31,6 +35,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class ChoosePatternActivity extends AppCompatActivity implements PatternAdapter.OnClickPatternListener {
@@ -38,6 +43,8 @@ public class ChoosePatternActivity extends AppCompatActivity implements PatternA
 
     private RecyclerView recyclerView;
     private PatternAdapter adapter;
+    private String searchQuery;
+    private List<RLEPattern> allSavedPatterns; // Will be refreshed each time the activity restarts and getSavedPatternsList is called
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -50,6 +57,11 @@ public class ChoosePatternActivity extends AppCompatActivity implements PatternA
         findViewById(R.id.save_fab).setVisibility(
                 getIntent().getSerializableExtra(CELLS_ARRAY_EXTRA) != null ? View.VISIBLE : View.GONE);
 
+        // Get searchQuery from savedInstanceState
+        if (savedInstanceState != null)
+            searchQuery = savedInstanceState.getString(SEARCH_QUERY, null);
+
+        // Init recyclerView and adapter
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new PatternAdapter(this, this, null);
@@ -58,14 +70,35 @@ public class ChoosePatternActivity extends AppCompatActivity implements PatternA
     }
 
     private void loadAdapter() {
+        // Get all patterns
         List<PatternListable> items = new ArrayList<>();
         List<RLEPattern> preloaded = RLEPattern.getList(getResources());
+        if (preloaded == null) preloaded = new ArrayList<>();
         List<RLEPattern> saved = getSavedPatternsList();
+
+        // Execute search if necessary
+        if (searchQuery == null) searchQuery = "";
+        if (!searchQuery.isEmpty()) {
+            // Make copies so the original arrays (RLEPattern.list and ChoosePatternActivity.allSavedPatterns) aren't affected
+            preloaded = new ArrayList<>(preloaded);
+            saved = new ArrayList<>(saved);
+            filterBySearchQuery(preloaded);
+            filterBySearchQuery(saved);
+        }
+
+        // Check if there are any results
+        if ((saved == null || saved.isEmpty()) && preloaded.isEmpty()) {
+            items.add(new NoResultsItem());
+            adapter.setData(items);
+            return;
+        }
+
+        // Create headers and add everything together
         if (saved != null && !saved.isEmpty()) {
             items.add(new Header(getString(R.string.saved_patterns)));
             items.addAll(saved);
         }
-        if (preloaded != null && !preloaded.isEmpty()) {
+        if (!preloaded.isEmpty()) {
             items.add(new Header(getString(R.string.preloaded_patterns)));
             items.addAll(preloaded);
         }
@@ -73,7 +106,9 @@ public class ChoosePatternActivity extends AppCompatActivity implements PatternA
     }
 
     private List<RLEPattern> getSavedPatternsList() {
-        List<RLEPattern> result = new ArrayList<>();
+        if (allSavedPatterns != null) return allSavedPatterns;
+
+        allSavedPatterns = new ArrayList<>();
 
         if (ContextCompat.checkSelfPermission(ChoosePatternActivity.this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
@@ -82,10 +117,16 @@ public class ChoosePatternActivity extends AppCompatActivity implements PatternA
             if (savedFiles != null)
                 for (File file : savedFiles) {
                     if (file.isFile() && (file.getName().endsWith(".rle") || file.getName().endsWith(".RLE")))
-                        result.add(new RLEPattern(file.getName().substring(0, file.getName().length() - 4), file.getName(), false));
+                        allSavedPatterns.add(new RLEPattern(file.getName().substring(0, file.getName().length() - 4), file.getName(), false));
                 }
         }
-        return result;
+        return allSavedPatterns;
+    }
+
+    private void filterBySearchQuery(List<RLEPattern> list) {
+        for (Iterator<RLEPattern> iter = list.iterator(); iter.hasNext(); )
+            if (!iter.next().getName().toLowerCase().contains(searchQuery.toLowerCase()))
+                iter.remove(); // TODO: 4-8-17 Better search mechanism?
     }
 
     private boolean cancelled = false;
@@ -317,5 +358,61 @@ public class ChoosePatternActivity extends AppCompatActivity implements PatternA
             e.printStackTrace();
             Snackbar.make(recyclerView, R.string.something_went_wrong, Snackbar.LENGTH_LONG).show();
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_search, menu);
+
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
+        searchView.setQueryHint(getString(R.string.search));
+
+        // If searchQuery was saved in savedInstanceState and reloaded in onCreate:
+        if (searchQuery != null && !searchQuery.isEmpty()) {
+            searchView.setQuery(searchQuery, false);
+            searchView.setIconified(false);
+        }
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                searchQuery = newText.trim();
+                loadAdapter();
+                return true;
+            }
+        });
+
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (searchQuery != null && !searchQuery.isEmpty()) {
+            // Hide soft keyboard
+            View focus = getCurrentFocus();
+            if (focus != null) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(focus.getWindowToken(), 0);
+            }
+
+            invalidateOptionsMenu();
+            searchQuery = "";
+            loadAdapter();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    private static final String SEARCH_QUERY = "search_query";
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(SEARCH_QUERY, searchQuery);
     }
 }
