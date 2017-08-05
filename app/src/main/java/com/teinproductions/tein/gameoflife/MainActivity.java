@@ -204,11 +204,12 @@ public class MainActivity extends AppCompatActivity {
     private static final int FILES_ACTIVITY_REQUEST_CODE = 1;
 
     public void onClickFiles(View view) {
-        ArrayList<short[]> cells = viewOfLife.getCells().isEmpty() ? null : viewOfLife.getCells();
-        startActivityForResult(new Intent(this, ChoosePatternActivity.class)
-                .putExtra(ChoosePatternActivity.CELLS_ARRAY_EXTRA, cells), FILES_ACTIVITY_REQUEST_CODE);
-        /*Intent intent = new Intent(this, FileReaderActivity.class);
-        startActivityForResult(intent, FILES_ACTIVITY_REQUEST_CODE);*/
+        viewOfLife.stop(); // To stop the mutation of viewOfLife.getCells(). The play icon will be set in onPause.
+        synchronized (viewOfLife.lock) {
+            ArrayList<short[]> cells = viewOfLife.getCells().isEmpty() ? null : viewOfLife.getCells();
+            startActivityForResult(new Intent(this, ChoosePatternActivity.class)
+                    .putExtra(ChoosePatternActivity.CELLS_ARRAY_EXTRA, cells), FILES_ACTIVITY_REQUEST_CODE);
+        }
     }
 
     @Override

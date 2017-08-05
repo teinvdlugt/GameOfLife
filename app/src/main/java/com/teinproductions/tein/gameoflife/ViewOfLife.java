@@ -30,7 +30,7 @@ public class ViewOfLife extends View {
      * 3: num of neighbours
      */
     private ArrayList<short[]> cells = new ArrayList<>();
-    private final Object lock = new Object();
+    final Object lock = new Object();
     private Paint gridPaint, cellPaint;
 
     private List<short[]> gen0 = new ArrayList<>();

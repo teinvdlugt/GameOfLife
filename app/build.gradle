@@ -8,8 +8,8 @@ android {
         applicationId "com.teinproductions.tein.gameoflife"
         minSdkVersion 14
         targetSdkVersion 25
-        versionCode 9
-        versionName "2.2"
+        versionCode 10
+        versionName "2.3"
     }
     buildTypes {
         release {
