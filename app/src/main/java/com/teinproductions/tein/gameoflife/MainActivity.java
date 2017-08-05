@@ -23,6 +23,12 @@ import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity {
+    // Parameters from ViewOfLife to save from orientation change:
+    private static final String CELLS_ARRAY = "cells_array";
+    private static final String START_X = "start_x";
+    private static final String START_Y = "start_Y";
+    private static final String CELL_WIDTH = "cell_width";
+
     private FirebaseAnalytics firebaseAnalytics;
 
     private ViewOfLife viewOfLife;
@@ -49,6 +55,22 @@ public class MainActivity extends AppCompatActivity {
         });
 
         reloadPreferenceValues();
+
+        // Restore from orientation change
+        if (savedInstanceState != null) {
+            ArrayList<short[]> cells = (ArrayList<short[]>) savedInstanceState.getSerializable(CELLS_ARRAY);
+            if (cells == null) return;
+            float startX = savedInstanceState.getFloat(START_X, 0);
+            float startY = savedInstanceState.getFloat(START_Y, 0);
+            float cellWidth = savedInstanceState.getFloat(CELL_WIDTH, -1);
+            Life life = new Life();
+            life.setCells(cells);
+            viewOfLife.load(life);
+            viewOfLife.setStartX(startX);
+            viewOfLife.setStartY(startY);
+            if (cellWidth > 0) viewOfLife.setCellWidth(cellWidth);
+            viewOfLife.invalidate();
+        }
     }
 
     public void onClickPencil(View view) {
@@ -219,6 +241,19 @@ public class MainActivity extends AppCompatActivity {
                 resultCode == RESULT_OK &&
                 data != null && (result = (Life) data.getSerializableExtra(ChoosePatternActivity.LIFE_MODEL_EXTRA)) != null) {
             viewOfLife.load(result);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // onSaveInstanceState may be called before or after onPause.
+        viewOfLife.stop();
+        synchronized (viewOfLife.lock) {
+            outState.putSerializable(CELLS_ARRAY, viewOfLife.getCells());
+            outState.putFloat(START_X, viewOfLife.getStartX());
+            outState.putFloat(START_Y, viewOfLife.getStartY());
+            outState.putFloat(CELL_WIDTH, viewOfLife.getCellWidth());
         }
     }
 

@@ -485,6 +485,30 @@ public class ViewOfLife extends View {
         gridPaint.setColor(color);
     }
 
+    public float getCellWidth() {
+        return cellWidth;
+    }
+
+    public void setCellWidth(float cellWidth) {
+        this.cellWidth = cellWidth;
+    }
+
+    public float getStartX() {
+        return startX;
+    }
+
+    public void setStartX(float startX) {
+        this.startX = startX;
+    }
+
+    public float getStartY() {
+        return startY;
+    }
+
+    public void setStartY(float startY) {
+        this.startY = startY;
+    }
+
     public ArrayList<short[]> getCells() {
         return cells;
     }
