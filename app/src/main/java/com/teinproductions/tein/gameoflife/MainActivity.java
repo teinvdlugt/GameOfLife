@@ -89,7 +89,6 @@ public class MainActivity extends AppCompatActivity {
         viewOfLife.stop();
         viewOfLife.clear();
         playPauseButton.setImageResource(R.drawable.ic_play_arrow_black_36dp);
-        lockScreenOrientation(false);
     }
 
     public void onClickClear(View view) {
@@ -109,22 +108,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClickSettings(View view) {
         startActivity(new Intent(this, SettingsActivity.class));
-    }
-
-    private void lockScreenOrientation(boolean lock) {
-        if (lock) {
-            int orientation = getResources().getConfiguration().orientation;
-            switch (orientation) {
-                case Configuration.ORIENTATION_PORTRAIT:
-                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-                    break;
-                case Configuration.ORIENTATION_LANDSCAPE:
-                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-                    break;
-            }
-        } else {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
-        }
     }
 
     @Override

@@ -78,14 +78,6 @@ public class ViewOfLife extends View {
         }
     }
 
-    private boolean isAlive(short x, short y) {
-        for (short[] cell : cells)
-            if (cell[0] == x && cell[1] == y) {
-                return cell[2] == 1;
-            }
-        return false;
-    }
-
     private float prevXDrag1 = -1, prevYDrag1 = -1;
     private float prevXDrag2 = -1, prevYDrag2 = -1;
     private int zoomPointerId1 = -1, zoomPointerId2 = -1;
