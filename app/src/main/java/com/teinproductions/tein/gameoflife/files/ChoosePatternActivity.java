@@ -25,6 +25,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.teinproductions.tein.gameoflife.R;
 
 import java.io.BufferedReader;
@@ -41,6 +42,7 @@ import java.util.List;
 public class ChoosePatternActivity extends AppCompatActivity implements PatternAdapter.OnClickPatternListener {
     public static final String LIFE_MODEL_EXTRA = "life";
 
+    private FirebaseAnalytics firebaseAnalytics;
     private RecyclerView recyclerView;
     private PatternAdapter adapter;
     private String searchQuery;
@@ -52,6 +54,7 @@ public class ChoosePatternActivity extends AppCompatActivity implements PatternA
         setContentView(R.layout.activity_choose_pattern);
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         // Remove the 'save'-FAB when there is nothing to save
         findViewById(R.id.save_fab).setVisibility(
@@ -144,6 +147,12 @@ public class ChoosePatternActivity extends AppCompatActivity implements PatternA
         dialog.setIndeterminate(true);
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.show();
+
+        // Log Firebase Analytics event
+        Bundle event = new Bundle();
+        event.putString("pattern_name", pattern.getName());
+        event.putString("pattern_type", pattern.isPreloaded() ? "preloaded" : "saved");
+        firebaseAnalytics.logEvent("open_pattern", event);
 
         new AsyncTask<RLEPattern, Void, Life>() {
             @Override
@@ -291,6 +300,11 @@ public class ChoosePatternActivity extends AppCompatActivity implements PatternA
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.show();
 
+        // Log Firebase Analytics event
+        Bundle event = new Bundle();
+        event.putString("pattern_name", info.getName());
+        firebaseAnalytics.logEvent("save_pattern", event);
+
         new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... params) {
@@ -376,6 +390,11 @@ public class ChoosePatternActivity extends AppCompatActivity implements PatternA
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                // Log FirebaseAnalytics event
+                Bundle params = new Bundle();
+                params.putString(FirebaseAnalytics.Param.SEARCH_TERM, query);
+                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SEARCH, params);
+
                 return false;
             }
 

@@ -3,8 +3,6 @@ package com.teinproductions.tein.gameoflife;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -41,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        firebaseAnalytics.setUserProperty("debug_status", BuildConfig.DEBUG ? "debugger" : "user");
 
         viewOfLife = (ViewOfLife) findViewById(R.id.view_of_life);
         playPauseButton = (ImageButton) findViewById(R.id.playPause_button);
@@ -50,6 +49,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onLongClick(View v) {
                 clear();
+
+                // Log Firebase Analytics event
+                Bundle params = new Bundle();
+                params.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "Click Clear");
+                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, params);
                 return true;
             }
         });
@@ -75,10 +79,20 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClickPencil(View view) {
         viewOfLife.setTouchMode(ViewOfLife.TOUCH_MODE_ADD);
+
+        // Log Firebase Analytics event
+        Bundle params = new Bundle();
+        params.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "Click Pencil");
+        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, params);
     }
 
     public void onClickErase(View view) {
         viewOfLife.setTouchMode(ViewOfLife.TOUCH_MODE_REMOVE);
+
+        // Log Firebase Analytics event
+        Bundle params = new Bundle();
+        params.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "Click Eraser");
+        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, params);
     }
 
     public void onClickMove(View view) {
@@ -92,7 +106,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickClear(View view) {
-        /*Snackbar.make(coordinatorLayout, getString(R.string.short_click_clear_message), Snackbar.LENGTH_SHORT).show();*/
         Toast.makeText(this, R.string.short_click_clear_message, Toast.LENGTH_SHORT).show();
     }
 
@@ -101,12 +114,22 @@ public class MainActivity extends AppCompatActivity {
             viewOfLife.stop();
             playPauseButton.setImageResource(R.drawable.ic_play_arrow_black_36dp);
         } else {
+            // Log Firebase Analytics event
+            Bundle params = new Bundle();
+            params.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "Click Play");
+            firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, params);
+
             viewOfLife.start();
             playPauseButton.setImageResource(R.drawable.ic_pause_black_36dp);
         }
     }
 
     public void onClickSettings(View view) {
+        // Log Firebase Analytics event
+        Bundle params = new Bundle();
+        params.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "Click Settings");
+        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, params);
+
         startActivity(new Intent(this, SettingsActivity.class));
     }
 
@@ -193,6 +216,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickNextGen(View view) {
+        // Log Firebase Analytics event
+        Bundle params = new Bundle();
+        params.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "Click Next Generation");
+        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, params);
+
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -204,12 +232,23 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClickInitialState(View view) {
         viewOfLife.restoreGen0();
+
+        // Log Firebase Analytics event
+        Bundle params = new Bundle();
+        params.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "Click Restore Generation 0");
+        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, params);
     }
 
     private static final int FILES_ACTIVITY_REQUEST_CODE = 1;
 
     public void onClickFiles(View view) {
         viewOfLife.stop(); // To stop the mutation of viewOfLife.getCells(). The play icon will be set in onPause.
+
+        // Log Firebase Analytics event
+        Bundle params = new Bundle();
+        params.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "Click Open Pattern");
+        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, params);
+
         synchronized (viewOfLife.lock) {
             ArrayList<short[]> cells = viewOfLife.getCells().isEmpty() ? null : viewOfLife.getCells();
             startActivityForResult(new Intent(this, ChoosePatternActivity.class)
